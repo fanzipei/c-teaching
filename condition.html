@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="C语言条件语句交互演示：if-else、switch、三目运算符、短路求值，配合动态程序流程图展示分支执行过程。">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<title>条件语句 - C语言教学演示</title>
+<link rel="stylesheet" href="style.css?v=16">
+</head>
+<body>
+<nav></nav>
+<div class="container">
+<h1>条件语句</h1>
+<div class="intro">
+<p><strong>条件语句</strong>让程序能够根据条件选择不同的执行路径。核心知识点：</p>
+<ul>
+<li><code>if</code> 单独判断；<code>if-else</code> 二选一；<code>if-else if-else</code> 多分支</li>
+<li>条件表达式结果为<strong>0即假，非0即真</strong></li>
+<li><code>==</code> 是相等判断，<code>=</code> 是赋值，初学者极易混淆</li>
+<li><code>switch</code> 适合多值等值判断，配合 <code>break</code> 使用</li>
+<li><strong>短路求值</strong>：<code>&&</code> 左假则右不算；<code>||</code> 左真则右不算</li>
+<li>三目运算符 <code>? :</code> 是 if-else 的简洁写法</li>
+</ul>
+<p class="flow-legend">右侧<strong>程序流程图</strong>会同步高亮当前执行位置：
+<span class="legend-item"><i class="legend-dot legend-current"></i>当前节点</span>
+<span class="legend-item"><i class="legend-dot legend-visited"></i>走过的路径</span>
+<span class="legend-item"><i class="legend-line legend-true"></i>条件为真</span>
+<span class="legend-item"><i class="legend-line legend-exit"></i>条件为假</span>
+<span class="legend-item"><i class="legend-line legend-back"></i>汇合到后续代码</span>
+</p>
+</div>
+<div class="demo-grid">
+  <div id="demo0"></div>
+  <div id="demo1"></div>
+  <div id="demo2"></div>
+  <div id="demo3"></div>
+  <div id="demo4"></div>
+  <div id="demo5"></div>
+</div>
+<h2>章节练习</h2>
+<div class="quiz-grid">
+  <div id="quiz0"></div>
+  <div id="quiz1"></div>
+  <div id="quiz2"></div>
+  <div id="quiz3"></div>
+  <div id="quiz4"></div>
+  <div id="quiz5"></div>
+</div>
+</div>
+
+<script src="demo-engine.js?v=16"></script>
+<script>
+/* ========== demo0: if 语句基础 ========== */
+createDemo("demo0", {
+  title: "if 语句基础",
+  subtitle: "判断成绩是否及格",
+  code: `#include <stdio.h>
+
+int main() {
+    int score = 75;
+    if (score >= 60) {
+        printf("及格\\n");
+    }
+    printf("结束\\n");
+    return 0;
+}`,
+  vizTypes: ["flowchart","vars","console"],
+  flowchart: {
+    nodes: [
+      { id: "start",   type: "start",    label: "开始",           x: 160, y: 8,   w: 90,  h: 34 },
+      { id: "init",    type: "process",  label: "score = 75",     x: 135, y: 56,  w: 140, h: 36 },
+      { id: "cond",    type: "decision", label: "score >= 60 ?",  x: 130, y: 110, w: 150, h: 64 },
+      { id: "pass",    type: "process",  label: "printf 及格",    x: 8,   y: 220, w: 140, h: 38 },
+      { id: "println", type: "process",  label: "printf 结束",    x: 272, y: 220, w: 140, h: 38 },
+      { id: "end",     type: "end",      label: "结束",           x: 297, y: 296, w: 90,  h: 34 }
+    ],
+    edges: [
+      { from: "start", to: "init" },
+      { from: "init", to: "cond" },
+      { from: "cond", to: "pass", fromSide: "left", toSide: "top", label: "真", kind: "true" },
+      { from: "cond", to: "println", fromSide: "right", toSide: "top", label: "假·跳过 if 块", kind: "false" },
+      { from: "pass", to: "println", fromSide: "right", toSide: "left" },
+      { from: "println", to: "end" }
+    ]
+  },
+  steps: [
+    { line: 3, info: "main() 开始", flow: { node: "start" } },
+    { line: 4, vars: {score:{value:75,type:"int"}}, info: "score = 75", flow: { node: "init", edge: { from: "start", to: "init" } } },
+    { line: 5, info: "判断 score >= 60：75 >= 60 为真，进入 if 分支", flow: { node: "cond", edge: { from: "init", to: "cond" }, kind: "match" } },
+    { line: 6, output: "及格", info: "执行 printf，输出 及格", flow: { node: "pass", edge: { from: "cond", to: "pass" } } },
+    { line: 8, info: "if 语句结束，汇合到后续代码", flow: { node: "println", edge: { from: "pass", to: "println" } } },
+    { line: 8, output: "结束", info: "输出 结束（注意：条件为假时会沿右侧路径直接到这里）", flow: { node: "println" } },
+    { line: 9, info: "程序结束", flow: { node: "end", edge: { from: "println", to: "end" } } }
+  ]
+});
+/* ========== demo1: if-else if-else 多分支 ========== */
+createDemo("demo1", {
+  title: "if-else 多分支",
+  subtitle: "判断一个整数的正负或零（注意分支的级联判断顺序）",
+  code: `#include <stdio.h>
+
+int main() {
+    int n = -5;
+    if (n > 0) {
+        printf("正数\\n");
+    } else if (n < 0) {
+        printf("负数\\n");
+    } else {
+        printf("零\\n");
+    }
+    return 0;
+}`,
+  vizTypes: ["flowchart","vars","console"],
+  flowchart: {
+    nodes: [
+      { id: "start", type: "start",    label: "开始",        x: 185, y: 8,   w: 90,  h: 34 },
+      { id: "init",  type: "process",  label: "n = -5",      x: 160, y: 54,  w: 140, h: 36 },
+      { id: "c1",    type: "decision", label: "n > 0 ?",     x: 155, y: 108, w: 150, h: 60 },
+      { id: "pos",   type: "process",  label: "printf 正数", x: 360, y: 120, w: 130, h: 36 },
+      { id: "c2",    type: "decision", label: "n < 0 ?",     x: 155, y: 198, w: 150, h: 60 },
+      { id: "neg",   type: "process",  label: "printf 负数", x: 360, y: 210, w: 130, h: 36 },
+      { id: "zero",  type: "process",  label: "printf 零",   x: 155, y: 288, w: 150, h: 38 },
+      { id: "end",   type: "end",      label: "结束",        x: 185, y: 356, w: 90,  h: 34 }
+    ],
+    edges: [
+      { from: "start", to: "init" },
+      { from: "init", to: "c1" },
+      { from: "c1", to: "pos", fromSide: "right", toSide: "left", label: "真", kind: "true" },
+      { from: "c1", to: "c2", label: "假", kind: "false" },
+      { from: "c2", to: "neg", fromSide: "right", toSide: "left", label: "真", kind: "true" },
+      { from: "c2", to: "zero", label: "假", kind: "false" },
+      { from: "zero", to: "end" },
+      { from: "pos", to: "end", fromSide: "right", toSide: "right", curve: { cx: 540, cy: 250 }, label: "跳过其余分支", kind: "back" },
+      { from: "neg", to: "end", fromSide: "right", toSide: "right", curve: { cx: 545, cy: 300 }, kind: "back" }
+    ]
+  },
+  steps: [
+    { line: 3, info: "main() 开始", flow: { node: "start" } },
+    { line: 4, vars: {n:{value:-5,type:"int"}}, info: "n = -5", flow: { node: "init", edge: { from: "start", to: "init" } } },
+    { line: 5, info: "n > 0 ? 否（沿假路径向下级联）。再判断 n < 0 ? 是，进入 else if 分支", flow: { node: "c2", edges: [{ from: "init", to: "c1" }, { from: "c1", to: "c2" }], kind: "match" } },
+    { line: 7, output: "负数", info: "输出 负数", flow: { node: "neg", edge: { from: "c2", to: "neg" } } },
+    { line: 11, info: "if-else 结构结束：执行完一个分支后，沿虚线汇合到末尾，其余分支全部被跳过", flow: { node: "end", edge: { from: "neg", to: "end" } } },
+    { line: 11, info: "程序结束", flow: { node: "end" } }
+  ]
+});
+/* ========== demo2: 复合条件（闰年） ========== */
+createDemo("demo2", {
+  title: "逻辑运算符组合条件",
+  subtitle: "判断闰年：能被4整除且不能被100整除，或能被400整除",
+  code: `#include <stdio.h>
+
+int main() {
+    int year = 2024;
+    if ((year % 4 == 0 && year % 100 != 0) || year % 400 == 0) {
+        printf("闰年\\n");
+    } else {
+        printf("平年\\n");
+    }
+    return 0;
+}`,
+  vizTypes: ["flowchart","vars","console"],
+  flowchart: {
+    nodes: [
+      { id: "start",  type: "start",    label: "开始",        x: 185, y: 8,   w: 90,  h: 34 },
+      { id: "init",   type: "process",  label: "year = 2024", x: 160, y: 54,  w: 140, h: 36 },
+      { id: "cond",   type: "decision", label: "闰年条件 ?",  x: 155, y: 110, w: 150, h: 64 },
+      { id: "leap",   type: "process",  label: "printf 闰年", x: 10,  y: 230, w: 140, h: 38 },
+      { id: "common", type: "process",  label: "printf 平年", x: 320, y: 230, w: 140, h: 38 },
+      { id: "end",    type: "end",      label: "结束",        x: 185, y: 320, w: 90,  h: 34 }
+    ],
+    edges: [
+      { from: "start", to: "init" },
+      { from: "init", to: "cond" },
+      { from: "cond", to: "leap", fromSide: "left", toSide: "top", label: "真", kind: "true" },
+      { from: "cond", to: "common", fromSide: "right", toSide: "top", label: "假", kind: "false" },
+      { from: "leap", to: "end", toSide: "left" },
+      { from: "common", to: "end", toSide: "right" }
+    ]
+  },
+  steps: [
+    { line: 3, info: "main() 开始", flow: { node: "start" } },
+    { line: 4, vars: {year:{value:2024,type:"int"}}, info: "year = 2024", flow: { node: "init", edge: { from: "start", to: "init" } } },
+    { line: 5, info: "2024%4=0 且 2024%100=24≠0，&& 左侧为真，整个条件为真，是闰年", flow: { node: "cond", edge: { from: "init", to: "cond" }, kind: "match" } },
+    { line: 6, output: "闰年", info: "输出 闰年", flow: { node: "leap", edge: { from: "cond", to: "leap" } } },
+    { line: 8, info: "else 分支被跳过，两个分支在末尾汇合", flow: { node: "end", edge: { from: "leap", to: "end" } } },
+    { line: 10, info: "程序结束", flow: { node: "end" } }
+  ]
+});
+/* ========== demo3: switch 多分支 ========== */
+createDemo("demo3", {
+  title: "switch 多分支",
+  subtitle: "根据数字输出星期几（观察如何逐个匹配、命中后由 break 跳出）",
+  code: `#include <stdio.h>
+
+int main() {
+    int day = 3;
+    switch (day) {
+        case 1: printf("周一\\n"); break;
+        case 2: printf("周二\\n"); break;
+        case 3: printf("周三\\n"); break;
+        case 4: printf("周四\\n"); break;
+        default: printf("其他\\n"); break;
+    }
+    return 0;
+}`,
+  vizTypes: ["flowchart","vars","console"],
+  flowchart: {
+    nodes: [
+      { id: "start", type: "start",    label: "开始",           x: 220, y: 8,   w: 90,  h: 34 },
+      { id: "init",  type: "process",  label: "day = 3",        x: 195, y: 56,  w: 140, h: 36 },
+      { id: "sw",    type: "decision", label: "switch(day)",    x: 190, y: 110, w: 150, h: 62 },
+      { id: "c1",    type: "process",  label: "case 1 → 周一",  x: 400, y: 56,  w: 150, h: 34 },
+      { id: "c2",    type: "process",  label: "case 2 → 周二",  x: 400, y: 104, w: 150, h: 34 },
+      { id: "c3",    type: "process",  label: "case 3 → 周三",  x: 400, y: 152, w: 150, h: 34 },
+      { id: "c4",    type: "process",  label: "case 4 → 周四",  x: 400, y: 200, w: 150, h: 34 },
+      { id: "def",   type: "process",  label: "default → 其他", x: 400, y: 248, w: 150, h: 34 },
+      { id: "end",   type: "end",      label: "结束",           x: 240, y: 330, w: 90,  h: 34 }
+    ],
+    edges: [
+      { from: "start", to: "init" },
+      { from: "init", to: "sw" },
+      { from: "sw", to: "c1", fromSide: "right", toSide: "left", label: "day=1" },
+      { from: "sw", to: "c2", fromSide: "right", toSide: "left", label: "day=2" },
+      { from: "sw", to: "c3", fromSide: "right", toSide: "left", label: "day=3" },
+      { from: "sw", to: "c4", fromSide: "right", toSide: "left", label: "day=4" },
+      { from: "sw", to: "def", fromSide: "right", toSide: "left", label: "其他" },
+      { from: "c1", to: "end", fromSide: "bottom", toSide: "right", curve: { cx: 560, cy: 210 } },
+      { from: "c2", to: "end", fromSide: "bottom", toSide: "right", curve: { cx: 555, cy: 240 } },
+      { from: "c3", to: "end", fromSide: "bottom", toSide: "right", curve: { cx: 550, cy: 265 }, label: "break 跳出" },
+      { from: "c4", to: "end", fromSide: "bottom", toSide: "right", curve: { cx: 545, cy: 290 } },
+      { from: "def", to: "end", fromSide: "bottom", toSide: "right", curve: { cx: 530, cy: 320 } }
+    ]
+  },
+  steps: [
+    { line: 3, info: "main() 开始", flow: { node: "start" } },
+    { line: 4, vars: {day:{value:3,type:"int"}}, info: "day = 3", flow: { node: "init", edge: { from: "start", to: "init" } } },
+    { line: 5, info: "进入 switch，用 day 的值逐个与 case 比较", flow: { node: "sw", edge: { from: "init", to: "sw" } } },
+    { line: 6, info: "case 1：3 ≠ 1，不匹配", flow: { node: "c1", edge: { from: "sw", to: "c1" } } },
+    { line: 7, info: "case 2：3 ≠ 2，不匹配", flow: { node: "c2", edge: { from: "sw", to: "c2" } } },
+    { line: 8, info: "case 3：3 == 3，匹配！执行该分支", flow: { node: "c3", edge: { from: "sw", to: "c3" }, kind: "match" } },
+    { line: 8, output: "周三", info: "输出 周三", flow: { node: "c3" } },
+    { line: 8, info: "遇到 break：沿曲线跳出 switch（没有 break 会继续落入 case 4！）", flow: { node: "c3", edge: { from: "c3", to: "end" }, kind: "break" } },
+    { line: 12, info: "switch 结束，继续执行后续代码", flow: { node: "end" } },
+    { line: 12, info: "程序结束", flow: { node: "end" } }
+  ]
+});
+/* ========== demo4: 三目运算符 ========== */
+createDemo("demo4", {
+  title: "三目运算符 ? :",
+  subtitle: "if-else 的简洁写法，每个 ? : 都是一次二选一",
+  code: `#include <stdio.h>
+
+int main() {
+    int a = 5, b = 8;
+    int max = (a > b) ? a : b;
+    int sign = (a > 0) ? 1 : -1;
+    printf("max=%d, sign=%d\\n", max, sign);
+    return 0;
+}`,
+  vizTypes: ["flowchart","vars","console"],
+  flowchart: {
+    nodes: [
+      { id: "start", type: "start",    label: "开始",        x: 185, y: 8,   w: 90,  h: 34 },
+      { id: "init",  type: "process",  label: "a = 5, b = 8",x: 160, y: 52,  w: 140, h: 36 },
+      { id: "c1",    type: "decision", label: "a > b ?",     x: 155, y: 104, w: 150, h: 58 },
+      { id: "maxa",  type: "process",  label: "max = a",     x: 10,  y: 196, w: 130, h: 36 },
+      { id: "maxb",  type: "process",  label: "max = b",     x: 330, y: 196, w: 130, h: 36 },
+      { id: "c2",    type: "decision", label: "a > 0 ?",     x: 155, y: 262, w: 150, h: 58 },
+      { id: "sg1",   type: "process",  label: "sign = 1",    x: 10,  y: 354, w: 130, h: 36 },
+      { id: "sg2",   type: "process",  label: "sign = -1",   x: 330, y: 354, w: 130, h: 36 },
+      { id: "print", type: "process",  label: "printf 结果", x: 160, y: 420, w: 140, h: 38 },
+      { id: "end",   type: "end",      label: "结束",        x: 185, y: 486, w: 90,  h: 34 }
+    ],
+    edges: [
+      { from: "start", to: "init" },
+      { from: "init", to: "c1" },
+      { from: "c1", to: "maxa", fromSide: "left", toSide: "top", label: "真", kind: "true" },
+      { from: "c1", to: "maxb", fromSide: "right", toSide: "top", label: "假", kind: "false" },
+      { from: "maxa", to: "c2", toSide: "left" },
+      { from: "maxb", to: "c2", toSide: "right" },
+      { from: "c2", to: "sg1", fromSide: "left", toSide: "top", label: "真", kind: "true" },
+      { from: "c2", to: "sg2", fromSide: "right", toSide: "top", label: "假", kind: "false" },
+      { from: "sg1", to: "print", toSide: "left" },
+      { from: "sg2", to: "print", toSide: "right" },
+      { from: "print", to: "end" }
+    ]
+  },
+  steps: [
+    { line: 3, info: "main() 开始", flow: { node: "start" } },
+    { line: 4, vars: {a:{value:5,type:"int"},b:{value:8,type:"int"}}, info: "a = 5, b = 8", flow: { node: "init", edge: { from: "start", to: "init" } } },
+    { line: 5, vars: {max:{value:8,type:"int"}}, info: "a > b ? 否，取 : 后面的值 b=8，max = 8", flow: { node: "maxb", edges: [{ from: "init", to: "c1" }, { from: "c1", to: "maxb" }] } },
+    { line: 6, vars: {sign:{value:1,type:"int"}}, info: "a > 0 ? 是，取 ? 后面的值 1，sign = 1", flow: { node: "sg1", edges: [{ from: "maxb", to: "c2" }, { from: "c2", to: "sg1" }], kind: "match" } },
+    { line: 7, output: "max=8, sign=1", info: "输出结果", flow: { node: "print", edge: { from: "sg1", to: "print" } } },
+    { line: 8, info: "程序结束", flow: { node: "end", edge: { from: "print", to: "end" } } }
+  ]
+});
+/* ========== demo5: 短路求值 ========== */
+createDemo("demo5", {
+  title: "短路求值",
+  subtitle: "&& 和 || 的惰性求值：右侧条件可能根本不会计算",
+  code: `#include <stdio.h>
+
+int main() {
+    int a = 0, b = 5;
+    if (a != 0 && b / a > 2) {
+        printf("条件1成立\\n");
+    }
+    if (a == 0 || b == 5) {
+        printf("条件2成立\\n");
+    }
+    return 0;
+}`,
+  vizTypes: ["flowchart","vars","console"],
+  flowchart: {
+    nodes: [
+      { id: "start", type: "start",    label: "开始",         x: 185, y: 8,   w: 90,  h: 34 },
+      { id: "init",  type: "process",  label: "a = 0, b = 5", x: 160, y: 50,  w: 140, h: 36 },
+      { id: "c1",    type: "decision", label: "a != 0 ?",     x: 155, y: 102, w: 150, h: 58 },
+      { id: "c1r",   type: "decision", label: "b/a > 2 ?",    x: 360, y: 110, w: 150, h: 52 },
+      { id: "p1",    type: "process",  label: "printf 条件1", x: 360, y: 192, w: 150, h: 36 },
+      { id: "c2",    type: "decision", label: "a == 0 ?",     x: 155, y: 192, w: 150, h: 58 },
+      { id: "c2r",   type: "decision", label: "b == 5 ?",     x: 360, y: 262, w: 150, h: 52 },
+      { id: "p2",    type: "process",  label: "printf 条件2", x: 10,  y: 290, w: 130, h: 36 },
+      { id: "end",   type: "end",      label: "结束",         x: 185, y: 320, w: 90,  h: 34 }
+    ],
+    edges: [
+      { from: "start", to: "init" },
+      { from: "init", to: "c1" },
+      { from: "c1", to: "c1r", fromSide: "right", toSide: "left", label: "真", kind: "true" },
+      { from: "c1", to: "c2", label: "假·短路跳过", kind: "false" },
+      { from: "c1r", to: "p1", label: "真", kind: "true" },
+      { from: "c1r", to: "c2", fromSide: "left", toSide: "right", label: "假", kind: "false" },
+      { from: "p1", to: "c2", fromSide: "left", toSide: "right" },
+      { from: "c2", to: "p2", fromSide: "left", toSide: "top", label: "真·短路跳过", kind: "true" },
+      { from: "c2", to: "c2r", fromSide: "right", toSide: "left", label: "假", kind: "false" },
+      { from: "c2r", to: "p2", fromSide: "bottom", toSide: "right", label: "真", kind: "true" },
+      { from: "c2r", to: "end", fromSide: "right", toSide: "right", label: "假", kind: "false" },
+      { from: "p2", to: "end", toSide: "left" }
+    ]
+  },
+  steps: [
+    { line: 3, info: "main() 开始", flow: { node: "start" } },
+    { line: 4, vars: {a:{value:0,type:"int"},b:{value:5,type:"int"}}, info: "a = 0, b = 5", flow: { node: "init", edge: { from: "start", to: "init" } } },
+    { line: 5, info: "a != 0 为假，&& 右侧 b/a 直接被跳过（避免了除零错误！）", flow: { node: "c1", edge: { from: "init", to: "c1" }, kind: "skip" } },
+    { line: 6, info: "整个条件为假，跳过 if 块，沿路径来到第二个 if", flow: { node: "c2", edge: { from: "c1", to: "c2" } } },
+    { line: 8, info: "a == 0 为真，|| 右侧 b==5 不再计算，条件直接为真", flow: { node: "c2", edge: { from: "c2", to: "p2" }, kind: "skip" } },
+    { line: 9, output: "条件2成立", info: "进入 if 块，输出", flow: { node: "p2" } },
+    { line: 11, info: "程序结束", flow: { node: "end", edge: { from: "p2", to: "end" } } }
+  ]
+});
+/* ========== 章节练习：3 道预测输出 + 3 道改错 ========== */
+createQuiz("quiz0", {
+  type: "predict",
+  title: "嵌套 if-else：先判及格再判优秀",
+  code: `#include <stdio.h>
+
+int main() {
+    int score = 75;
+    if (score >= 60) {
+        if (score >= 90) {
+            printf("优秀\\n");
+        } else {
+            printf("及格\\n");
+        }
+    } else {
+        printf("不及格\\n");
+    }
+    return 0;
+}`,
+  answer: "及格",
+  explain: "外层 75 >= 60 为真，进入嵌套的内层判断；内层 75 >= 90 为假，走 else 输出 <code>及格</code>。嵌套 if-else 中每个 else 都归属于离它最近的 if。"
+});
+createQuiz("quiz1", {
+  type: "predict",
+  title: "switch 缺少 break 的穿透",
+  code: `#include <stdio.h>
+
+int main() {
+    int n = 2;
+    switch (n) {
+        case 1: printf("one\\n"); break;
+        case 2: printf("two\\n");
+        case 3: printf("three\\n");
+        default: printf("other\\n");
+    }
+    return 0;
+}`,
+  answer: "two\nthree\nother",
+  explain: "case 2 匹配成功，但该分支<strong>没有 break</strong>，于是穿透（fall-through）继续执行 case 3 和 default，一路输出到 switch 结束。case 1 在入口之前，不会执行。"
+});
+createQuiz("quiz2", {
+  type: "predict",
+  title: "短路求值与赋值副作用",
+  code: `#include <stdio.h>
+
+int main() {
+    int a = 0, b = 5;
+    if (a != 0 && (b = 99) > 2) {
+        printf("X\\n");
+    }
+    printf("b = %d\\n", b);
+    if (b == 5 || (a = 1) > 0) {
+        printf("Y\\n");
+    }
+    printf("a = %d\\n", a);
+    return 0;
+}`,
+  answer: "b = 5\nY\na = 0",
+  explain: "第一个 if：a != 0 为假，&& 左侧为假即短路，右侧 (b = 99) 不会执行，b 仍是 5。第二个 if：b == 5 为真，|| 左侧为真即短路，(a = 1) 也不会执行，a 仍是 0。所以两次赋值副作用都没有发生。"
+});
+createQuiz("quiz3", {
+  type: "fix",
+  title: "if 条件里把 == 写成了 =",
+  code: `#include <stdio.h>
+
+int main() {
+    int score = 75;
+    if (score = 60) {
+        printf("刚好及格\\n");
+    } else {
+        printf("其他分数\\n");
+    }
+    return 0;
+}`,
+  accept: [`#include <stdio.h>
+
+int main() {
+    int score = 75;
+    if (score == 60) {
+        printf("刚好及格\\n");
+    } else {
+        printf("其他分数\\n");
+    }
+    return 0;
+}`, `#include <stdio.h>
+
+int main() {
+    int score = 75;
+    if (60 == score) {
+        printf("刚好及格\\n");
+    } else {
+        printf("其他分数\\n");
+    }
+    return 0;
+}`],
+  explain: "<code>score = 60</code> 是<strong>赋值</strong>而不是比较：它把 score 改成 60，表达式值为 60（非 0 即真），所以永远进入 if 分支。判断相等要用 <code>==</code>；把常量写在左边（<code>60 == score</code>）还能让编译器在误写 <code>=</code> 时直接报错。"
+});
+createQuiz("quiz4", {
+  type: "fix",
+  title: "switch 分支漏写 break",
+  code: `#include <stdio.h>
+
+int main() {
+    int level = 1;
+    switch (level) {
+        case 0:
+            printf("初级\\n");
+            break;
+        case 1:
+            printf("中级\\n");
+        case 2:
+            printf("高级\\n");
+            break;
+        default:
+            printf("未知\\n");
+    }
+    return 0;
+}`,
+  accept: [`#include <stdio.h>
+
+int main() {
+    int level = 1;
+    switch (level) {
+        case 0:
+            printf("初级\\n");
+            break;
+        case 1:
+            printf("中级\\n");
+            break;
+        case 2:
+            printf("高级\\n");
+            break;
+        default:
+            printf("未知\\n");
+    }
+    return 0;
+}`],
+  explain: "case 1 分支末尾漏了 <code>break</code>，匹配后会穿透到 case 2，实际输出 中级、高级 两行。最小修改：在输出 中级 之后补上 <code>break;</code>，改对后只输出 中级。"
+});
+createQuiz("quiz5", {
+  type: "fix",
+  title: "三目运算符把 : 写成了 ;",
+  code: `#include <stdio.h>
+
+int main() {
+    int a = 3, b = 7;
+    int max = (a > b) ? a ; b;
+    printf("max = %d\\n", max);
+    return 0;
+}`,
+  accept: [`#include <stdio.h>
+
+int main() {
+    int a = 3, b = 7;
+    int max = (a > b) ? a : b;
+    printf("max = %d\\n", max);
+    return 0;
+}`],
+  explain: "三目运算符是 <code>? :</code> 两个符号配对使用，这里把 <code>:</code> 误写成了 <code>;</code>，导致编译错误。最小修改：把分号改成冒号，改对后 max 取 a、b 中较大的 7。"
+});
+</script>
+</body>
+</html>

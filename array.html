@@ -1,0 +1,817 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="C语言数组交互演示：一维数组定义、遍历、排序、栈与队列，二维矩阵、转置、行列求和、数组作为函数参数，可视化每个元素的变化。">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<title>数组 - C语言教学演示</title>
+<link rel="stylesheet" href="style.css?v=16">
+</head>
+<body>
+<nav></nav>
+<div class="container">
+<h1>数组</h1>
+<div class="intro">
+<p><strong>一维数组</strong>是相同类型数据的连续存储集合。核心知识点：</p>
+<ul>
+<li>定义：<code>int arr[5];</code> 分配 5 个连续的 int 空间，下标从 0 开始</li>
+<li>初始化：<code>int arr[5] = {1,2,3,4,5};</code> 部分初始化时其余自动为 0</li>
+<li>数组名是<strong>首元素地址</strong>（常量指针）：<code>arr[i]</code> 等价于 <code>*(arr+i)</code></li>
+<li>越界访问是未定义行为：访问 <code>arr[-1]</code> 或 <code>arr[5]</code> 可能崩溃</li>
+<li>数组长度必须用常量或宏定义，不能用变量（C99 前）</li>
+<li>数组作为函数参数<strong>退化为指针</strong>，函数内无法通过 sizeof 获得长度</li>
+</ul>
+<p style="margin-top:1rem"><strong>二维数组</strong>本质是「数组的数组」，常用于表示矩阵、表格。核心知识点：</p>
+<ul>
+<li>定义：<code>int a[3][4];</code> 表示 3 行 4 列的矩阵，在内存中按<strong>行优先</strong>连续存储</li>
+<li>初始化：<code>int a[2][3] = {{1,2,3}, {4,5,6}};</code> 内层大括号代表每一行</li>
+<li>访问元素：<code>a[i][j]</code>，下标从 0 开始</li>
+<li>遍历需要<strong>嵌套循环</strong>：外层控制行，内层控制列</li>
+<li>二维数组名 <code>a</code> 是指向首行（一维数组）的指针，<code>a[i]</code> 指向第 i 行首元素</li>
+<li>函数参数可写成 <code>int a[][4]</code> 或 <code>int (*a)[4]</code>，必须指定列数</li>
+</ul>
+</div>
+<h2>一维数组</h2>
+<div class="demo-grid">
+  <div id="demo0"></div>
+  <div id="demo1"></div>
+  <div id="demo2"></div>
+  <div id="demo3"></div>
+  <div id="demo4"></div>
+  <div id="demo5"></div>
+  <div id="demo6"></div>
+  <div id="demo7"></div>
+</div>
+<h2>二维数组</h2>
+<div class="demo-grid">
+  <div id="demo8"></div>
+  <div id="demo9"></div>
+  <div id="demo10"></div>
+  <div id="demo11"></div>
+  <div id="demo12"></div>
+  <div id="demo13"></div>
+  <div id="demo14"></div>
+</div>
+<h2>章节练习</h2>
+<div class="quiz-grid">
+  <div id="quiz0"></div>
+  <div id="quiz1"></div>
+  <div id="quiz2"></div>
+  <div id="quiz3"></div>
+  <div id="quiz4"></div>
+  <div id="quiz5"></div>
+</div>
+</div>
+
+<script src="demo-engine.js?v=16"></script>
+<script>
+createDemo("demo0", {
+  title: "数组的定义与初始化",
+  subtitle: "多种初始化方式对比",
+  code: `#include <stdio.h>
+
+int main() {
+    int a[5] = {10, 20, 30, 40, 50};
+    int b[5] = {1, 2};
+    int c[] = {5, 6, 7};
+    printf("a[0]=%d, b[4]=%d, c[2]=%d\\n", a[0], b[4], c[2]);
+    return 0;
+}`,
+  vizTypes: ["vars","array","console"],
+  steps: [
+    { line: 3, info: "main() 开始" },
+    { line: 4, vars: {a:{value:"int[5]",type:"array"}}, array: {name:"a", cells:[{val:10},{val:20},{val:30},{val:40},{val:50}]}, info: "完全初始化：a = {10,20,30,40,50}" },
+    { line: 5, vars: {b:{value:"int[5]",type:"array"}}, array: {name:"b", cells:[{val:1},{val:2},{val:0},{val:0},{val:0}]}, info: "部分初始化：b = {1,2}，其余自动补 0" },
+    { line: 6, vars: {c:{value:"int[3]",type:"array"}}, array: {name:"c", cells:[{val:5},{val:6},{val:7}]}, info: "省略长度，编译器自动推算 c 长度为 3" },
+    { line: 7, output: "a[0]=10, b[4]=0, c[2]=7", info: "输出：b[4] 被自动初始化为 0" },
+    { line: 8, info: "程序结束" }
+  ]
+});
+createDemo("demo1", {
+  title: "数组遍历",
+  subtitle: "用循环逐个访问元素",
+  code: `#include <stdio.h>
+
+int main() {
+    int arr[5] = {10, 20, 30, 40, 50};
+    int i;
+    for (i = 0; i < 5; i++) {
+        printf("arr[%d] = %d\\n", i, arr[i]);
+    }
+    return 0;
+}`,
+  vizTypes: ["vars","array","loop","console"],
+  steps: [
+    { line: 3, info: "main() 开始" },
+    { line: 4, vars: {arr:{value:"int[5]",type:"array"}}, array: {name:"arr", cells:[{val:10},{val:20},{val:30},{val:40},{val:50}]}, info: "定义数组 arr = {10,20,30,40,50}" },
+    { line: 5, vars: {i:{value:0,type:"int"}}, loop: [{label:"i=0",active:true}], info: "i=0，开始遍历" },
+    { line: 6, output: "arr[0] = 10", info: "访问 arr[0]" },
+    { line: 5, vars: {i:{value:1,type:"int"}}, loop: [{label:"i=1",active:true}], array: {name:"arr", cells:[{val:10,highlight:true},{val:20},{val:30},{val:40},{val:50}]}, info: "i=1" },
+    { line: 6, output: "arr[0] = 10\narr[1] = 20", info: "访问 arr[1]" },
+    { line: 5, vars: {i:{value:2,type:"int"}}, loop: [{label:"i=2",active:true}], array: {name:"arr", cells:[{val:10},{val:20,highlight:true},{val:30},{val:40},{val:50}]}, info: "i=2" },
+    { line: 6, output: "arr[0] = 10\narr[1] = 20\narr[2] = 30", info: "访问 arr[2]" },
+    { line: 5, vars: {i:{value:3,type:"int"}}, loop: [{label:"i=3",active:true}], array: {name:"arr", cells:[{val:10},{val:20},{val:30,highlight:true},{val:40},{val:50}]}, info: "i=3" },
+    { line: 6, output: "arr[0] = 10\narr[1] = 20\narr[2] = 30\narr[3] = 40", info: "访问 arr[3]" },
+    { line: 5, vars: {i:{value:4,type:"int"}}, loop: [{label:"i=4",active:true}], array: {name:"arr", cells:[{val:10},{val:20},{val:30},{val:40,highlight:true},{val:50}]}, info: "i=4" },
+    { line: 6, output: "arr[0] = 10\narr[1] = 20\narr[2] = 30\narr[3] = 40\narr[4] = 50", info: "访问 arr[4]" },
+    { line: 5, loop: [{label:"i=4",active:false}], info: "i=5，循环结束" },
+    { line: 8, info: "程序结束" }
+  ]
+});
+createDemo("demo2", {
+  title: "数组元素的修改",
+  subtitle: "通过下标读取和写入",
+  code: `#include <stdio.h>
+
+int main() {
+    int arr[5] = {1, 2, 3, 4, 5};
+    arr[0] = 100;
+    arr[2] = arr[0] + arr[1];
+    arr[4] *= 10;
+    printf("%d %d %d %d %d\\n", arr[0], arr[1], arr[2], arr[3], arr[4]);
+    return 0;
+}`,
+  vizTypes: ["vars","array","console"],
+  steps: [
+    { line: 3, info: "main() 开始" },
+    { line: 4, vars: {arr:{value:"int[5]",type:"array"}}, array: {name:"arr", cells:[{val:1},{val:2},{val:3},{val:4},{val:5}]}, info: "初始数组 {1,2,3,4,5}" },
+    { line: 5, vars: {arr:{value:"int[5]",type:"array"}}, array: {name:"arr", cells:[{val:100},{val:2},{val:3},{val:4},{val:5}]}, info: "arr[0] = 100" },
+    { line: 6, vars: {arr:{value:"int[5]",type:"array"}}, array: {name:"arr", cells:[{val:100},{val:2},{val:102},{val:4},{val:5}]}, info: "arr[2] = arr[0] + arr[1] = 100 + 2 = 102" },
+    { line: 7, vars: {arr:{value:"int[5]",type:"array"}}, array: {name:"arr", cells:[{val:100},{val:2},{val:102},{val:4},{val:50}]}, info: "arr[4] *= 10，即 arr[4] = 5 * 10 = 50" },
+    { line: 8, output: "100 2 102 4 50", info: "输出修改后的数组" },
+    { line: 9, info: "程序结束" }
+  ]
+});
+createDemo("demo3", {
+  title: "求和与求最值",
+  subtitle: "遍历数组完成统计",
+  code: `#include <stdio.h>
+
+int main() {
+    int arr[6] = {3, 7, 2, 9, 1, 5};
+    int sum = 0;
+    int max = arr[0];
+    int min = arr[0];
+    int i;
+    for (i = 0; i < 6; i++) {
+        sum += arr[i];
+        if (arr[i] > max) max = arr[i];
+        if (arr[i] < min) min = arr[i];
+    }
+    printf("sum=%d max=%d min=%d\\n", sum, max, min);
+    return 0;
+}`,
+  vizTypes: ["vars","array","console"],
+  steps: [
+    { line: 3, info: "main() 开始" },
+    { line: 4, vars: {arr:{value:"int[6]",type:"array"}}, array: {name:"arr", cells:[{val:3},{val:7},{val:2},{val:9},{val:1},{val:5}]}, info: "数组 {3,7,2,9,1,5}" },
+    { line: 5, vars: {sum:{value:0,type:"int"}}, info: "sum = 0" },
+    { line: 6, vars: {max:{value:3,type:"int"}}, info: "max 初始化为 arr[0] = 3" },
+    { line: 7, vars: {min:{value:3,type:"int"}}, info: "min 初始化为 arr[0] = 3" },
+    { line: 8, vars: {i:{value:0,type:"int"}}, loop: [{label:"i=0",active:true}], array: {name:"arr", cells:[{val:3,highlight:true},{val:7},{val:2},{val:9},{val:1},{val:5}]}, info: "i=0：arr[0]=3，sum=3，max=3，min=3" },
+    { line: 8, vars: {i:{value:1,type:"int"},sum:{value:10,type:"int"},max:{value:7,type:"int"}}, loop: [{label:"i=1",active:true}], array: {name:"arr", cells:[{val:3},{val:7,highlight:true},{val:2},{val:9},{val:1},{val:5}]}, info: "i=1：arr[1]=7，sum=10，max=7" },
+    { line: 8, vars: {i:{value:2,type:"int"},sum:{value:12,type:"int"},min:{value:2,type:"int"}}, loop: [{label:"i=2",active:true}], array: {name:"arr", cells:[{val:3},{val:7},{val:2,highlight:true},{val:9},{val:1},{val:5}]}, info: "i=2：arr[2]=2，sum=12，min=2" },
+    { line: 8, vars: {i:{value:3,type:"int"},sum:{value:21,type:"int"},max:{value:9,type:"int"}}, loop: [{label:"i=3",active:true}], array: {name:"arr", cells:[{val:3},{val:7},{val:2},{val:9,highlight:true},{val:1},{val:5}]}, info: "i=3：arr[3]=9，sum=21，max=9" },
+    { line: 8, vars: {i:{value:4,type:"int"},sum:{value:22,type:"int"},min:{value:1,type:"int"}}, loop: [{label:"i=4",active:true}], array: {name:"arr", cells:[{val:3},{val:7},{val:2},{val:9},{val:1,highlight:true},{val:5}]}, info: "i=4：arr[4]=1，sum=22，min=1" },
+    { line: 8, vars: {i:{value:5,type:"int"},sum:{value:27,type:"int"}}, loop: [{label:"i=5",active:true}], array: {name:"arr", cells:[{val:3},{val:7},{val:2},{val:9},{val:1},{val:5,highlight:true}]}, info: "i=5：arr[5]=5，sum=27" },
+    { line: 12, output: "sum=27 max=9 min=1", info: "最终结果" },
+    { line: 13, info: "程序结束" }
+  ]
+});
+createDemo("demo4", {
+  title: "冒泡排序",
+  subtitle: "两两比较，逐渐把最大的元素「冒泡」到末尾",
+  code: `#include <stdio.h>
+
+int main() {
+    int arr[5] = {5, 3, 4, 1, 2};
+    int i, j;
+    for (i = 0; i < 4; i++) {
+        for (j = 0; j < 4 - i; j++) {
+            if (arr[j] > arr[j+1]) {
+                int tmp = arr[j];
+                arr[j] = arr[j+1];
+                arr[j+1] = tmp;
+            }
+        }
+    }
+    printf("%d %d %d %d %d\\n", arr[0], arr[1], arr[2], arr[3], arr[4]);
+    return 0;
+}`,
+  vizTypes: ["vars","array","console"],
+  steps: [
+    { line: 3, info: "main() 开始" },
+    { line: 4, vars: {arr:{value:"int[5]",type:"array"}}, array: {name:"arr", cells:[{val:5},{val:3},{val:4},{val:1},{val:2}]}, info: "初始数组 {5,3,4,1,2}" },
+    { line: 5, vars: {i:{value:0,type:"int"}}, loop: [{label:"i=0",active:true}], info: "外层 i=0，把最大元素冒泡到末尾" },
+    { line: 6, vars: {j:{value:0,type:"int"}}, loop: [{label:"j=0",active:true}], info: "内层 j=0：arr[0]=5 > arr[1]=3，交换" },
+    { line: 7, vars: {arr:{value:"int[5]",type:"array"}}, array: {name:"arr", cells:[{val:3},{val:5},{val:4},{val:1},{val:2}]}, info: "交换后 {3,5,4,1,2}" },
+    { line: 6, vars: {j:{value:1,type:"int"}}, loop: [{label:"j=1",active:true}], array: {name:"arr", cells:[{val:3},{val:4},{val:5},{val:1},{val:2}]}, info: "j=1：arr[1]=5 > arr[2]=4，交换" },
+    { line: 6, vars: {j:{value:2,type:"int"}}, loop: [{label:"j=2",active:true}], array: {name:"arr", cells:[{val:3},{val:4},{val:1},{val:5},{val:2}]}, info: "j=2：arr[2]=5 > arr[3]=1，交换" },
+    { line: 6, vars: {j:{value:3,type:"int"}}, loop: [{label:"j=3",active:true}], array: {name:"arr", cells:[{val:3},{val:4},{val:1},{val:2},{val:5}]}, info: "j=3：arr[3]=5 > arr[4]=2，交换。最大元素 5 已就位" },
+    { line: 5, vars: {i:{value:1,type:"int"}}, loop: [{label:"i=1",active:true}], info: "外层 i=1，第二大的元素冒泡" },
+    { line: 6, vars: {j:{value:0,type:"int"}}, loop: [{label:"j=0",active:true}], array: {name:"arr", cells:[{val:3},{val:1},{val:4},{val:2},{val:5}]}, info: "j=0：3>1 交换" },
+    { line: 6, vars: {j:{value:1,type:"int"}}, loop: [{label:"j=1",active:true}], array: {name:"arr", cells:[{val:3},{val:1},{val:2},{val:4},{val:5}]}, info: "j=1：4>2 交换。4 就位" },
+    { line: 5, vars: {i:{value:2,type:"int"}}, loop: [{label:"i=2",active:true}], info: "外层 i=2" },
+    { line: 6, vars: {j:{value:0,type:"int"}}, loop: [{label:"j=0",active:true}], array: {name:"arr", cells:[{val:1},{val:3},{val:2},{val:4},{val:5}]}, info: "j=0：3>1 交换" },
+    { line: 6, vars: {j:{value:1,type:"int"}}, loop: [{label:"j=1",active:true}], array: {name:"arr", cells:[{val:1},{val:2},{val:3},{val:4},{val:5}]}, info: "j=1：3>2 交换。3 就位，数组已有序" },
+    { line: 5, vars: {i:{value:3,type:"int"}}, loop: [{label:"i=3",active:true}], info: "外层 i=3，最后一轮检查" },
+    { line: 14, output: "1 2 3 4 5", info: "排序完成，输出有序数组" },
+    { line: 15, info: "程序结束" }
+  ]
+});
+createDemo("demo5", {
+  title: "数组作为函数参数",
+  subtitle: "传递的是首地址，函数内可修改原数组",
+  code: `#include <stdio.h>
+
+void double_arr(int arr[], int n) {
+    int i;
+    for (i = 0; i < n; i++) {
+        arr[i] *= 2;
+    }
+}
+
+int main() {
+    int a[4] = {1, 2, 3, 4};
+    double_arr(a, 4);
+    printf("%d %d %d %d\\n", a[0], a[1], a[2], a[3]);
+    return 0;
+}`,
+  vizTypes: ["vars","array","stack","console"],
+  steps: [
+    { line: 10, info: "main() 开始" },
+    { line: 11, vars: {a:{value:"int[4]",type:"array"}}, array: {name:"a", cells:[{val:1},{val:2},{val:3},{val:4}]}, info: "定义数组 a = {1,2,3,4}" },
+    { line: 12, info: "调用 double_arr(a, 4)，传递数组首地址" },
+    { line: 3, stack: [{name:"main",value:"a[4]"},{name:"double_arr",value:"arr=a,n=4",highlight:true}], vars: {n:{value:4,type:"int"}}, info: "进入 double_arr，arr 获得 a 的首地址" },
+    { line: 4, vars: {i:{value:0,type:"int"}}, loop: [{label:"i=0",active:true}], array: {name:"a", cells:[{val:2,highlight:true},{val:2},{val:3},{val:4}]}, info: "i=0：arr[0]*=2 => 2" },
+    { line: 4, vars: {i:{value:1,type:"int"}}, loop: [{label:"i=1",active:true}], array: {name:"a", cells:[{val:2},{val:4,highlight:true},{val:3},{val:4}]}, info: "i=1：arr[1]*=2 => 4" },
+    { line: 4, vars: {i:{value:2,type:"int"}}, loop: [{label:"i=2",active:true}], array: {name:"a", cells:[{val:2},{val:4},{val:6,highlight:true},{val:4}]}, info: "i=2：arr[2]*=2 => 6" },
+    { line: 4, vars: {i:{value:3,type:"int"}}, loop: [{label:"i=3",active:true}], array: {name:"a", cells:[{val:2},{val:4},{val:6},{val:8,highlight:true}]}, info: "i=3：arr[3]*=2 => 8" },
+    { line: 6, stack: [{name:"main",value:"a[4]",highlight:true}], info: "double_arr 结束，返回 main" },
+    { line: 12, vars: {a:{value:"int[4]",type:"array"}}, array: {name:"a", cells:[{val:2},{val:4},{val:6},{val:8}]}, info: "main 中的 a 已经被修改" },
+    { line: 13, output: "2 4 6 8", info: "输出修改后的数组" },
+    { line: 14, info: "程序结束" }
+  ]
+});
+createDemo("demo6", {
+  title: "用数组实现栈（Stack）",
+  subtitle: "把初始化、入栈、出栈、判空封装成函数：后进先出（LIFO）",
+  code: `#include <stdio.h>
+
+#define MAX 5
+
+int stack[MAX];
+int top;
+
+void init() {
+    top = -1;
+}
+
+int is_empty() {
+    return top == -1;
+}
+
+void push(int x) {
+    stack[++top] = x;
+}
+
+int pop() {
+    return stack[top--];
+}
+
+int main() {
+    init();
+    push(10);
+    push(20);
+    push(30);
+    printf("pop: %d\\n", pop());
+    printf("pop: %d\\n", pop());
+    if (is_empty()) {
+        printf("栈已空\\n");
+    } else {
+        printf("栈顶下标 top = %d\\n", top);
+    }
+    return 0;
+}`,
+  vizTypes: ["vars","array","stack","console"],
+  steps: [
+    { line: 23, info: "main() 开始" },
+    { line: 24, stack: [{name:"main",value:"",highlight:true}], info: "调用 init() 初始化栈" },
+    { line: 8, vars: {top:{value:-1,type:"int"}}, array: {name:"stack", cells:[{val:null,empty:true},{val:null,empty:true},{val:null,empty:true},{val:null,empty:true},{val:null,empty:true}], markers:[{index:0,label:"top=-1"}]}, stack: [{name:"main",value:""},{name:"init",value:"",highlight:true}], info: "进入 init()：top = -1 表示空栈（标记放在下标 0 处仅作提示）" },
+    { line: 25, stack: [{name:"main",value:"",highlight:true}], info: "init() 返回，调用 push(10)" },
+    { line: 16, vars: {top:{value:0,type:"int"},x:{value:10,type:"int"}}, array: {name:"stack", cells:[{val:10,highlight:true},{val:null,empty:true},{val:null,empty:true},{val:null,empty:true},{val:null,empty:true}], markers:[{index:0,label:"top"}]}, stack: [{name:"main",value:""},{name:"push",value:"x=10",highlight:true}], info: "进入 push(10)：先 ++top（top=0），再写入 stack[0]=10" },
+    { line: 26, stack: [{name:"main",value:"",highlight:true}], info: "push 返回，调用 push(20)" },
+    { line: 16, vars: {top:{value:1,type:"int"},x:{value:20,type:"int"}}, array: {name:"stack", cells:[{val:10},{val:20,highlight:true},{val:null,empty:true},{val:null,empty:true},{val:null,empty:true}], markers:[{index:1,label:"top"}]}, stack: [{name:"main",value:""},{name:"push",value:"x=20",highlight:true}], info: "push(20)：top=1，stack[1]=20" },
+    { line: 27, stack: [{name:"main",value:"",highlight:true}], info: "push 返回，调用 push(30)" },
+    { line: 16, vars: {top:{value:2,type:"int"},x:{value:30,type:"int"}}, array: {name:"stack", cells:[{val:10},{val:20},{val:30,highlight:true},{val:null,empty:true},{val:null,empty:true}], markers:[{index:2,label:"top"}]}, stack: [{name:"main",value:""},{name:"push",value:"x=30",highlight:true}], info: "push(30)：top=2，stack[2]=30" },
+    { line: 28, stack: [{name:"main",value:"",highlight:true}], info: "printf 前先调用 pop() 取栈顶" },
+    { line: 20, vars: {top:{value:1,type:"int"}}, array: {name:"stack", cells:[{val:10},{val:20},{val:30,empty:true},{val:null,empty:true},{val:null,empty:true}], markers:[{index:1,label:"top"}]}, stack: [{name:"main",value:""},{name:"pop",value:"",highlight:true,ret:30}], info: "进入 pop()：先取 stack[2]=30 作为返回值，再 top--（top=1）。30 仍在数组里但已不属于栈" },
+    { line: 28, output: "pop: 30", stack: [{name:"main",value:"",highlight:true}], info: "pop() 返回 30，printf 输出" },
+    { line: 29, stack: [{name:"main",value:"",highlight:true}], info: "再次调用 pop()" },
+    { line: 20, vars: {top:{value:0,type:"int"}}, array: {name:"stack", cells:[{val:10},{val:20,empty:true},{val:30,empty:true},{val:null,empty:true},{val:null,empty:true}], markers:[{index:0,label:"top"}]}, stack: [{name:"main",value:""},{name:"pop",value:"",highlight:true,ret:20}], info: "pop()：返回 20，top=0" },
+    { line: 29, output: "pop: 30\npop: 20", stack: [{name:"main",value:"",highlight:true}], info: "输出 20。后进先出（LIFO）" },
+    { line: 30, stack: [{name:"main",value:"",highlight:true}], info: "调用 is_empty() 判断栈是否为空" },
+    { line: 12, stack: [{name:"main",value:""},{name:"is_empty",value:"",highlight:true,ret:0}], info: "is_empty()：top=0 ≠ -1，返回 0（假），栈非空，走 else 分支" },
+    { line: 33, output: "pop: 30\npop: 20\n栈顶下标 top = 0", stack: [{name:"main",value:"",highlight:true}], info: "输出当前栈顶下标" },
+    { line: 35, info: "程序结束" }
+  ]
+});
+createDemo("demo7", {
+  title: "用数组实现队列（Queue）",
+  subtitle: "把初始化、入队、出队、判空封装成函数：先进先出（FIFO）",
+  code: `#include <stdio.h>
+
+#define MAX 5
+
+int queue[MAX];
+int front, rear;
+
+void init() {
+    front = rear = 0;
+}
+
+int is_empty() {
+    return front == rear;
+}
+
+void enqueue(int x) {
+    queue[rear++] = x;
+}
+
+int dequeue() {
+    return queue[front++];
+}
+
+int main() {
+    init();
+    enqueue(1);
+    enqueue(2);
+    enqueue(3);
+    printf("出队: %d\\n", dequeue());
+    printf("出队: %d\\n", dequeue());
+    enqueue(4);
+    if (is_empty()) {
+        printf("队列已空\\n");
+    } else {
+        printf("front=%d rear=%d\\n", front, rear);
+    }
+    return 0;
+}`,
+  vizTypes: ["vars","array","stack","console"],
+  steps: [
+    { line: 23, info: "main() 开始" },
+    { line: 24, stack: [{name:"main",value:"",highlight:true}], info: "调用 init() 初始化队列" },
+    { line: 8, vars: {front:{value:0,type:"int"},rear:{value:0,type:"int"}}, array: {name:"queue", cells:[{val:null,empty:true},{val:null,empty:true},{val:null,empty:true},{val:null,empty:true},{val:null,empty:true}], markers:[{index:0,label:"front"},{index:0,label:"rear"}]}, stack: [{name:"main",value:""},{name:"init",value:"",highlight:true}], info: "进入 init()：front = rear = 0，空队列" },
+    { line: 25, stack: [{name:"main",value:"",highlight:true}], info: "init() 返回，调用 enqueue(1)" },
+    { line: 16, vars: {rear:{value:1,type:"int"},x:{value:1,type:"int"}}, array: {name:"queue", cells:[{val:1,highlight:true},{val:null,empty:true},{val:null,empty:true},{val:null,empty:true},{val:null,empty:true}], markers:[{index:0,label:"front"},{index:1,label:"rear"}]}, stack: [{name:"main",value:""},{name:"enqueue",value:"x=1",highlight:true}], info: "进入 enqueue(1)：queue[0]=1，rear 后移到 1" },
+    { line: 26, stack: [{name:"main",value:"",highlight:true}], info: "enqueue 返回，调用 enqueue(2)" },
+    { line: 16, vars: {rear:{value:2,type:"int"},x:{value:2,type:"int"}}, array: {name:"queue", cells:[{val:1},{val:2,highlight:true},{val:null,empty:true},{val:null,empty:true},{val:null,empty:true}], markers:[{index:0,label:"front"},{index:2,label:"rear"}]}, stack: [{name:"main",value:""},{name:"enqueue",value:"x=2",highlight:true}], info: "enqueue(2)：queue[1]=2，rear=2" },
+    { line: 27, stack: [{name:"main",value:"",highlight:true}], info: "enqueue 返回，调用 enqueue(3)" },
+    { line: 16, vars: {rear:{value:3,type:"int"},x:{value:3,type:"int"}}, array: {name:"queue", cells:[{val:1},{val:2},{val:3,highlight:true},{val:null,empty:true},{val:null,empty:true}], markers:[{index:0,label:"front"},{index:3,label:"rear"}]}, stack: [{name:"main",value:""},{name:"enqueue",value:"x=3",highlight:true}], info: "enqueue(3)：queue[2]=3，rear=3" },
+    { line: 28, stack: [{name:"main",value:"",highlight:true}], info: "printf 前先调用 dequeue() 取队首" },
+    { line: 20, vars: {front:{value:1,type:"int"}}, array: {name:"queue", cells:[{val:1,empty:true},{val:2},{val:3},{val:null,empty:true},{val:null,empty:true}], markers:[{index:1,label:"front"},{index:3,label:"rear"}]}, stack: [{name:"main",value:""},{name:"dequeue",value:"",highlight:true,ret:1}], info: "进入 dequeue()：取 queue[0]=1 作为返回值，front 后移到 1" },
+    { line: 28, output: "出队: 1", stack: [{name:"main",value:"",highlight:true}], info: "dequeue() 返回 1，printf 输出。先进先出（FIFO）" },
+    { line: 29, stack: [{name:"main",value:"",highlight:true}], info: "再次调用 dequeue()" },
+    { line: 20, vars: {front:{value:2,type:"int"}}, array: {name:"queue", cells:[{val:1,empty:true},{val:2,empty:true},{val:3},{val:null,empty:true},{val:null,empty:true}], markers:[{index:2,label:"front"},{index:3,label:"rear"}]}, stack: [{name:"main",value:""},{name:"dequeue",value:"",highlight:true,ret:2}], info: "dequeue()：返回 queue[1]=2，front=2" },
+    { line: 29, output: "出队: 1\n出队: 2", stack: [{name:"main",value:"",highlight:true}], info: "输出 2" },
+    { line: 30, stack: [{name:"main",value:"",highlight:true}], info: "调用 enqueue(4)" },
+    { line: 16, vars: {rear:{value:4,type:"int"},x:{value:4,type:"int"}}, array: {name:"queue", cells:[{val:1,empty:true},{val:2,empty:true},{val:3},{val:4,highlight:true},{val:null,empty:true}], markers:[{index:2,label:"front"},{index:4,label:"rear"}]}, stack: [{name:"main",value:""},{name:"enqueue",value:"x=4",highlight:true}], info: "enqueue(4)：queue[3]=4，rear=4" },
+    { line: 31, stack: [{name:"main",value:"",highlight:true}], info: "调用 is_empty() 判断队列是否为空" },
+    { line: 12, stack: [{name:"main",value:""},{name:"is_empty",value:"",highlight:true,ret:0}], info: "is_empty()：front=2 ≠ rear=4，返回 0（假），队列非空，走 else 分支" },
+    { line: 34, output: "出队: 1\n出队: 2\nfront=2 rear=4", stack: [{name:"main",value:"",highlight:true}], info: "队列中还剩 3 和 4（front 到 rear 之间）" },
+    { line: 36, info: "程序结束" }
+  ]
+});
+createDemo("demo8", {
+  title: "二维数组的定义与初始化",
+  subtitle: "矩阵在内存中按行连续存放",
+  code: `#include <stdio.h>
+
+int main() {
+    int a[2][3] = {{1, 2, 3}, {4, 5, 6}};
+    int b[3][3] = {{1, 2}, {3}};
+    printf("a[1][2]=%d, b[2][0]=%d\\n", a[1][2], b[2][0]);
+    return 0;
+}`,
+  vizTypes: ["vars","matrix","console"],
+  steps: [
+    { line: 3, info: "main() 开始" },
+    { line: 4, vars: {a:{value:"int[2][3]",type:"array"}}, matrix: {name:"a", rows:2, cols:3, cells:[[{val:1},{val:2},{val:3}],[{val:4},{val:5},{val:6}]]}, info: "完全初始化 2x3 矩阵 a = {{1,2,3},{4,5,6}}" },
+    { line: 5, vars: {b:{value:"int[3][3]",type:"array"}}, matrix: {name:"b", rows:3, cols:3, cells:[[{val:1},{val:2},{val:0,hl:true}],[{val:3},{val:0,hl:true},{val:0,hl:true}],[{val:0,hl:true},{val:0,hl:true},{val:0,hl:true}]]}, info: "部分初始化 3x3 矩阵 b，未指定的元素自动为 0" },
+    { line: 6, output: "a[1][2]=6, b[2][0]=0", info: "b[2][0] 被自动初始化为 0" },
+    { line: 7, info: "程序结束" }
+  ]
+});
+createDemo("demo9", {
+  title: "二维数组的遍历",
+  subtitle: "外层循环行，内层循环列",
+  code: `#include <stdio.h>
+
+int main() {
+    int a[2][3] = {{1, 2, 3}, {4, 5, 6}};
+    int i, j;
+    for (i = 0; i < 2; i++) {
+        for (j = 0; j < 3; j++) {
+            printf("%d ", a[i][j]);
+        }
+        printf("\\n");
+    }
+    return 0;
+}`,
+  vizTypes: ["vars","matrix","loop","console"],
+  steps: [
+    { line: 3, info: "main() 开始" },
+    { line: 4, vars: {a:{value:"int[2][3]",type:"array"}}, matrix: {name:"a", rows:2, cols:3, cells:[[{val:1},{val:2},{val:3}],[{val:4},{val:5},{val:6}]]}, info: "定义 2x3 矩阵" },
+    { line: 5, vars: {i:{value:0,type:"int"}}, loop: [{label:"i=0",active:true}], info: "外层 i=0（第 0 行）" },
+    { line: 6, vars: {j:{value:0,type:"int"}}, loop: [{label:"i=0 j=0",active:true}], matrix: {name:"a", rows:2, cols:3, cells:[[{val:1,highlight:true},{val:2},{val:3}],[{val:4},{val:5},{val:6}]]}, info: "内层 j=0，访问 a[0][0]=1" },
+    { line: 7, output: "1 ", info: "打印 1" },
+    { line: 6, vars: {j:{value:1,type:"int"}}, loop: [{label:"i=0 j=1",active:true}], matrix: {name:"a", rows:2, cols:3, cells:[[{val:1,hl:true},{val:2,highlight:true},{val:3}],[{val:4},{val:5},{val:6}]]}, info: "内层 j=1，访问 a[0][1]=2" },
+    { line: 7, output: "1 2 ", info: "打印 2" },
+    { line: 6, vars: {j:{value:2,type:"int"}}, loop: [{label:"i=0 j=2",active:true}], matrix: {name:"a", rows:2, cols:3, cells:[[{val:1,hl:true},{val:2,hl:true},{val:3,highlight:true}],[{val:4},{val:5},{val:6}]]}, info: "内层 j=2，访问 a[0][2]=3" },
+    { line: 7, output: "1 2 3 ", info: "打印 3" },
+    { line: 9, output: "1 2 3 \n", info: "第 0 行结束，换行" },
+    { line: 5, vars: {i:{value:1,type:"int"}}, loop: [{label:"i=1",active:true}], info: "外层 i=1（第 1 行）" },
+    { line: 6, vars: {j:{value:0,type:"int"}}, loop: [{label:"i=1 j=0",active:true}], matrix: {name:"a", rows:2, cols:3, cells:[[{val:1,hl:true},{val:2,hl:true},{val:3,hl:true}],[{val:4,highlight:true},{val:5},{val:6}]]}, info: "j=0，访问 a[1][0]=4" },
+    { line: 7, output: "1 2 3 \n4 ", info: "打印 4" },
+    { line: 6, vars: {j:{value:1,type:"int"}}, loop: [{label:"i=1 j=1",active:true}], matrix: {name:"a", rows:2, cols:3, cells:[[{val:1,hl:true},{val:2,hl:true},{val:3,hl:true}],[{val:4,hl:true},{val:5,highlight:true},{val:6}]]}, info: "j=1，访问 a[1][1]=5" },
+    { line: 7, output: "1 2 3 \n4 5 ", info: "打印 5" },
+    { line: 6, vars: {j:{value:2,type:"int"}}, loop: [{label:"i=1 j=2",active:true}], matrix: {name:"a", rows:2, cols:3, cells:[[{val:1,hl:true},{val:2,hl:true},{val:3,hl:true}],[{val:4,hl:true},{val:5,hl:true},{val:6,highlight:true}]]}, info: "j=2，访问 a[1][2]=6" },
+    { line: 7, output: "1 2 3 \n4 5 6 ", info: "打印 6" },
+    { line: 9, output: "1 2 3 \n4 5 6 \n", info: "第 1 行结束，换行" },
+    { line: 11, info: "程序结束" }
+  ]
+});
+createDemo("demo10", {
+  title: "矩阵转置",
+  subtitle: "行列互换：b[j][i] = a[i][j]",
+  code: `#include <stdio.h>
+
+int main() {
+    int a[2][3] = {{1, 2, 3}, {4, 5, 6}};
+    int b[3][2];
+    int i, j;
+    for (i = 0; i < 2; i++) {
+        for (j = 0; j < 3; j++) {
+            b[j][i] = a[i][j];
+        }
+    }
+    printf("%d %d\\n%d %d\\n%d %d\\n", b[0][0], b[0][1], b[1][0], b[1][1], b[2][0], b[2][1]);
+    return 0;
+}`,
+  vizTypes: ["vars","matrix","loop","console"],
+  steps: [
+    { line: 3, info: "main() 开始" },
+    { line: 4, vars: {a:{value:"int[2][3]",type:"array"}}, matrix: {name:"a", rows:2, cols:3, cells:[[{val:1},{val:2},{val:3}],[{val:4},{val:5},{val:6}]]}, info: "原矩阵 a（2行3列）" },
+    { line: 5, vars: {b:{value:"int[3][2]",type:"array"}}, matrix: {name:"b", rows:3, cols:2, cells:[[{val:null,empty:true},{val:null,empty:true}],[{val:null,empty:true},{val:null,empty:true}],[{val:null,empty:true},{val:null,empty:true}]]}, info: "转置矩阵 b（3行2列）" },
+    { line: 6, vars: {i:{value:0,type:"int"}}, loop: [{label:"i=0",active:true}], info: "外层 i=0" },
+    { line: 7, vars: {j:{value:0,type:"int"}}, loop: [{label:"i=0 j=0",active:true}], matrix: [{name:"a", rows:2, cols:3, cells:[[{val:1,hl:true},{val:2},{val:3}],[{val:4},{val:5},{val:6}]]}, {name:"b", rows:3, cols:2, cells:[[{val:1,highlight:true},{val:null,empty:true}],[{val:null,empty:true},{val:null,empty:true}],[{val:null,empty:true},{val:null,empty:true}]]}], info: "b[0][0] = a[0][0] = 1" },
+    { line: 7, vars: {j:{value:1,type:"int"}}, loop: [{label:"i=0 j=1",active:true}], matrix: [{name:"a", rows:2, cols:3, cells:[[{val:1},{val:2,hl:true},{val:3}],[{val:4},{val:5},{val:6}]]}, {name:"b", rows:3, cols:2, cells:[[{val:1},{val:null,empty:true}],[{val:2,highlight:true},{val:null,empty:true}],[{val:null,empty:true},{val:null,empty:true}]]}], info: "b[1][0] = a[0][1] = 2" },
+    { line: 7, vars: {j:{value:2,type:"int"}}, loop: [{label:"i=0 j=2",active:true}], matrix: [{name:"a", rows:2, cols:3, cells:[[{val:1},{val:2},{val:3,hl:true}],[{val:4},{val:5},{val:6}]]}, {name:"b", rows:3, cols:2, cells:[[{val:1},{val:null,empty:true}],[{val:2},{val:null,empty:true}],[{val:3,highlight:true},{val:null,empty:true}]]}], info: "b[2][0] = a[0][2] = 3" },
+    { line: 6, vars: {i:{value:1,type:"int"}}, loop: [{label:"i=1",active:true}], info: "外层 i=1" },
+    { line: 7, vars: {j:{value:0,type:"int"}}, loop: [{label:"i=1 j=0",active:true}], matrix: [{name:"a", rows:2, cols:3, cells:[[{val:1},{val:2},{val:3}],[{val:4,hl:true},{val:5},{val:6}]]}, {name:"b", rows:3, cols:2, cells:[[{val:1},{val:4,highlight:true}],[{val:2},{val:null,empty:true}],[{val:3},{val:null,empty:true}]]}], info: "b[0][1] = a[1][0] = 4" },
+    { line: 7, vars: {j:{value:1,type:"int"}}, loop: [{label:"i=1 j=1",active:true}], matrix: [{name:"a", rows:2, cols:3, cells:[[{val:1},{val:2},{val:3}],[{val:4},{val:5,hl:true},{val:6}]]}, {name:"b", rows:3, cols:2, cells:[[{val:1},{val:4}],[{val:2},{val:5,highlight:true}],[{val:3},{val:null,empty:true}]]}], info: "b[1][1] = a[1][1] = 5" },
+    { line: 7, vars: {j:{value:2,type:"int"}}, loop: [{label:"i=1 j=2",active:true}], matrix: [{name:"a", rows:2, cols:3, cells:[[{val:1},{val:2},{val:3}],[{val:4},{val:5},{val:6,hl:true}]]}, {name:"b", rows:3, cols:2, cells:[[{val:1},{val:4}],[{val:2},{val:5}],[{val:3},{val:6,highlight:true}]]}], info: "b[2][1] = a[1][2] = 6" },
+    { line: 10, output: "1 4\n2 5\n3 6", info: "输出转置后的矩阵" },
+    { line: 11, info: "程序结束" }
+  ]
+});
+createDemo("demo11", {
+  title: "行和与列和",
+  subtitle: "分别对每行、每列求和",
+  code: `#include <stdio.h>
+
+int main() {
+    int a[3][3] = {{1, 2, 3}, {4, 5, 6}, {7, 8, 9}};
+    int row_sum[3] = {0};
+    int col_sum[3] = {0};
+    int i, j;
+    for (i = 0; i < 3; i++) {
+        for (j = 0; j < 3; j++) {
+            row_sum[i] += a[i][j];
+            col_sum[j] += a[i][j];
+        }
+    }
+    printf("row: %d %d %d\\n", row_sum[0], row_sum[1], row_sum[2]);
+    printf("col: %d %d %d\\n", col_sum[0], col_sum[1], col_sum[2]);
+    return 0;
+}`,
+  vizTypes: ["vars","matrix","array","loop","console"],
+  steps: [
+    { line: 3, info: "main() 开始" },
+    { line: 4, vars: {a:{value:"int[3][3]",type:"array"}}, matrix: {name:"a", rows:3, cols:3, cells:[[{val:1},{val:2},{val:3}],[{val:4},{val:5},{val:6}],[{val:7},{val:8},{val:9}]]}, info: "3x3 矩阵" },
+    { line: 5, vars: {row_sum:{value:"int[3]",type:"array"}}, array: {name:"row_sum", cells:[{val:0},{val:0},{val:0}]}, info: "row_sum 初始化为 {0,0,0}" },
+    { line: 6, vars: {col_sum:{value:"int[3]",type:"array"}}, array: {name:"col_sum", cells:[{val:0},{val:0},{val:0}]}, info: "col_sum 初始化为 {0,0,0}" },
+    { line: 7, vars: {i:{value:0,type:"int"}}, loop: [{label:"i=0",active:true}], info: "外层 i=0" },
+    { line: 8, vars: {j:{value:0,type:"int"}}, loop: [{label:"i=0 j=0",active:true}], matrix: {name:"a", rows:3, cols:3, cells:[[{val:1,highlight:true},{val:2},{val:3}],[{val:4},{val:5},{val:6}],[{val:7},{val:8},{val:9}]]}, array: [{name:"row_sum", cells:[{val:1,highlight:true},{val:0},{val:0}]}, {name:"col_sum", cells:[{val:1,highlight:true},{val:0},{val:0}]}], info: "a[0][0]=1：row_sum[0]=1, col_sum[0]=1" },
+    { line: 8, vars: {j:{value:1,type:"int"}}, loop: [{label:"i=0 j=1",active:true}], matrix: {name:"a", rows:3, cols:3, cells:[[{val:1},{val:2,highlight:true},{val:3}],[{val:4},{val:5},{val:6}],[{val:7},{val:8},{val:9}]]}, array: [{name:"row_sum", cells:[{val:3,highlight:true},{val:0},{val:0}]}, {name:"col_sum", cells:[{val:1},{val:2,highlight:true},{val:0}]}], info: "a[0][1]=2：row_sum[0]=3, col_sum[1]=2" },
+    { line: 8, vars: {j:{value:2,type:"int"}}, loop: [{label:"i=0 j=2",active:true}], matrix: {name:"a", rows:3, cols:3, cells:[[{val:1},{val:2},{val:3,highlight:true}],[{val:4},{val:5},{val:6}],[{val:7},{val:8},{val:9}]]}, array: [{name:"row_sum", cells:[{val:6,highlight:true},{val:0},{val:0}]}, {name:"col_sum", cells:[{val:1},{val:2},{val:3,highlight:true}]}], info: "a[0][2]=3：row_sum[0]=6, col_sum[2]=3" },
+    { line: 7, vars: {i:{value:1,type:"int"}}, loop: [{label:"i=1",active:true}], info: "外层 i=1" },
+    { line: 8, vars: {j:{value:0,type:"int"}}, loop: [{label:"i=1 j=0",active:true}], matrix: {name:"a", rows:3, cols:3, cells:[[{val:1},{val:2},{val:3}],[{val:4,highlight:true},{val:5},{val:6}],[{val:7},{val:8},{val:9}]]}, array: [{name:"row_sum", cells:[{val:6},{val:4,highlight:true},{val:0}]}, {name:"col_sum", cells:[{val:5,highlight:true},{val:2},{val:3}]}], info: "a[1][0]=4：row_sum[1]=4, col_sum[0]=5" },
+    { line: 8, vars: {j:{value:1,type:"int"}}, loop: [{label:"i=1 j=1",active:true}], matrix: {name:"a", rows:3, cols:3, cells:[[{val:1},{val:2},{val:3}],[{val:4},{val:5,highlight:true},{val:6}],[{val:7},{val:8},{val:9}]]}, array: [{name:"row_sum", cells:[{val:6},{val:9,highlight:true},{val:0}]}, {name:"col_sum", cells:[{val:5},{val:7,highlight:true},{val:3}]}], info: "a[1][1]=5：row_sum[1]=9, col_sum[1]=7" },
+    { line: 8, vars: {j:{value:2,type:"int"}}, loop: [{label:"i=1 j=2",active:true}], matrix: {name:"a", rows:3, cols:3, cells:[[{val:1},{val:2},{val:3}],[{val:4},{val:5},{val:6,highlight:true}],[{val:7},{val:8},{val:9}]]}, array: [{name:"row_sum", cells:[{val:6},{val:15,highlight:true},{val:0}]}, {name:"col_sum", cells:[{val:5},{val:7},{val:9,highlight:true}]}], info: "a[1][2]=6：row_sum[1]=15, col_sum[2]=9" },
+    { line: 7, vars: {i:{value:2,type:"int"}}, loop: [{label:"i=2",active:true}], info: "外层 i=2" },
+    { line: 8, vars: {j:{value:0,type:"int"}}, loop: [{label:"i=2 j=0",active:true}], matrix: {name:"a", rows:3, cols:3, cells:[[{val:1},{val:2},{val:3}],[{val:4},{val:5},{val:6}],[{val:7,highlight:true},{val:8},{val:9}]]}, array: [{name:"row_sum", cells:[{val:6},{val:15},{val:7,highlight:true}]}, {name:"col_sum", cells:[{val:12,highlight:true},{val:7},{val:9}]}], info: "a[2][0]=7：row_sum[2]=7, col_sum[0]=12" },
+    { line: 8, vars: {j:{value:1,type:"int"}}, loop: [{label:"i=2 j=1",active:true}], matrix: {name:"a", rows:3, cols:3, cells:[[{val:1},{val:2},{val:3}],[{val:4},{val:5},{val:6}],[{val:7},{val:8,highlight:true},{val:9}]]}, array: [{name:"row_sum", cells:[{val:6},{val:15},{val:15,highlight:true}]}, {name:"col_sum", cells:[{val:12},{val:15,highlight:true},{val:9}]}], info: "a[2][1]=8：row_sum[2]=15, col_sum[1]=15" },
+    { line: 8, vars: {j:{value:2,type:"int"}}, loop: [{label:"i=2 j=2",active:true}], matrix: {name:"a", rows:3, cols:3, cells:[[{val:1},{val:2},{val:3}],[{val:4},{val:5},{val:6}],[{val:7},{val:8},{val:9,highlight:true}]]}, array: [{name:"row_sum", cells:[{val:6},{val:15},{val:24,highlight:true}]}, {name:"col_sum", cells:[{val:12},{val:15},{val:18,highlight:true}]}], info: "a[2][2]=9：row_sum[2]=24, col_sum[2]=18" },
+    { line: 11, output: "row: 6 15 24", info: "每行之和" },
+    { line: 12, output: "row: 6 15 24\ncol: 12 15 18", info: "每列之和" },
+    { line: 13, info: "程序结束" }
+  ]
+});
+createDemo("demo12", {
+  title: "二维数组与指针",
+  subtitle: "a[i][j] 等价于 *(*(a+i)+j)",
+  code: `#include <stdio.h>
+
+int main() {
+    int a[2][3] = {{1, 2, 3}, {4, 5, 6}};
+    int *p = a[0];
+    printf("a[0][0]=%d, *p=%d\\n", a[0][0], *p);
+    printf("a[1][1]=%d, *(p+4)=%d\\n", a[1][1], *(p+4));
+    return 0;
+}`,
+  vizTypes: ["vars","matrix","pointer","console"],
+  steps: [
+    { line: 3, info: "main() 开始" },
+    { line: 4, vars: {a:{value:"int[2][3]",type:"array"}}, matrix: {name:"a", rows:2, cols:3, cells:[[{val:1},{val:2},{val:3}],[{val:4},{val:5},{val:6}]]}, info: "定义 2x3 矩阵" },
+    { line: 5, vars: {p:{value:"0x1000",type:"int*"}}, info: "p = a[0]，指向第 0 行首元素" },
+    { line: 6, output: "a[0][0]=1, *p=1", matrix: {name:"a", rows:2, cols:3, cells:[[{val:1,highlight:true},{val:2},{val:3}],[{val:4},{val:5},{val:6}]]}, pointer: [{name:"p", type:"int*", addr:"0x2000", value:"0x1000", targetName:"a[0][0]", targetType:"int", targetAddr:"0x1000", targetValue:1}], info: "*p 即 a[0][0]" },
+    { line: 7, output: "a[0][0]=1, *p=1\na[1][1]=5, *(p+4)=5", matrix: {name:"a", rows:2, cols:3, cells:[[{val:1},{val:2},{val:3}],[{val:4},{val:5,highlight:true},{val:6}]]}, pointer: [{name:"p", type:"int*", addr:"0x2000", value:"0x1000+16", targetName:"a[1][1]", targetType:"int", targetAddr:"0x1010", targetValue:5}], info: "p+4 跳过 4 个 int，到达 a[1][1]（行优先存储）" },
+    { line: 8, info: "程序结束" }
+  ]
+});
+createDemo("demo13", {
+  title: "二维数组作为函数参数",
+  subtitle: "必须指定列数，传递首行地址",
+  code: `#include <stdio.h>
+
+void print_matrix(int m[][3], int rows) {
+    int i, j;
+    for (i = 0; i < rows; i++) {
+        for (j = 0; j < 3; j++) {
+            printf("%d ", m[i][j]);
+        }
+        printf("\\n");
+    }
+}
+
+int main() {
+    int a[2][3] = {{1, 2, 3}, {4, 5, 6}};
+    print_matrix(a, 2);
+    return 0;
+}`,
+  vizTypes: ["vars","matrix","loop","stack","console"],
+  steps: [
+    { line: 12, info: "main() 开始" },
+    { line: 13, vars: {a:{value:"int[2][3]",type:"array"}}, matrix: {name:"a", rows:2, cols:3, cells:[[{val:1},{val:2},{val:3}],[{val:4},{val:5},{val:6}]]}, info: "定义矩阵 a" },
+    { line: 14, info: "调用 print_matrix(a, 2)" },
+    { line: 3, stack: [{name:"main",value:"a[2][3]"},{name:"print_matrix",value:"m=a,rows=2",highlight:true}], info: "进入函数，m 获得 a 的首地址，必须知道列数 3 才能正确计算偏移" },
+    { line: 4, vars: {i:{value:0,type:"int"}}, loop: [{label:"i=0",active:true}], info: "外层 i=0" },
+    { line: 5, vars: {j:{value:0,type:"int"}}, loop: [{label:"j=0",active:true}], matrix: {name:"a", rows:2, cols:3, cells:[[{val:1,highlight:true},{val:2},{val:3}],[{val:4},{val:5},{val:6}]]}, info: "内层 j=0，m[0][0]=1" },
+    { line: 6, output: "1 ", info: "打印 1" },
+    { line: 5, vars: {j:{value:1,type:"int"}}, loop: [{label:"j=1",active:true}], matrix: {name:"a", rows:2, cols:3, cells:[[{val:1,hl:true},{val:2,highlight:true},{val:3}],[{val:4},{val:5},{val:6}]]}, info: "j=1，m[0][1]=2" },
+    { line: 6, output: "1 2 ", info: "打印 2" },
+    { line: 5, vars: {j:{value:2,type:"int"}}, loop: [{label:"j=2",active:true}], matrix: {name:"a", rows:2, cols:3, cells:[[{val:1,hl:true},{val:2,hl:true},{val:3,highlight:true}],[{val:4},{val:5},{val:6}]]}, info: "j=2，m[0][2]=3" },
+    { line: 6, output: "1 2 3 ", info: "打印 3" },
+    { line: 8, output: "1 2 3 \n", info: "换行" },
+    { line: 4, vars: {i:{value:1,type:"int"}}, loop: [{label:"i=1",active:true}], info: "外层 i=1" },
+    { line: 5, vars: {j:{value:0,type:"int"}}, loop: [{label:"j=0",active:true}], matrix: {name:"a", rows:2, cols:3, cells:[[{val:1,hl:true},{val:2,hl:true},{val:3,hl:true}],[{val:4,highlight:true},{val:5},{val:6}]]}, info: "j=0，m[1][0]=4" },
+    { line: 6, output: "1 2 3 \n4 ", info: "打印 4" },
+    { line: 5, vars: {j:{value:1,type:"int"}}, loop: [{label:"j=1",active:true}], matrix: {name:"a", rows:2, cols:3, cells:[[{val:1,hl:true},{val:2,hl:true},{val:3,hl:true}],[{val:4,hl:true},{val:5,highlight:true},{val:6}]]}, info: "j=1，m[1][1]=5" },
+    { line: 6, output: "1 2 3 \n4 5 ", info: "打印 5" },
+    { line: 5, vars: {j:{value:2,type:"int"}}, loop: [{label:"j=2",active:true}], matrix: {name:"a", rows:2, cols:3, cells:[[{val:1,hl:true},{val:2,hl:true},{val:3,hl:true}],[{val:4,hl:true},{val:5,hl:true},{val:6,highlight:true}]]}, info: "j=2，m[1][2]=6" },
+    { line: 6, output: "1 2 3 \n4 5 6 ", info: "打印 6" },
+    { line: 8, output: "1 2 3 \n4 5 6 \n", info: "换行" },
+    { line: 9, stack: [{name:"main",value:"a[2][3]",highlight:true}], info: "函数结束" },
+    { line: 14, info: "程序结束" }
+  ]
+});
+createDemo("demo14", {
+  title: "二维数组与图：邻接矩阵",
+  subtitle: "用 g[i][j]=1 表示顶点 i 与 j 之间有边，右侧同步显示图的形态",
+  code: `#include <stdio.h>
+
+int main() {
+    int g[4][4] = {0};
+    int i, j;
+    g[0][1] = g[1][0] = 1;
+    g[0][2] = g[2][0] = 1;
+    g[1][3] = g[3][1] = 1;
+    g[2][3] = g[3][2] = 1;
+    for (i = 0; i < 4; i++) {
+        int deg = 0;
+        for (j = 0; j < 4; j++) {
+            deg += g[i][j];
+        }
+        printf("%c 的度 = %d\\n", 'A' + i, deg);
+    }
+    return 0;
+}`,
+  vizTypes: ["vars","matrix","graph","loop","console"],
+  steps: [
+    { line: 3, info: "main() 开始：用邻接矩阵表示一张 4 个顶点的无向图（0=A, 1=B, 2=C, 3=D）" },
+    { line: 4, vars: {g:{value:"int[4][4]",type:"array"}}, matrix: {name:"g", rows:4, cols:4, cells:[[{val:0},{val:0},{val:0},{val:0}],[{val:0},{val:0},{val:0},{val:0}],[{val:0},{val:0},{val:0},{val:0}],[{val:0},{val:0},{val:0},{val:0}]]}, graph: {nodes:[{id:"A",label:"A",x:30,y:20},{id:"B",label:"B",x:170,y:20},{id:"C",label:"C",x:30,y:140},{id:"D",label:"D",x:170,y:140}], edges:[]}, info: "g[4][4] 全部初始化为 0：任意两点之间暂时没有边" },
+    { line: 5, vars: {i:{value:0,type:"int"},j:{value:0,type:"int"}}, info: "声明循环变量 i, j" },
+    { line: 6, matrix: {name:"g", rows:4, cols:4, cells:[[{val:0},{val:1,highlight:true},{val:0},{val:0}],[{val:1,highlight:true},{val:0},{val:0},{val:0}],[{val:0},{val:0},{val:0},{val:0}],[{val:0},{val:0},{val:0},{val:0}]]}, graph: {nodes:[{id:"A",label:"A",x:30,y:20},{id:"B",label:"B",x:170,y:20},{id:"C",label:"C",x:30,y:140},{id:"D",label:"D",x:170,y:140}], edges:[{from:"A",to:"B",highlight:true}]}, info: "g[0][1]=g[1][0]=1：A 与 B 之间出现一条边（无向图矩阵对称）" },
+    { line: 7, matrix: {name:"g", rows:4, cols:4, cells:[[{val:0},{val:1},{val:1,highlight:true},{val:0}],[{val:1},{val:0},{val:0},{val:0}],[{val:1,highlight:true},{val:0},{val:0},{val:0}],[{val:0},{val:0},{val:0},{val:0}]]}, graph: {nodes:[{id:"A",label:"A",x:30,y:20},{id:"B",label:"B",x:170,y:20},{id:"C",label:"C",x:30,y:140},{id:"D",label:"D",x:170,y:140}], edges:[{from:"A",to:"B"},{from:"A",to:"C",highlight:true}]}, info: "g[0][2]=g[2][0]=1：A 与 C 之间连边" },
+    { line: 8, matrix: {name:"g", rows:4, cols:4, cells:[[{val:0},{val:1},{val:1},{val:0}],[{val:1},{val:0},{val:0},{val:1,highlight:true}],[{val:1},{val:0},{val:0},{val:0}],[{val:0},{val:1,highlight:true},{val:0},{val:0}]]}, graph: {nodes:[{id:"A",label:"A",x:30,y:20},{id:"B",label:"B",x:170,y:20},{id:"C",label:"C",x:30,y:140},{id:"D",label:"D",x:170,y:140}], edges:[{from:"A",to:"B"},{from:"A",to:"C"},{from:"B",to:"D",highlight:true}]}, info: "g[1][3]=g[3][1]=1：B 与 D 之间连边" },
+    { line: 9, matrix: {name:"g", rows:4, cols:4, cells:[[{val:0},{val:1},{val:1},{val:0}],[{val:1},{val:0},{val:0},{val:1}],[{val:1},{val:0},{val:0},{val:1,highlight:true}],[{val:0},{val:1},{val:1,highlight:true},{val:0}]]}, graph: {nodes:[{id:"A",label:"A",x:30,y:20},{id:"B",label:"B",x:170,y:20},{id:"C",label:"C",x:30,y:140},{id:"D",label:"D",x:170,y:140}], edges:[{from:"A",to:"B"},{from:"A",to:"C"},{from:"B",to:"D"},{from:"C",to:"D",highlight:true}]}, info: "g[2][3]=g[3][2]=1：C 与 D 之间连边，图构建完成（一个四边形）" },
+    { line: 10, vars: {i:{value:0,type:"int"}}, loop: [{label:"i=0",active:true}], matrix: {name:"g", rows:4, cols:4, cells:[[{val:0,hl:true},{val:1,hl:true},{val:1,hl:true},{val:0,hl:true}],[{val:1},{val:0},{val:0},{val:1}],[{val:1},{val:0},{val:0},{val:1}],[{val:0},{val:1},{val:1},{val:0}]]}, graph: {nodes:[{id:"A",label:"A",x:30,y:20,highlight:true},{id:"B",label:"B",x:170,y:20},{id:"C",label:"C",x:30,y:140},{id:"D",label:"D",x:170,y:140}], edges:[{from:"A",to:"B"},{from:"A",to:"C"},{from:"B",to:"D"},{from:"C",to:"D"}]}, info: "i=0：把第 0 行全部加起来，0+1+1+0=2" },
+    { line: 14, vars: {deg:{value:2,type:"int"}}, output: "A 的度 = 2", info: "顶点 A 的度为 2（连着 B 和 C）" },
+    { line: 10, vars: {i:{value:1,type:"int"}}, loop: [{label:"i=1",active:true}], matrix: {name:"g", rows:4, cols:4, cells:[[{val:0},{val:1},{val:1},{val:0}],[{val:1,hl:true},{val:0,hl:true},{val:0,hl:true},{val:1,hl:true}],[{val:1},{val:0},{val:0},{val:1}],[{val:0},{val:1},{val:1},{val:0}]]}, graph: {nodes:[{id:"A",label:"A",x:30,y:20},{id:"B",label:"B",x:170,y:20,highlight:true},{id:"C",label:"C",x:30,y:140},{id:"D",label:"D",x:170,y:140}], edges:[{from:"A",to:"B"},{from:"A",to:"C"},{from:"B",to:"D"},{from:"C",to:"D"}]}, info: "i=1：第 1 行求和，1+0+0+1=2" },
+    { line: 14, output: "A 的度 = 2\nB 的度 = 2", info: "顶点 B 的度为 2（连着 A 和 D）" },
+    { line: 10, vars: {i:{value:2,type:"int"}}, loop: [{label:"i=2",active:true}], matrix: {name:"g", rows:4, cols:4, cells:[[{val:0},{val:1},{val:1},{val:0}],[{val:1},{val:0},{val:0},{val:1}],[{val:1,hl:true},{val:0,hl:true},{val:0,hl:true},{val:1,hl:true}],[{val:0},{val:1},{val:1},{val:0}]]}, graph: {nodes:[{id:"A",label:"A",x:30,y:20},{id:"B",label:"B",x:170,y:20},{id:"C",label:"C",x:30,y:140,highlight:true},{id:"D",label:"D",x:170,y:140}], edges:[{from:"A",to:"B"},{from:"A",to:"C"},{from:"B",to:"D"},{from:"C",to:"D"}]}, info: "i=2：第 2 行求和，1+0+0+1=2" },
+    { line: 14, output: "A 的度 = 2\nB 的度 = 2\nC 的度 = 2", info: "顶点 C 的度为 2（连着 A 和 D）" },
+    { line: 10, vars: {i:{value:3,type:"int"}}, loop: [{label:"i=3",active:true}], matrix: {name:"g", rows:4, cols:4, cells:[[{val:0},{val:1},{val:1},{val:0}],[{val:1},{val:0},{val:0},{val:1}],[{val:1},{val:0},{val:0},{val:1}],[{val:0,hl:true},{val:1,hl:true},{val:1,hl:true},{val:0,hl:true}]]}, graph: {nodes:[{id:"A",label:"A",x:30,y:20},{id:"B",label:"B",x:170,y:20},{id:"C",label:"C",x:30,y:140},{id:"D",label:"D",x:170,y:140,highlight:true}], edges:[{from:"A",to:"B"},{from:"A",to:"C"},{from:"B",to:"D"},{from:"C",to:"D"}]}, info: "i=3：第 3 行求和，0+1+1+0=2" },
+    { line: 14, output: "A 的度 = 2\nB 的度 = 2\nC 的度 = 2\nD 的度 = 2", info: "顶点 D 的度为 2。每个顶点的度就是邻接矩阵对应行的和" },
+    { line: 17, info: "程序结束" }
+  ]
+});
+/* ========== 章节练习：3 道预测输出 + 3 道改错 ========== */
+createQuiz("quiz0", {
+  type: "predict",
+  title: "部分初始化：没写的元素是几",
+  code: `#include <stdio.h>
+
+int main() {
+    int a[5] = {1, 2, 3};
+    int i, sum = 0;
+    for (i = 0; i < 5; i++) {
+        sum += a[i];
+    }
+    printf("sum = %d\\n", sum);
+    return 0;
+}`,
+  answer: "sum = 6",
+  explain: "初始化列表只给了 3 个值，但数组有 5 个元素：C 语言规定<strong>剩余元素自动初始化为 0</strong>，所以 a[3]、a[4] 都是 0。求和 1+2+3+0+0 = 6。"
+});
+createQuiz("quiz1", {
+  type: "predict",
+  title: "数组名作函数参数：函数里的修改会带回来",
+  code: `#include <stdio.h>
+
+void double_it(int a[], int n) {
+    int i;
+    for (i = 0; i < n; i++) {
+        a[i] *= 2;
+    }
+}
+
+int main() {
+    int a[4] = {1, 2, 3, 4};
+    int i;
+    double_it(a, 4);
+    for (i = 0; i < 4; i++) {
+        printf("%d ", a[i]);
+    }
+    printf("\\n");
+    return 0;
+}`,
+  answer: "2 4 6 8",
+  explain: "数组名作为实参时传的是<strong>首元素地址</strong>，形参 a 和实参 a 指向同一段内存，函数里把每个元素乘 2，main 里打印的就是修改后的结果 <code>2 4 6 8</code>（数组传参不是值拷贝）。"
+});
+createQuiz("quiz2", {
+  type: "predict",
+  title: "二维数组：内层大括号初始化与按行求和",
+  code: `#include <stdio.h>
+
+int main() {
+    int a[2][3] = {{1, 2}, {4, 5, 6}};
+    int i, j;
+    for (i = 0; i < 2; i++) {
+        int row = 0;
+        for (j = 0; j < 3; j++) {
+            row += a[i][j];
+        }
+        printf("%d\\n", row);
+    }
+    return 0;
+}`,
+  answer: "3\n15",
+  explain: "内层大括号逐行初始化：第 0 行是 {1, 2}，第 3 列没给值<strong>自动补 0</strong>，所以第 0 行和为 1+2+0 = 3；第 1 行是 {4, 5, 6}，和为 15。嵌套循环外层走行、内层走列，正好符合二维数组按行优先的存储顺序。"
+});
+createQuiz("quiz3", {
+  type: "fix",
+  title: "遍历数组时下标越界（差一错误）",
+  code: `#include <stdio.h>
+
+int main() {
+    int a[5] = {10, 20, 30, 40, 50};
+    int i, sum = 0;
+    for (i = 0; i <= 5; i++) {
+        sum += a[i];
+    }
+    printf("sum = %d\\n", sum);
+    return 0;
+}`,
+  accept: [`#include <stdio.h>
+
+int main() {
+    int a[5] = {10, 20, 30, 40, 50};
+    int i, sum = 0;
+    for (i = 0; i < 5; i++) {
+        sum += a[i];
+    }
+    printf("sum = %d\\n", sum);
+    return 0;
+}`, `#include <stdio.h>
+
+int main() {
+    int a[5] = {10, 20, 30, 40, 50};
+    int i, sum = 0;
+    for (i = 0; i <= 4; i++) {
+        sum += a[i];
+    }
+    printf("sum = %d\\n", sum);
+    return 0;
+}`],
+  explain: "数组 a[5] 的合法下标是 <strong>0~4</strong>，条件 <code>i <= 5</code> 让循环多走一次，读到越界的 a[5]，结果是不确定的垃圾值（越界在 C 里不报错，最危险）。最小修改：把 <code>i <= 5</code> 改成 <code>i < 5</code>（或 <code>i <= 4</code>）。"
+});
+createQuiz("quiz4", {
+  type: "fix",
+  title: "二维数组作函数参数：列数不能省略",
+  code: `#include <stdio.h>
+
+int row_sum(int m[][], int r) {
+    int j, s = 0;
+    for (j = 0; j < 3; j++) {
+        s += m[r][j];
+    }
+    return s;
+}
+
+int main() {
+    int a[2][3] = {{1, 2, 3}, {4, 5, 6}};
+    printf("%d\\n", row_sum(a, 1));
+    return 0;
+}`,
+  accept: [`#include <stdio.h>
+
+int row_sum(int m[][3], int r) {
+    int j, s = 0;
+    for (j = 0; j < 3; j++) {
+        s += m[r][j];
+    }
+    return s;
+}
+
+int main() {
+    int a[2][3] = {{1, 2, 3}, {4, 5, 6}};
+    printf("%d\\n", row_sum(a, 1));
+    return 0;
+}`, `#include <stdio.h>
+
+int row_sum(int m[2][3], int r) {
+    int j, s = 0;
+    for (j = 0; j < 3; j++) {
+        s += m[r][j];
+    }
+    return s;
+}
+
+int main() {
+    int a[2][3] = {{1, 2, 3}, {4, 5, 6}};
+    printf("%d\\n", row_sum(a, 1));
+    return 0;
+}`],
+  explain: "二维数组按行优先连续存储，编译器要靠<strong>列数</strong>才能把 m[r][j] 换算成地址 r*列数+j，所以形参里第二维（列数）必须写，第一维可以省略。最小修改：把 <code>int m[][]</code> 改成 <code>int m[][3]</code>（写全 <code>int m[2][3]</code> 也可以）。"
+});
+createQuiz("quiz5", {
+  type: "fix",
+  title: "求列和时行、列下标写反了",
+  code: `#include <stdio.h>
+
+int main() {
+    int a[2][3] = {{1, 2, 3}, {4, 5, 6}};
+    int i, j;
+    for (j = 0; j < 3; j++) {
+        int col = 0;
+        for (i = 0; i < 2; i++) {
+            col += a[j][i];
+        }
+        printf("%d ", col);
+    }
+    printf("\\n");
+    return 0;
+}`,
+  accept: [`#include <stdio.h>
+
+int main() {
+    int a[2][3] = {{1, 2, 3}, {4, 5, 6}};
+    int i, j;
+    for (j = 0; j < 3; j++) {
+        int col = 0;
+        for (i = 0; i < 2; i++) {
+            col += a[i][j];
+        }
+        printf("%d ", col);
+    }
+    printf("\\n");
+    return 0;
+}`],
+  explain: "外层 j 走列（0~2）、内层 i 走行（0~1），元素应当写成 <code>a[i][j]</code>（先行后列）。写成 <code>a[j][i]</code> 时，j=2 会访问 a[2][i]，第一维越界（数组只有 2 行），结果错误。改对后输出各列之和 <code>5 7 9</code>。"
+});
+</script>
+</body>
+</html>

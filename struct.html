@@ -1,0 +1,604 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="C语言结构体交互演示：结构体定义、数组、指针、嵌套、typedef、链表、malloc 创建结构体与局部变量陷阱。">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<title>结构体 - C语言教学演示</title>
+<link rel="stylesheet" href="style.css?v=16">
+</head>
+<body>
+<nav></nav>
+<div class="container">
+<h1>结构体</h1>
+<div class="intro">
+<p><strong>结构体</strong>允许将多个不同类型的数据组合成一个整体。核心知识点：</p>
+<ul>
+<li><code>struct</code> 定义一种新的复合数据类型，包含若干成员（字段）</li>
+<li>定义变量：<code>struct Student s;</code>；访问成员用点号 <code>s.age</code></li>
+<li><strong>结构体指针</strong>用箭头访问成员：<code>ps->age</code> 等价于 <code>(*ps).age</code></li>
+<li>结构体数组：每个元素都是一个完整的结构体</li>
+<li>结构体可以嵌套：一个结构体的成员可以是另一个结构体</li>
+<li><code>typedef</code> 可以给结构体起别名，简化代码书写</li>
+<li><strong>链表</strong>：结构体中包含指向同类型结构体的指针 <code>struct Node *next;</code>，就能把节点串成链</li>
+<li>函数里用 <code>malloc</code> 创建的结构体在<strong>堆</strong>上，函数返回后依然有效；而局部变量在<strong>栈</strong>上，函数返回即失效，绝不能返回局部变量的地址</li>
+</ul>
+</div>
+<div class="demo-grid">
+  <div id="demo0"></div>
+  <div id="demo1"></div>
+  <div id="demo2"></div>
+  <div id="demo3"></div>
+  <div id="demo4"></div>
+  <div id="demo5"></div>
+  <div id="demo6"></div>
+  <div id="demo7"></div>
+  <div id="demo8"></div>
+  <div id="demo9"></div>
+</div>
+<h2>章节练习</h2>
+<div class="quiz-grid">
+  <div id="quiz0"></div>
+  <div id="quiz1"></div>
+  <div id="quiz2"></div>
+  <div id="quiz3"></div>
+  <div id="quiz4"></div>
+  <div id="quiz5"></div>
+</div>
+</div>
+
+<script src="demo-engine.js?v=16"></script>
+<script>
+createDemo("demo0", {
+  title: "结构体定义与初始化",
+  subtitle: "把学生的信息封装成一个整体",
+  code: `#include <stdio.h>
+
+struct Student {
+    char name[20];
+    int age;
+    float score;
+};
+
+int main() {
+    struct Student s1 = {"Alice", 20, 89.5};
+    s1.age = 21;
+    printf("%s %d %.1f\\n", s1.name, s1.age, s1.score);
+    return 0;
+}`,
+  vizTypes: ["vars","struct","console"],
+  steps: [
+    { line: 8, info: "main() 开始" },
+    { line: 9, vars: {s1:{value:"struct Student",type:"struct"}}, struct: [{name:"s1",addr:"0x1000",fields:[{name:"name",value:"Alice"},{name:"age",value:20},{name:"score",value:89.5}]}], info: "定义结构体变量 s1 并初始化三个字段" },
+    { line: 10, vars: {s1:{value:"struct Student",type:"struct"}}, struct: [{name:"s1",addr:"0x1000",fields:[{name:"name",value:"Alice"},{name:"age",value:21},{name:"score",value:89.5}]}], info: "用点号访问并修改 age 字段：s1.age = 21" },
+    { line: 11, output: "Alice 21 89.5", info: "输出三个成员的值" },
+    { line: 12, info: "程序结束" }
+  ]
+});
+createDemo("demo1", {
+  title: "结构体数组",
+  subtitle: "多个结构体组成数组",
+  code: `#include <stdio.h>
+
+struct Point { int x; int y; };
+
+int main() {
+    struct Point pts[3] = {{0,0}, {1,2}, {3,4}};
+    int i;
+    for (i = 0; i < 3; i++) {
+        printf("(%d,%d) ", pts[i].x, pts[i].y);
+    }
+    printf("\\n");
+    return 0;
+}`,
+  vizTypes: ["vars","struct","loop","console"],
+  steps: [
+    { line: 5, info: "main() 开始" },
+    { line: 6, vars: {pts:{value:"struct Point[3]",type:"array"}}, struct: [{name:"pts[0]",addr:"0x1000",fields:[{name:"x",value:0},{name:"y",value:0}]},{name:"pts[1]",addr:"0x1008",fields:[{name:"x",value:1},{name:"y",value:2}]},{name:"pts[2]",addr:"0x1010",fields:[{name:"x",value:3},{name:"y",value:4}]}], info: "定义结构体数组并初始化 3 个点" },
+    { line: 7, vars: {i:{value:0,type:"int"}}, loop: [{label:"i=0",active:true}], info: "循环开始，i=0" },
+    { line: 8, output: "(0,0) ", info: "访问 pts[0].x 和 pts[0].y" },
+    { line: 7, vars: {i:{value:1,type:"int"}}, loop: [{label:"i=1",active:true}], info: "i=1" },
+    { line: 8, output: "(0,0) (1,2) ", info: "访问 pts[1]" },
+    { line: 7, vars: {i:{value:2,type:"int"}}, loop: [{label:"i=2",active:true}], info: "i=2" },
+    { line: 8, output: "(0,0) (1,2) (3,4) ", info: "访问 pts[2]" },
+    { line: 10, output: "(0,0) (1,2) (3,4) \n", info: "换行输出" },
+    { line: 11, info: "程序结束" }
+  ]
+});
+createDemo("demo2", {
+  title: "结构体指针与 -> 运算符",
+  subtitle: "用指针访问结构体成员",
+  code: `#include <stdio.h>
+
+struct Student { char name[20]; int age; };
+
+int main() {
+    struct Student s = {"Bob", 19};
+    struct Student *p = &s;
+    p->age = 20;
+    printf("%s %d\\n", p->name, p->age);
+    return 0;
+}`,
+  vizTypes: ["vars","pointer","struct","console"],
+  steps: [
+    { line: 6, info: "main() 开始" },
+    { line: 7, vars: {s:{value:"struct Student",type:"struct"}}, struct: [{name:"s",addr:"0x1000",fields:[{name:"name",value:"Bob"},{name:"age",value:19}]}], info: "定义 s 并初始化" },
+    { line: 8, vars: {p:{value:"0x1000",type:"struct Student*"}}, pointer: [{name:"p",type:"struct Student*",addr:"0x2000",value:"0x1000",targetName:"s",targetType:"struct Student",targetAddr:"0x1000",targetValue:"{Bob, 19}"}], info: "p 指向 s 的地址" },
+    { line: 9, vars: {s:{value:"struct Student",type:"struct"}}, struct: [{name:"s",addr:"0x1000",fields:[{name:"name",value:"Bob"},{name:"age",value:20}]}], pointer: [{name:"p",type:"struct Student*",addr:"0x2000",value:"0x1000",targetName:"s",targetType:"struct Student",targetAddr:"0x1000",targetValue:"{Bob, 20}"}], info: "p->age = 20：通过指针修改 s 的 age 字段" },
+    { line: 10, output: "Bob 20", info: "通过指针访问成员并输出" },
+    { line: 10, info: "程序结束" }
+  ]
+});
+createDemo("demo3", {
+  title: "嵌套结构体",
+  subtitle: "结构体内部包含另一个结构体",
+  code: `#include <stdio.h>
+
+struct Date { int year; int month; int day; };
+
+struct Person {
+    char name[20];
+    struct Date birthday;
+};
+
+int main() {
+    struct Person p = {"Alice", {2000, 5, 15}};
+    printf("%s born on %d/%d/%d\\n",
+           p.name, p.birthday.year,
+           p.birthday.month, p.birthday.day);
+    return 0;
+}`,
+  vizTypes: ["vars","struct","console"],
+  steps: [
+    { line: 10, info: "main() 开始" },
+    { line: 11, vars: {p:{value:"struct Person",type:"struct"}}, struct: [{name:"p",addr:"0x1000",fields:[{name:"name",value:"Alice"},{name:"birthday",value:"{2000,5,15}"}]}], info: "定义嵌套结构体并初始化" },
+    { line: 12, output: "Alice born on 2000/5/15", info: "通过 p.birthday.year 访问嵌套成员" },
+    { line: 15, info: "程序结束" }
+  ]
+});
+createDemo("demo4", {
+  title: "结构体作为函数参数",
+  subtitle: "传值 vs 传指针：内存拷贝的代价",
+  code: `#include <stdio.h>
+
+struct Point { int x; int y; };
+
+void move(struct Point *p) {
+    p->x += 10;
+    p->y += 10;
+}
+
+int main() {
+    struct Point a = {1, 2};
+    move(&a);
+    printf("(%d,%d)\\n", a.x, a.y);
+    return 0;
+}`,
+  vizTypes: ["vars","struct","pointer","stack","console"],
+  steps: [
+    { line: 10, info: "main() 开始" },
+    { line: 11, vars: {a:{value:"struct Point",type:"struct"}}, struct: [{name:"a",addr:"0x1000",fields:[{name:"x",value:1},{name:"y",value:2}]}], info: "a = (1, 2)" },
+    { line: 12, info: "调用 move(&a)：传递地址，避免整个结构体拷贝" },
+    { line: 5, stack: [{name:"main",value:"a=(1,2)"},{name:"move",value:"p=&a",highlight:true}], vars: {p:{value:"0x1000",type:"struct Point*"}}, pointer: [{name:"p",type:"struct Point*",addr:"0x2000",value:"0x1000",targetName:"a",targetType:"struct Point",targetAddr:"0x1000",targetValue:"(1, 2)"}], info: "p 指向 a" },
+    { line: 6, vars: {a:{value:"struct Point",type:"struct"}}, struct: [{name:"a",addr:"0x1000",fields:[{name:"x",value:11},{name:"y",value:2}]}], pointer: [{name:"p",type:"struct Point*",addr:"0x2000",value:"0x1000",targetName:"a",targetType:"struct Point",targetAddr:"0x1000",targetValue:"(11, 2)"}], info: "p->x += 10：修改 x 为 11" },
+    { line: 7, vars: {a:{value:"struct Point",type:"struct"}}, struct: [{name:"a",addr:"0x1000",fields:[{name:"x",value:11},{name:"y",value:12}]}], pointer: [{name:"p",type:"struct Point*",addr:"0x2000",value:"0x1000",targetName:"a",targetType:"struct Point",targetAddr:"0x1000",targetValue:"(11, 12)"}], info: "p->y += 10：修改 y 为 12" },
+    { line: 9, stack: [{name:"main",value:"a=(11,12)",highlight:true}], info: "move 结束" },
+    { line: 13, vars: {a:{value:"struct Point",type:"struct"}}, struct: [{name:"a",addr:"0x1000",fields:[{name:"x",value:11},{name:"y",value:12}]}], info: "a 被成功修改为 (11, 12)" },
+    { line: 13, output: "(11,12)", info: "输出结果" },
+    { line: 14, info: "程序结束" }
+  ]
+});
+createDemo("demo5", {
+  title: "typedef 简化结构体",
+  subtitle: "给结构体起别名，省略 struct 关键字",
+  code: `#include <stdio.h>
+
+typedef struct {
+    int x;
+    int y;
+} Point;
+
+int main() {
+    Point p1 = {3, 4};
+    Point p2 = p1;
+    p2.x = 10;
+    printf("p1=(%d,%d) p2=(%d,%d)\\n",
+           p1.x, p1.y, p2.x, p2.y);
+    return 0;
+}`,
+  vizTypes: ["vars","struct","console"],
+  steps: [
+    { line: 8, info: "main() 开始" },
+    { line: 9, vars: {p1:{value:"Point",type:"struct"}}, struct: [{name:"p1",addr:"0x1000",fields:[{name:"x",value:3},{name:"y",value:4}]}], info: "用别名 Point 定义变量 p1，无需写 struct" },
+    { line: 10, vars: {p2:{value:"Point",type:"struct"}}, struct: [{name:"p1",addr:"0x1000",fields:[{name:"x",value:3},{name:"y",value:4}]},{name:"p2",addr:"0x1008",fields:[{name:"x",value:3},{name:"y",value:4}]}], info: "p2 = p1：结构体整体拷贝，p2 得到一份独立副本" },
+    { line: 11, vars: {p2:{value:"Point",type:"struct"}}, struct: [{name:"p1",addr:"0x1000",fields:[{name:"x",value:3},{name:"y",value:4}]},{name:"p2",addr:"0x1008",fields:[{name:"x",value:10},{name:"y",value:4}]}], info: "修改 p2.x 为 10，不影响 p1" },
+    { line: 12, output: "p1=(3,4) p2=(10,4)", info: "p1 和 p2 是独立的两个结构体" },
+    { line: 14, info: "程序结束" }
+  ]
+});
+createDemo("demo6", {
+  title: "链表的创建与遍历",
+  subtitle: "每个节点用 next 指针串起下一个节点",
+  code: `#include <stdio.h>
+
+struct Node {
+    int data;
+    struct Node *next;
+};
+
+int main() {
+    struct Node n3 = {30, NULL};
+    struct Node n2 = {20, &n3};
+    struct Node n1 = {10, &n2};
+    struct Node *head = &n1;
+    struct Node *p = head;
+    while (p != NULL) {
+        printf("%d ", p->data);
+        p = p->next;
+    }
+    return 0;
+}`,
+  vizTypes: ["vars","linkedlist","console"],
+  steps: [
+    { line: 7, info: "main() 开始" },
+    { line: 8, vars: {n3:{value:"struct Node",type:"struct"}}, linkedlist: [{label:"n3", data:30, addr:"0x1008", nextNull:true, isNew:true}], info: "创建 n3：data=30，next=NULL（暂时只有它自己）" },
+    { line: 9, vars: {n2:{value:"struct Node",type:"struct"}}, linkedlist: [{label:"n2", data:20, addr:"0x1004", isNew:true},{label:"n3", data:30, addr:"0x1008", nextNull:true}], info: "创建 n2：data=20，next 指向 n3" },
+    { line: 10, vars: {n1:{value:"struct Node",type:"struct"}}, linkedlist: [{label:"n1", data:10, addr:"0x1000", isNew:true},{label:"n2", data:20, addr:"0x1004"},{label:"n3", data:30, addr:"0x1008", nextNull:true}], info: "创建 n1：data=10，next 指向 n2，三个节点连成链" },
+    { line: 11, vars: {head:{value:"0x1000",type:"struct Node*"}}, linkedlist: [{label:"head", data:10, addr:"0x1000"},{label:"", data:20, addr:"0x1004"},{label:"", data:30, addr:"0x1008", nextNull:true}], info: "head 指向头节点 n1，head 是链表的入口" },
+    { line: 12, vars: {p:{value:"0x1000",type:"struct Node*"}}, linkedlist: [{label:"head p", data:10, addr:"0x1000", highlight:true},{label:"", data:20, addr:"0x1004"},{label:"", data:30, addr:"0x1008", nextNull:true}], info: "p = head：p 也指向第一个节点" },
+    { line: 14, output: "10 ", linkedlist: [{label:"head p", data:10, addr:"0x1000", highlight:true},{label:"", data:20, addr:"0x1004"},{label:"", data:30, addr:"0x1008", nextNull:true}], info: "p != NULL 成立，输出 p->data = 10" },
+    { line: 15, vars: {p:{value:"0x1004",type:"struct Node*"}}, linkedlist: [{label:"head", data:10, addr:"0x1000"},{label:"p", data:20, addr:"0x1004", highlight:true},{label:"", data:30, addr:"0x1008", nextNull:true}], info: "p = p->next：p 顺着 next 移动到第二个节点" },
+    { line: 14, output: "10 20 ", linkedlist: [{label:"head", data:10, addr:"0x1000"},{label:"p", data:20, addr:"0x1004", highlight:true},{label:"", data:30, addr:"0x1008", nextNull:true}], info: "输出 20" },
+    { line: 15, vars: {p:{value:"0x1008",type:"struct Node*"}}, linkedlist: [{label:"head", data:10, addr:"0x1000"},{label:"", data:20, addr:"0x1004"},{label:"p", data:30, addr:"0x1008", nextNull:true, highlight:true}], info: "p 移动到第三个节点" },
+    { line: 14, output: "10 20 30 ", linkedlist: [{label:"head", data:10, addr:"0x1000"},{label:"", data:20, addr:"0x1004"},{label:"p", data:30, addr:"0x1008", nextNull:true, highlight:true}], info: "输出 30" },
+    { line: 15, vars: {p:{value:"NULL",type:"struct Node*"}}, linkedlist: [{label:"head", data:10, addr:"0x1000"},{label:"", data:20, addr:"0x1004"},{label:"", data:30, addr:"0x1008", nextNull:true}], info: "p = p->next = NULL，while 条件为假，遍历结束" },
+    { line: 17, info: "程序结束" }
+  ]
+});
+createDemo("demo7", {
+  title: "头插法建立链表",
+  subtitle: "每次把新节点插到头部，链表内容与原顺序相反",
+  code: `#include <stdio.h>
+
+struct Node {
+    int data;
+    struct Node *next;
+};
+
+int main() {
+    struct Node *head = NULL;
+    struct Node n1 = {10, NULL};
+    struct Node n2 = {20, NULL};
+    struct Node n3 = {30, NULL};
+    n1.next = head; head = &n1;
+    n2.next = head; head = &n2;
+    n3.next = head; head = &n3;
+    struct Node *p = head;
+    while (p != NULL) {
+        printf("%d ", p->data);
+        p = p->next;
+    }
+    return 0;
+}`,
+  vizTypes: ["vars","linkedlist","console"],
+  steps: [
+    { line: 7, info: "main() 开始" },
+    { line: 8, vars: {head:{value:"NULL",type:"struct Node*"}}, info: "head = NULL，空链表" },
+    { line: 9, vars: {n1:{value:"struct Node",type:"struct"}}, linkedlist: [{label:"n1", data:10, addr:"0x1000", nextNull:true, isNew:true}], info: "创建 n1（还没入链）" },
+    { line: 10, vars: {n2:{value:"struct Node",type:"struct"}}, linkedlist: [{label:"n1", data:10, addr:"0x1000", nextNull:true},{label:"n2", data:20, addr:"0x1004", nextNull:true, isNew:true}], info: "创建 n2" },
+    { line: 11, vars: {n3:{value:"struct Node",type:"struct"}}, linkedlist: [{label:"n1", data:10, addr:"0x1000", nextNull:true},{label:"n2", data:20, addr:"0x1004", nextNull:true},{label:"n3", data:30, addr:"0x1008", nextNull:true, isNew:true}], info: "创建 n3。注意：此时三个节点都还没有互相连接（下面是头插过程）" },
+    { line: 12, vars: {head:{value:"0x1000",type:"struct Node*"}}, linkedlist: [{label:"head", data:10, addr:"0x1000", nextNull:true, highlight:true},{label:"n2", data:20, addr:"0x1004", nextNull:true},{label:"n3", data:30, addr:"0x1008", nextNull:true}], info: "n1.next = head(NULL)；head = &n1：10 入链，链表为 10" },
+    { line: 13, vars: {head:{value:"0x1004",type:"struct Node*"}}, linkedlist: [{label:"head", data:20, addr:"0x1004", highlight:true},{label:"", data:10, addr:"0x1000", nextNull:true},{label:"n3", data:30, addr:"0x1008", nextNull:true}], info: "n2.next = head；head = &n2：20 插到头部，链表为 20→10" },
+    { line: 14, vars: {head:{value:"0x1008",type:"struct Node*"}}, linkedlist: [{label:"head", data:30, addr:"0x1008", highlight:true},{label:"", data:20, addr:"0x1004"},{label:"", data:10, addr:"0x1000", nextNull:true}], info: "n3.next = head；head = &n3：30 插到头部，链表为 30→20→10（与创建顺序相反！）" },
+    { line: 15, vars: {p:{value:"0x1008",type:"struct Node*"}}, linkedlist: [{label:"head p", data:30, addr:"0x1008", highlight:true},{label:"", data:20, addr:"0x1004"},{label:"", data:10, addr:"0x1000", nextNull:true}], info: "p = head，开始遍历" },
+    { line: 17, output: "30 ", info: "输出 30" },
+    { line: 18, vars: {p:{value:"0x1004",type:"struct Node*"}}, linkedlist: [{label:"head", data:30, addr:"0x1008"},{label:"p", data:20, addr:"0x1004", highlight:true},{label:"", data:10, addr:"0x1000", nextNull:true}], info: "p 后移" },
+    { line: 17, output: "30 20 ", info: "输出 20" },
+    { line: 18, vars: {p:{value:"0x1000",type:"struct Node*"}}, linkedlist: [{label:"head", data:30, addr:"0x1008"},{label:"", data:20, addr:"0x1004"},{label:"p", data:10, addr:"0x1000", nextNull:true, highlight:true}], info: "p 后移" },
+    { line: 17, output: "30 20 10 ", info: "输出 10" },
+    { line: 18, vars: {p:{value:"NULL",type:"struct Node*"}}, info: "p = NULL，遍历结束。输出顺序 30 20 10 与插入顺序相反" },
+    { line: 20, info: "程序结束" }
+  ]
+});
+createDemo("demo8", {
+  title: "删除链表中的节点",
+  subtitle: "让前一个节点的 next 绕过被删节点",
+  code: `#include <stdio.h>
+
+struct Node {
+    int data;
+    struct Node *next;
+};
+
+int main() {
+    struct Node n3 = {30, NULL};
+    struct Node n2 = {20, &n3};
+    struct Node n1 = {10, &n2};
+    struct Node *head = &n1;
+    n1.next = n2.next;
+    struct Node *p = head;
+    while (p != NULL) {
+        printf("%d ", p->data);
+        p = p->next;
+    }
+    return 0;
+}`,
+  vizTypes: ["vars","linkedlist","console"],
+  steps: [
+    { line: 7, info: "main() 开始" },
+    { line: 8, vars: {n3:{value:"struct Node",type:"struct"}}, linkedlist: [{label:"n3", data:30, addr:"0x1008", nextNull:true, isNew:true}], info: "创建 n3" },
+    { line: 9, vars: {n2:{value:"struct Node",type:"struct"}}, linkedlist: [{label:"n2", data:20, addr:"0x1004", isNew:true},{label:"n3", data:30, addr:"0x1008", nextNull:true}], info: "创建 n2，next 指向 n3" },
+    { line: 10, vars: {n1:{value:"struct Node",type:"struct"}}, linkedlist: [{label:"n1", data:10, addr:"0x1000", isNew:true},{label:"n2", data:20, addr:"0x1004"},{label:"n3", data:30, addr:"0x1008", nextNull:true}], info: "创建 n1，链表 10→20→30" },
+    { line: 11, vars: {head:{value:"0x1000",type:"struct Node*"}}, linkedlist: [{label:"head", data:10, addr:"0x1000"},{label:"", data:20, addr:"0x1004"},{label:"", data:30, addr:"0x1008", nextNull:true}], info: "head 指向头节点。现在想删除值为 20 的节点 n2" },
+    { line: 12, linkedlist: [{label:"head", data:10, addr:"0x1000", highlight:true},{label:"n2 被绕过", data:20, addr:"0x1004", deleted:true},{label:"", data:30, addr:"0x1008", nextNull:true, highlight:true}], info: "关键一步：n1.next = n2.next，让 n1 的 next 直接指向 n3，n2 被「绕过」——它还在内存里，但已经不在链中（灰色虚线）" },
+    { line: 13, vars: {p:{value:"0x1000",type:"struct Node*"}}, linkedlist: [{label:"head p", data:10, addr:"0x1000", highlight:true},{label:"n2", data:20, addr:"0x1004", deleted:true},{label:"", data:30, addr:"0x1008", nextNull:true}], info: "开始遍历（注意：真实工程中还应该 free(n2) 释放内存，这里为了演示先省略）" },
+    { line: 15, output: "10 ", info: "输出 10" },
+    { line: 16, vars: {p:{value:"0x1008",type:"struct Node*"}}, linkedlist: [{label:"head", data:10, addr:"0x1000"},{label:"n2", data:20, addr:"0x1004", deleted:true},{label:"p", data:30, addr:"0x1008", nextNull:true, highlight:true}], info: "p = p->next：从 10 直接跳到 30，不会再经过 20" },
+    { line: 15, output: "10 30 ", info: "输出 30，链表中已经没有 20" },
+    { line: 16, vars: {p:{value:"NULL",type:"struct Node*"}}, info: "p = NULL，遍历结束" },
+    { line: 18, info: "程序结束" }
+  ]
+});
+/* ========== demo9: malloc 创建结构体并返回 ========== */
+createDemo("demo9", {
+  title: "malloc 结构体与函数返回",
+  subtitle: "对比：返回局部变量的地址（危险） vs 返回 malloc 的堆内存（安全）",
+  code: `#include <stdio.h>
+#include <stdlib.h>
+
+struct Point { int x; int y; };
+
+struct Point* create_wrong() {
+    struct Point p = {1, 2};
+    return &p;
+}
+
+struct Point* create_right() {
+    struct Point *p = malloc(sizeof(struct Point));
+    p->x = 3;
+    p->y = 4;
+    return p;
+}
+
+int main() {
+    struct Point *a = create_wrong();
+    struct Point *b = create_right();
+    printf("b=(%d,%d)\\n", b->x, b->y);
+    free(b);
+    return 0;
+}`,
+  vizTypes: ["vars","stack","pointer","console"],
+  steps: [
+    { line: 18, info: "main() 开始" },
+    { line: 19, info: "先调用 create_wrong()：它返回局部变量的地址" },
+    { line: 7, stack: [{name:"main",value:"a=?, b=?"},{name:"create_wrong",value:"p=(1,2) @0x3000",highlight:true}], vars: {p:{value:"(1,2)",type:"struct Point",addr:"0x3000"}}, info: "create_wrong 里的 p 是【局部变量】，住在栈上（假设地址 0x3000）" },
+    { line: 8, info: "return &p：把 p 的地址 0x3000 返回给 main" },
+    { line: 10, stack: [{name:"main",value:"a=0x3000, b=?",highlight:true}], vars: {a:{value:"0x3000",type:"struct Point*"}}, pointer: [{name:"a",type:"struct Point*",addr:"0x2000",value:"0x3000",targetName:"p（栈上）",targetType:"struct Point",targetAddr:"0x3000",targetValue:"(1, 2)",targetInvalid:true}], info: "⚠ create_wrong 结束，栈帧销毁，p 的内存随即被回收——a 成了「悬垂指针」：地址还在，但家没了。再使用 a 是未定义行为！" },
+    { line: 20, info: "再调用 create_right()：它返回 malloc 申请的堆内存" },
+    { line: 12, stack: [{name:"main",value:"a=0x3000, b=?"},{name:"create_right",value:"p=0xB000",highlight:true}], vars: {p:{value:"0xB000",type:"struct Point*"}}, pointer: [{name:"p",type:"struct Point*",addr:"0x2004",value:"0xB000",targetName:"堆内存",targetType:"struct Point",targetAddr:"0xB000",targetValue:"?"}], info: "malloc(sizeof(struct Point))：在【堆】上申请内存 0xB000——堆内存不随函数返回释放" },
+    { line: 13, pointer: [{name:"p",type:"struct Point*",addr:"0x2004",value:"0xB000",targetName:"堆内存",targetType:"struct Point",targetAddr:"0xB000",targetValue:"(3, ?)"}], info: "p->x = 3：往堆内存写数据" },
+    { line: 14, pointer: [{name:"p",type:"struct Point*",addr:"0x2004",value:"0xB000",targetName:"堆内存",targetType:"struct Point",targetAddr:"0xB000",targetValue:"(3, 4)"}], info: "p->y = 4" },
+    { line: 15, info: "return p：把堆内存地址 0xB000 返回" },
+    { line: 17, stack: [{name:"main",value:"a=0x3000, b=0xB000",highlight:true}], vars: {b:{value:"0xB000",type:"struct Point*"}}, pointer: [{name:"b",type:"struct Point*",addr:"0x2004",value:"0xB000",targetName:"堆内存",targetType:"struct Point",targetAddr:"0xB000",targetValue:"(3, 4)"}], info: "create_right 结束：局部指针 p 销毁了，但【堆内存还在】——b 是合法有效的！" },
+    { line: 21, output: "b=(3,4)", info: "b 可以安全使用。对比 a：同样是函数返回的地址，栈上的家被收了，堆上的家还在" },
+    { line: 22, pointer: [{name:"b",type:"struct Point*",addr:"0x2004",value:"0xB000",targetName:"堆内存",targetType:"struct Point",targetAddr:"0xB000",targetValue:"(3, 4)",targetInvalid:true}], info: "free(b)：堆内存的生命周期由你掌控——不用了就手动归还（a 指向的栈内存不需要也不能 free）" },
+    { line: 23, info: "程序结束。记住：需要跨函数存活的结构体，就用 malloc 在堆上创建" }
+  ]
+});
+/* ========== 章节练习：3 道预测输出 + 3 道改错 ========== */
+createQuiz("quiz0", {
+  type: "predict",
+  title: "结构体初始化与点号访问",
+  code: `#include <stdio.h>
+
+struct Student {
+    char name[20];
+    int age;
+    float score;
+};
+
+int main() {
+    struct Student s = {"Alice", 20, 89.5};
+    s.age = s.age + 1;
+    printf("%s %d %.1f\\n", s.name, s.age, s.score);
+    return 0;
+}`,
+  answer: "Alice 21 89.5",
+  explain: "初始化列表按成员顺序依次赋给 name、age、score；<code>s.age = s.age + 1</code> 用点号把 age 从 20 改为 21；<code>%.1f</code> 只保留一位小数，score 输出 89.5。"
+});
+createQuiz("quiz1", {
+  type: "predict",
+  title: "结构体数组求和",
+  code: `#include <stdio.h>
+
+struct Point { int x; int y; };
+
+int main() {
+    struct Point pts[3] = {{1, 2}, {3, 4}, {5, 6}};
+    int i, sum = 0;
+    for (i = 0; i < 3; i++) {
+        sum += pts[i].x + pts[i].y;
+    }
+    printf("sum=%d\\n", sum);
+    return 0;
+}`,
+  answer: "sum=21",
+  explain: "数组每个元素都是一个 struct Point，用 <code>pts[i].x</code> 访问成员。sum 累加 (1+2)+(3+4)+(5+6) = 3+7+11 = <strong>21</strong>。"
+});
+createQuiz("quiz2", {
+  type: "predict",
+  title: "typedef 别名与 -> 访问",
+  code: `#include <stdio.h>
+
+typedef struct {
+    int x;
+    int y;
+} Point;
+
+int main() {
+    Point p = {3, 4};
+    Point *q = &p;
+    q->x = q->x + 10;
+    (*q).y = (*q).y * 2;
+    printf("(%d,%d)\\n", q->x, p.y);
+    return 0;
+}`,
+  answer: "(13,8)",
+  explain: "<code>typedef</code> 让 Point 成为该结构体的别名，定义变量时不必再写 struct。q 指向 p，<code>q->x</code> 与 <code>(*q).x</code> 完全等价，改的都是 p：x = 3+10 = 13，y = 4*2 = 8。"
+});
+createQuiz("quiz3", {
+  type: "fix",
+  title: "嵌套结构体少写了一层",
+  code: `#include <stdio.h>
+
+struct Date { int year; int month; int day; };
+
+struct Person {
+    char name[20];
+    struct Date birthday;
+};
+
+int main() {
+    struct Person p = {"Alice", {2000, 5, 15}};
+    printf("%s: %d/%d/%d\\n", p.name, p.year, p.birthday.month, p.birthday.day);
+    return 0;
+}`,
+  accept: [`#include <stdio.h>
+
+struct Date { int year; int month; int day; };
+
+struct Person {
+    char name[20];
+    struct Date birthday;
+};
+
+int main() {
+    struct Person p = {"Alice", {2000, 5, 15}};
+    printf("%s: %d/%d/%d\\n", p.name, p.birthday.year, p.birthday.month, p.birthday.day);
+    return 0;
+}`],
+  explain: "year 是 <code>birthday</code>（struct Date）的成员，struct Person 本身并没有 year 这个成员，直接写 <code>p.year</code> 编译报错。嵌套结构体要逐层访问：<code>p.birthday.year</code>。"
+});
+createQuiz("quiz4", {
+  type: "fix",
+  title: "链表遍历漏掉最后一个节点",
+  code: `#include <stdio.h>
+
+struct Node {
+    int data;
+    struct Node *next;
+};
+
+int main() {
+    struct Node n3 = {30, NULL};
+    struct Node n2 = {20, &n3};
+    struct Node n1 = {10, &n2};
+    struct Node *p = &n1;
+    while (p->next != NULL) {
+        printf("%d ", p->data);
+        p = p->next;
+    }
+    printf("\\n");
+    return 0;
+}`,
+  accept: [`#include <stdio.h>
+
+struct Node {
+    int data;
+    struct Node *next;
+};
+
+int main() {
+    struct Node n3 = {30, NULL};
+    struct Node n2 = {20, &n3};
+    struct Node n1 = {10, &n2};
+    struct Node *p = &n1;
+    while (p != NULL) {
+        printf("%d ", p->data);
+        p = p->next;
+    }
+    printf("\\n");
+    return 0;
+}`, `#include <stdio.h>
+
+struct Node {
+    int data;
+    struct Node *next;
+};
+
+int main() {
+    struct Node n3 = {30, NULL};
+    struct Node n2 = {20, &n3};
+    struct Node n1 = {10, &n2};
+    struct Node *p = &n1;
+    while (p) {
+        printf("%d ", p->data);
+        p = p->next;
+    }
+    printf("\\n");
+    return 0;
+}`],
+  explain: "当 p 指向最后一个节点（30）时，<code>p->next</code> 已是 NULL，条件 <code>p->next != NULL</code> 为假，循环提前退出，30 永远不会被输出。遍历链表应判断 p 本身是否为空：<code>while (p != NULL)</code>（或简写 <code>while (p)</code>），改对后输出 10 20 30。"
+});
+createQuiz("quiz5", {
+  type: "fix",
+  title: "malloc 申请的字节数不对",
+  code: `#include <stdio.h>
+#include <stdlib.h>
+
+struct Data {
+    int values[10];
+    int count;
+};
+
+int main() {
+    struct Data *p = malloc(sizeof(p));
+    p->count = 3;
+    p->values[0] = 10;
+    p->values[1] = 20;
+    p->values[2] = 30;
+    printf("%d %d %d\\n", p->values[0], p->values[1], p->values[2]);
+    free(p);
+    return 0;
+}`,
+  accept: [`#include <stdio.h>
+#include <stdlib.h>
+
+struct Data {
+    int values[10];
+    int count;
+};
+
+int main() {
+    struct Data *p = malloc(sizeof(struct Data));
+    p->count = 3;
+    p->values[0] = 10;
+    p->values[1] = 20;
+    p->values[2] = 30;
+    printf("%d %d %d\\n", p->values[0], p->values[1], p->values[2]);
+    free(p);
+    return 0;
+}`, `#include <stdio.h>
+#include <stdlib.h>
+
+struct Data {
+    int values[10];
+    int count;
+};
+
+int main() {
+    struct Data *p = malloc(sizeof(*p));
+    p->count = 3;
+    p->values[0] = 10;
+    p->values[1] = 20;
+    p->values[2] = 30;
+    printf("%d %d %d\\n", p->values[0], p->values[1], p->values[2]);
+    free(p);
+    return 0;
+}`],
+  explain: "p 是<strong>指针</strong>，<code>sizeof(p)</code> 得到的是指针本身的大小（通常 8 字节），而不是 struct Data 的大小（40 多个字节）。堆内存申请不足，后面写入 p->values 就越界，属于未定义行为。应写 <code>sizeof(struct Data)</code>，或更稳妥的 <code>sizeof(*p)</code>——指针类型变了也不容易写错。"
+});
+</script>
+</body>
+</html>

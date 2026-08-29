@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="C语言指针交互演示：取地址与解引用、指针运算、指针参数、多级指针、字符串、malloc/free，直观展示指针与内存数据的关系。">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<title>指针 - C语言教学演示</title>
+<link rel="stylesheet" href="style.css?v=16">
+</head>
+<body>
+<nav></nav>
+<div class="container">
+<h1>指针</h1>
+<div class="intro">
+<p><strong>指针</strong>是C语言的灵魂，它存储的是内存地址而非数据本身。核心知识点：</p>
+<ul>
+<li><code>int *p;</code> 声明指向 int 的指针；<code>&a</code> 取地址；<code>*p</code> 解引用</li>
+<li>指针让函数能够<strong>修改外部变量</strong>（传递地址而非值）</li>
+<li>指针与数组关系密切：数组名本质是指向首元素的常量指针</li>
+<li><strong>指针运算</strong>：<code>p+1</code> 移动的是一个元素的大小，不是 1 个字节</li>
+<li>指针可以指向指针，形成多级指针（如 <code>int **pp;</code>）</li>
+<li>小心<strong>空指针</strong>和<strong>野指针</strong>：解引用前必须确保指向有效内存</li>
+<li><strong>动态内存</strong>：<code>malloc</code> 在堆上申请内存（需 <code>#include &lt;stdlib.h&gt;</code>），用完必须 <code>free</code> 归还，否则内存泄漏；free 后应立刻把指针置为 NULL</li>
+</ul>
+</div>
+<div class="demo-grid">
+  <div id="demo0"></div>
+  <div id="demo1"></div>
+  <div id="demo2"></div>
+  <div id="demo3"></div>
+  <div id="demo4"></div>
+  <div id="demo5"></div>
+  <div id="demo6"></div>
+  <div id="demo7"></div>
+</div>
+<h2>章节练习</h2>
+<div class="quiz-grid">
+  <div id="quiz0"></div>
+  <div id="quiz1"></div>
+  <div id="quiz2"></div>
+  <div id="quiz3"></div>
+  <div id="quiz4"></div>
+  <div id="quiz5"></div>
+</div>
+</div>
+
+<script src="demo-engine.js?v=16"></script>
+<script>
+createDemo("demo0", {
+  title: "指针基础：& 与 *",
+  subtitle: "取地址和解引用是互逆操作",
+  code: `#include <stdio.h>
+
+int main() {
+    int a = 10;
+    int *p = &a;
+    *p = 20;
+    printf("a = %d\\n", a);
+    return 0;
+}`,
+  vizTypes: ["vars","pointer","console"],
+  steps: [
+    { line: 3, info: "main() 开始" },
+    { line: 4, vars: {a:{value:10,type:"int",addr:"0x1000"}}, info: "a = 10，假设存放在地址 0x1000" },
+    { line: 5, vars: {p:{value:"0x1000",type:"int*",addr:"0x2000"}}, pointer: [{name:"p",type:"int*",addr:"0x2000",value:"0x1000",targetName:"a",targetType:"int",targetAddr:"0x1000",targetValue:10}], info: "p 存储 a 的地址 0x1000" },
+    { line: 6, vars: {a:{value:20,type:"int",addr:"0x1000"}}, pointer: [{name:"p",type:"int*",addr:"0x2000",value:"0x1000",targetName:"a",targetType:"int",targetAddr:"0x1000",targetValue:20}], info: "*p = 20：通过指针修改 a 的值" },
+    { line: 7, output: "a = 20", info: "a 已经被改为 20" },
+    { line: 8, info: "程序结束" }
+  ]
+});
+createDemo("demo1", {
+  title: "指针与数组",
+  subtitle: "数组名即首地址，指针可像数组一样使用",
+  code: `#include <stdio.h>
+
+int main() {
+    int arr[3] = {10, 20, 30};
+    int *p = arr;
+    printf("*p = %d\\n", *p);
+    printf("*(p+1) = %d\\n", *(p+1));
+    p++;
+    printf("*p = %d\\n", *p);
+    return 0;
+}`,
+  vizTypes: ["vars","array","pointer","console"],
+  steps: [
+    { line: 3, info: "main() 开始" },
+    { line: 4, vars: {arr:{value:"int[3]",type:"array"}}, array: {name:"arr",cells:[{val:10,highlight:false},{val:20},{val:30}]}, info: "arr = {10,20,30}，假设首地址 0x1000" },
+    { line: 5, vars: {p:{value:"0x1000",type:"int*"}}, pointer: [{name:"p",type:"int*",addr:"0x2000",value:"0x1000",targetName:"arr[0]",targetType:"int",targetAddr:"0x1000",targetValue:10}], info: "p = arr，p 指向 arr[0]" },
+    { line: 6, output: "*p = 10", info: "*p 即 arr[0]，输出 10" },
+    { line: 7, output: "*p = 10\n*(p+1) = 20", info: "*(p+1) 移动到 arr[1]，输出 20" },
+    { line: 8, vars: {p:{value:"0x1004",type:"int*"}}, pointer: [{name:"p",type:"int*",addr:"0x2000",value:"0x1004",targetName:"arr[1]",targetType:"int",targetAddr:"0x1004",targetValue:20}], info: "p++：指针向后移动一个 int 的大小（4字节），指向 arr[1]" },
+    { line: 9, output: "*p = 10\n*(p+1) = 20\n*p = 20", info: "*p 现在指向 arr[1]，输出 20" },
+    { line: 10, info: "程序结束" }
+  ]
+});
+createDemo("demo2", {
+  title: "指针作为函数参数",
+  subtitle: "对比实验：值传递交换失败 vs 指针传递交换成功",
+  code: `#include <stdio.h>
+
+void swap_wrong(int a, int b) {
+    int tmp = a;
+    a = b;
+    b = tmp;
+}
+
+void swap(int *pa, int *pb) {
+    int tmp = *pa;
+    *pa = *pb;
+    *pb = tmp;
+}
+
+int main() {
+    int x = 3, y = 7;
+    swap_wrong(x, y);
+    printf("wrong: x=%d, y=%d\\n", x, y);
+    swap(&x, &y);
+    printf("right: x=%d, y=%d\\n", x, y);
+    return 0;
+}`,
+  vizTypes: ["vars","pointer","stack","console"],
+  steps: [
+    { line: 15, info: "main() 开始" },
+    { line: 16, vars: {x:{value:3,type:"int",addr:"0x1000"},y:{value:7,type:"int",addr:"0x1004"}}, info: "main 中 x=3, y=7，假设 x 住在 0x1000，y 住在 0x1004" },
+    { line: 17, info: "先调用 swap_wrong(x, y)：只传【值】" },
+    { line: 3, stack: [{name:"main",value:"x=3, y=7"},{name:"swap_wrong",value:"a=3, b=7",highlight:true}], vars: {a:{value:3,type:"int"},b:{value:7,type:"int"}}, info: "形参 a、b 是 x、y 的【副本】——函数拿到的是复印件，不是原件" },
+    { line: 4, vars: {tmp:{value:3,type:"int"},a:{value:3,type:"int"},b:{value:7,type:"int"}}, info: "tmp = a = 3" },
+    { line: 5, vars: {a:{value:7,type:"int"},b:{value:7,type:"int"},tmp:{value:3,type:"int"}}, info: "a = b = 7（改的只是副本 a）" },
+    { line: 6, vars: {b:{value:3,type:"int"},a:{value:7,type:"int"},tmp:{value:3,type:"int"}}, info: "b = tmp = 3（副本 a、b 交换“成功”了，但和 x、y 毫无关系）" },
+    { line: 8, stack: [{name:"main",value:"x=3, y=7",highlight:true}], info: "swap_wrong 结束，副本 a、b、tmp 随栈帧一起销毁" },
+    { line: 18, output: "wrong: x=3, y=7", info: "x、y 根本没变——值传递改不到 main 里的变量" },
+    { line: 19, info: "再调用 swap(&x, &y)：这次把 x、y 的【地址】交给函数" },
+    { line: 9, stack: [{name:"main",value:"x=3, y=7"},{name:"swap",value:"pa=0x1000, pb=0x1004",highlight:true}], vars: {pa:{value:"0x1000",type:"int*"},pb:{value:"0x1004",type:"int*"}}, pointer: [{name:"pa",type:"int*",addr:"0x2000",value:"0x1000",targetName:"x",targetType:"int",targetAddr:"0x1000",targetValue:3},{name:"pb",type:"int*",addr:"0x2004",value:"0x1004",targetName:"y",targetType:"int",targetAddr:"0x1004",targetValue:7}], info: "形参 pa、pb 存的是 x、y 的地址——相当于函数拿到了「通往 x 和 y 的钥匙」，看右侧指针关系图" },
+    { line: 10, vars: {tmp:{value:3,type:"int"}}, info: "tmp = *pa：顺着地址读出 x 的值 3" },
+    { line: 11, vars: {x:{value:7,type:"int",addr:"0x1000"}}, pointer: [{name:"pa",type:"int*",addr:"0x2000",value:"0x1000",targetName:"x",targetType:"int",targetAddr:"0x1000",targetValue:7},{name:"pb",type:"int*",addr:"0x2004",value:"0x1004",targetName:"y",targetType:"int",targetAddr:"0x1004",targetValue:7}], info: "*pa = *pb：顺着地址把 7 写进 x 的“家门”——改的就是 main 里的 x 本身！" },
+    { line: 12, vars: {y:{value:3,type:"int",addr:"0x1004"}}, pointer: [{name:"pa",type:"int*",addr:"0x2000",value:"0x1000",targetName:"x",targetType:"int",targetAddr:"0x1000",targetValue:7},{name:"pb",type:"int*",addr:"0x2004",value:"0x1004",targetName:"y",targetType:"int",targetAddr:"0x1004",targetValue:3}], info: "*pb = tmp：同样顺着地址把 3 写进 y" },
+    { line: 14, stack: [{name:"main",value:"x=7, y=3",highlight:true}], info: "swap 结束，指针 pa、pb 销毁，但 x、y 已经被真正交换" },
+    { line: 20, output: "right: x=7, y=3", info: "对比两次输出：有没有指针，结果完全不同——指针让函数拥有了修改外部变量的能力" },
+    { line: 21, info: "程序结束" }
+  ]
+});
+createDemo("demo3", {
+  title: "指针运算",
+  subtitle: "加减整数、两指针相减得到元素个数",
+  code: `#include <stdio.h>
+
+int main() {
+    int arr[5] = {10, 20, 30, 40, 50};
+    int *p = &arr[1];
+    int *q = &arr[4];
+    printf("q - p = %ld\\n", q - p);
+    printf("*(p + 2) = %d\\n", *(p + 2));
+    return 0;
+}`,
+  vizTypes: ["vars","array","pointer","console"],
+  steps: [
+    { line: 3, info: "main() 开始" },
+    { line: 4, vars: {arr:{value:"int[5]",type:"array"}}, array: {name:"arr",cells:[{val:10},{val:20},{val:30},{val:40},{val:50}]}, info: "arr = {10,20,30,40,50}" },
+    { line: 5, vars: {p:{value:"0x1004",type:"int*"}}, pointer: [{name:"p",type:"int*",addr:"0x2000",value:"0x1004",targetName:"arr[1]",targetType:"int",targetAddr:"0x1004",targetValue:20}], info: "p 指向 arr[1]" },
+    { line: 6, vars: {q:{value:"0x1010",type:"int*"}}, pointer: [{name:"p",type:"int*",addr:"0x2000",value:"0x1004",targetName:"arr[1]",targetType:"int",targetAddr:"0x1004",targetValue:20},{name:"q",type:"int*",addr:"0x2004",value:"0x1010",targetName:"arr[4]",targetType:"int",targetAddr:"0x1010",targetValue:50}], info: "q 指向 arr[4]" },
+    { line: 7, output: "q - p = 3", info: "q-p = 3（表示两者相隔 3 个 int 元素，不是 12 字节）" },
+    { line: 8, output: "q - p = 3\n*(p + 2) = 40", info: "p+2 指向 arr[3]，解引用得到 40" },
+    { line: 9, info: "程序结束" }
+  ]
+});
+createDemo("demo4", {
+  title: "多级指针",
+  subtitle: "指针的指针：int** pp",
+  code: `#include <stdio.h>
+
+int main() {
+    int a = 10;
+    int *p = &a;
+    int **pp = &p;
+    **pp = 99;
+    printf("a = %d\\n", a);
+    return 0;
+}`,
+  vizTypes: ["vars","pointer","console"],
+  steps: [
+    { line: 3, info: "main() 开始" },
+    { line: 4, vars: {a:{value:10,type:"int",addr:"0x1000"}}, info: "a = 10" },
+    { line: 5, vars: {p:{value:"0x1000",type:"int*",addr:"0x2000"}}, pointer: [{name:"p",type:"int*",addr:"0x2000",value:"0x1000",targetName:"a",targetType:"int",targetAddr:"0x1000",targetValue:10}], info: "p 指向 a" },
+    { line: 6, vars: {pp:{value:"0x2000",type:"int**",addr:"0x3000"}}, pointer: [{name:"pp",type:"int**",addr:"0x3000",value:"0x2000",targetName:"p",targetType:"int*",targetAddr:"0x2000",targetValue:"0x1000",targetIsPointer:true},{name:"p",type:"int*",addr:"0x2000",value:"0x1000",targetName:"a",targetType:"int",targetAddr:"0x1000",targetValue:10}], info: "pp 存储 p 的地址，pp 指向 p" },
+    { line: 7, vars: {a:{value:99,type:"int",addr:"0x1000"}}, pointer: [{name:"pp",type:"int**",addr:"0x3000",value:"0x2000",targetName:"p",targetType:"int*",targetAddr:"0x2000",targetValue:"0x1000",targetIsPointer:true},{name:"p",type:"int*",addr:"0x2000",value:"0x1000",targetName:"a",targetType:"int",targetAddr:"0x1000",targetValue:99}], info: "**pp = 99：先解引用 pp 得到 p，再解引用 p 修改 a" },
+    { line: 8, output: "a = 99", info: "a 被修改为 99" },
+    { line: 9, info: "程序结束" }
+  ]
+});
+createDemo("demo5", {
+  title: "指针与字符串",
+  subtitle: "char* 指向字符串常量，遍历字符",
+  code: `#include <stdio.h>
+
+int main() {
+    char *str = "Hello";
+    char *p = str;
+    while (*p != '\\0') {
+        printf("%c ", *p);
+        p++;
+    }
+    printf("\\n");
+    return 0;
+}`,
+  vizTypes: ["vars","array","pointer","console"],
+  steps: [
+    { line: 3, info: "main() 开始" },
+    { line: 4, vars: {str:{value:"0x5000",type:"char*"}}, info: "str 指向字符串常量 \"Hello\" 的首地址" },
+    { line: 5, vars: {p:{value:"0x5000",type:"char*"}}, pointer: [{name:"p",type:"char*",addr:"0x2000",value:"0x5000",targetName:"str[0]",targetType:"char",targetAddr:"0x5000",targetValue:"'H'"}], info: "p 也指向首字符 'H'" },
+    { line: 6, array: {name:"str",cells:[{val:"'H'",highlight:true},{val:"'e'"},{val:"'l'"},{val:"'l'"},{val:"'o'"},{val:"'\\0'"}]}, info: "*p = 'H' != '\\0'，进入循环" },
+    { line: 7, output: "H ", info: "打印 H" },
+    { line: 8, vars: {p:{value:"0x5001",type:"char*"}}, pointer: [{name:"p",type:"char*",addr:"0x2000",value:"0x5001",targetName:"str[1]",targetType:"char",targetAddr:"0x5001",targetValue:"'e'"}], info: "p++，指向下一个字符" },
+    { line: 6, array: {name:"str",cells:[{val:"'H'"},{val:"'e'",highlight:true},{val:"'l'"},{val:"'l'"},{val:"'o'"},{val:"'\\0'"}]}, info: "*p = 'e'" },
+    { line: 7, output: "H e ", info: "打印 e" },
+    { line: 8, vars: {p:{value:"0x5002",type:"char*"}}, pointer: [{name:"p",type:"char*",addr:"0x2000",value:"0x5002",targetName:"str[2]",targetType:"char",targetAddr:"0x5002",targetValue:"'l'"}], info: "p++" },
+    { line: 6, array: {name:"str",cells:[{val:"'H'"},{val:"'e'"},{val:"'l'",highlight:true},{val:"'l'"},{val:"'o'"},{val:"'\\0'"}]}, info: "*p = 'l'" },
+    { line: 7, output: "H e l ", info: "打印 l" },
+    { line: 8, vars: {p:{value:"0x5003",type:"char*"}}, pointer: [{name:"p",type:"char*",addr:"0x2000",value:"0x5003",targetName:"str[3]",targetType:"char",targetAddr:"0x5003",targetValue:"'l'"}], info: "p++" },
+    { line: 7, output: "H e l l ", info: "打印第二个 l" },
+    { line: 8, vars: {p:{value:"0x5004",type:"char*"}}, pointer: [{name:"p",type:"char*",addr:"0x2000",value:"0x5004",targetName:"str[4]",targetType:"char",targetAddr:"0x5004",targetValue:"'o'"}], info: "p++" },
+    { line: 7, output: "H e l l o ", info: "打印 o" },
+    { line: 8, vars: {p:{value:"0x5005",type:"char*"}}, pointer: [{name:"p",type:"char*",addr:"0x2000",value:"0x5005",targetName:"str[5]",targetType:"char",targetAddr:"0x5005",targetValue:"'\\0'"}], info: "p++，现在指向结束符" },
+    { line: 6, array: {name:"str",cells:[{val:"'H'"},{val:"'e'"},{val:"'l'"},{val:"'l'"},{val:"'o'"},{val:"'\\0'",highlight:true}]}, info: "*p = '\\0'，循环条件为假，退出" },
+    { line: 10, output: "H e l l o ", info: "输出换行" },
+    { line: 11, info: "程序结束" }
+  ]
+});
+/* ========== demo6: malloc 与 free ========== */
+createDemo("demo6", {
+  title: "动态内存：malloc 与 free",
+  subtitle: "堆内存由你手动管理：申请、使用、归还",
+  code: `#include <stdio.h>
+#include <stdlib.h>
+
+int main() {
+    int *p = malloc(sizeof(int));
+    if (p == NULL) return 1;
+    *p = 42;
+    printf("*p = %d\\n", *p);
+    free(p);
+    p = NULL;
+    return 0;
+}`,
+  vizTypes: ["vars","pointer","console"],
+  steps: [
+    { line: 4, info: "main() 开始" },
+    { line: 5, vars: {p:{value:"0xA000",type:"int*",addr:"0x2000"}}, pointer: [{name:"p",type:"int*",addr:"0x2000",value:"0xA000",targetName:"堆内存",targetType:"int",targetAddr:"0xA000",targetValue:"?"}], info: "malloc(sizeof(int))：在【堆】上申请 4 字节，返回地址 0xA000。堆内存不随函数结束自动释放，由你手动管理" },
+    { line: 6, info: "好习惯：检查 malloc 是否成功——内存不足时会返回 NULL" },
+    { line: 7, pointer: [{name:"p",type:"int*",addr:"0x2000",value:"0xA000",targetName:"堆内存",targetType:"int",targetAddr:"0xA000",targetValue:42}], info: "*p = 42：往堆内存里写数据" },
+    { line: 8, output: "*p = 42", info: "读出并打印 42" },
+    { line: 9, pointer: [{name:"p",type:"int*",addr:"0x2000",value:"0xA000",targetName:"堆内存",targetType:"int",targetAddr:"0xA000",targetValue:42,targetInvalid:true}], info: "free(p)：把堆内存还给系统。注意 p 里还存着 0xA000，但这块内存已不属于你——此时再解引用就是野指针！" },
+    { line: 10, vars: {p:{value:"NULL",type:"int*",addr:"0x2000"}}, pointer: [], info: "好习惯：free 后立刻 p = NULL，防止误用野指针（对 NULL 解引用会立即报错，反而容易发现问题）" },
+    { line: 11, info: "程序结束" }
+  ]
+});
+/* ========== demo7: 动态数组 ========== */
+createDemo("demo7", {
+  title: "malloc 动态数组",
+  subtitle: "运行时才确定大小的数组，只能用 malloc",
+  code: `#include <stdio.h>
+#include <stdlib.h>
+
+int main() {
+    int n = 5;
+    int *arr = malloc(n * sizeof(int));
+    int i;
+    for (i = 0; i < n; i++) {
+        arr[i] = i * 10;
+    }
+    printf("arr[3] = %d\\n", arr[3]);
+    free(arr);
+    return 0;
+}`,
+  vizTypes: ["vars","array","loop","pointer","console"],
+  steps: [
+    { line: 4, info: "main() 开始" },
+    { line: 5, vars: {n:{value:5,type:"int"}}, info: "n = 5（假设 n 的值运行时才确定，无法写进数组定义）" },
+    { line: 6, vars: {arr:{value:"0xA000",type:"int*",addr:"0x2000"}}, array: {name:"arr（堆）", cells:[{val:null,empty:true},{val:null,empty:true},{val:null,empty:true},{val:null,empty:true},{val:null,empty:true}]}, pointer: [{name:"arr",type:"int*",addr:"0x2000",value:"0xA000",targetName:"arr[0]",targetType:"int",targetAddr:"0xA000",targetValue:"?"}], info: "malloc(n * sizeof(int))：在堆上申请 5 个连续 int，arr 指向首元素" },
+    { line: 7, vars: {i:{value:0,type:"int"}}, info: "声明循环变量 i" },
+    { line: 8, vars: {i:{value:0,type:"int"}}, loop: [{label:"i=0",active:true}], info: "i=0；i<5 为真" },
+    { line: 9, array: {name:"arr（堆）", cells:[{val:0,highlight:true},{val:null,empty:true},{val:null,empty:true},{val:null,empty:true},{val:null,empty:true}]}, pointer: [{name:"arr",type:"int*",addr:"0x2000",value:"0xA000",targetName:"arr[0]",targetType:"int",targetAddr:"0xA000",targetValue:0}], info: "arr[0] = 0：堆上的数组可以像普通数组一样用下标访问" },
+    { line: 8, vars: {i:{value:1,type:"int"}}, loop: [{label:"i=1",active:true}], info: "i=1" },
+    { line: 9, array: {name:"arr（堆）", cells:[{val:0},{val:10,highlight:true},{val:null,empty:true},{val:null,empty:true},{val:null,empty:true}]}, info: "arr[1] = 10" },
+    { line: 8, vars: {i:{value:2,type:"int"}}, loop: [{label:"i=2",active:true}], info: "i=2" },
+    { line: 9, array: {name:"arr（堆）", cells:[{val:0},{val:10},{val:20,highlight:true},{val:null,empty:true},{val:null,empty:true}]}, info: "arr[2] = 20" },
+    { line: 8, vars: {i:{value:3,type:"int"}}, loop: [{label:"i=3",active:true}], info: "i=3" },
+    { line: 9, array: {name:"arr（堆）", cells:[{val:0},{val:10},{val:20},{val:30,highlight:true},{val:null,empty:true}]}, info: "arr[3] = 30" },
+    { line: 8, vars: {i:{value:4,type:"int"}}, loop: [{label:"i=4",active:true}], info: "i=4" },
+    { line: 9, array: {name:"arr（堆）", cells:[{val:0},{val:10},{val:20},{val:30},{val:40,highlight:true}]}, info: "arr[4] = 40" },
+    { line: 11, output: "arr[3] = 30", info: "验证结果：arr[3] = 30" },
+    { line: 12, array: {name:"arr（堆）", cells:[{val:0,empty:true},{val:10,empty:true},{val:20,empty:true},{val:30,empty:true},{val:40,empty:true}]}, pointer: [{name:"arr",type:"int*",addr:"0x2000",value:"0xA000",targetName:"arr[0]",targetType:"int",targetAddr:"0xA000",targetValue:0,targetInvalid:true}], info: "free(arr)：整块堆内存一次归还（malloc 多少次，free 就多少次，一一对应）" },
+    { line: 13, info: "程序结束" }
+  ]
+});
+/* ========== 章节练习：3 道预测输出 + 3 道改错 ========== */
+createQuiz("quiz0", {
+  type: "predict",
+  title: "取地址 & 与解引用 *",
+  code: `#include <stdio.h>
+
+int main() {
+    int a = 5;
+    int b = 10;
+    int *p = &a;
+    *p = *p + 3;
+    p = &b;
+    *p = *p + 1;
+    printf("a = %d, b = %d\\n", a, b);
+    return 0;
+}`,
+  answer: "a = 8, b = 11",
+  explain: "<code>p = &a</code> 后 <code>*p</code> 就是 a，<code>*p = *p + 3</code> 把 a 改成 8；随后 <code>p = &b</code> 让 p 改指向 b，之后的 <code>*p = *p + 1</code> 修改的是 b（变为 11）。指针可以被重新赋值：指向谁，<code>*p</code> 操作的就是谁。"
+});
+createQuiz("quiz1", {
+  type: "predict",
+  title: "指针与数组：下标与指针算术",
+  code: `#include <stdio.h>
+
+int main() {
+    int arr[5] = {10, 20, 30, 40, 50};
+    int *p = arr;
+    printf("%d %d\\n", arr[2], *(arr + 2));
+    printf("%d\\n", *p + *(p + 1));
+    return 0;
+}`,
+  answer: "30 30\n30",
+  explain: "<code>arr[i]</code> 与 <code>*(arr + i)</code> 完全等价，所以第一行两个值都是 30；<code>*p + *(p + 1)</code> 即 arr[0] + arr[1] = 10 + 20 = 30。注意指针加 1 移动的是一个元素的位置，而不是一个字节。"
+});
+createQuiz("quiz2", {
+  type: "predict",
+  title: "malloc 动态数组",
+  code: `#include <stdio.h>
+#include <stdlib.h>
+
+int main() {
+    int n = 4;
+    int *arr = malloc(n * sizeof(int));
+    int sum = 0;
+    int i;
+    for (i = 0; i < n; i++) {
+        arr[i] = (i + 1) * 10;
+        sum += arr[i];
+    }
+    printf("arr[2] = %d\\n", arr[2]);
+    printf("sum = %d\\n", sum);
+    free(arr);
+    return 0;
+}`,
+  answer: "arr[2] = 30\nsum = 100",
+  explain: "malloc 在堆上申请 4 个 int，循环写入 10、20、30、40：arr[2] = 30，sum = 10+20+30+40 = 100。<code>free(arr)</code> 只是归还内存，不影响已经打印的输出，但 malloc 的内存用完必须 free，否则就是内存泄漏。"
+});
+createQuiz("quiz3", {
+  type: "fix",
+  title: "swap 调用：忘记传地址",
+  code: `#include <stdio.h>
+
+void swap(int *pa, int *pb) {
+    int tmp = *pa;
+    *pa = *pb;
+    *pb = tmp;
+}
+
+int main() {
+    int x = 3, y = 8;
+    swap(x, y);
+    printf("x = %d, y = %d\\n", x, y);
+    return 0;
+}`,
+  accept: [`#include <stdio.h>
+
+void swap(int *pa, int *pb) {
+    int tmp = *pa;
+    *pa = *pb;
+    *pb = tmp;
+}
+
+int main() {
+    int x = 3, y = 8;
+    swap(&x, &y);
+    printf("x = %d, y = %d\\n", x, y);
+    return 0;
+}`],
+  explain: "swap 的形参是 <code>int *</code>，调用时必须传变量的<strong>地址</strong>。<code>swap(x, y)</code> 把整数 3 和 8 当成地址传进去，函数解引用的是非法地址（编译器会警告，运行时崩溃）。最小修改：调用处改为 <code>swap(&x, &y);</code>，改对后输出 x = 8, y = 3。"
+});
+createQuiz("quiz4", {
+  type: "fix",
+  title: "多级指针：少解引用了一层",
+  code: `#include <stdio.h>
+
+int main() {
+    int a = 10;
+    int *p = &a;
+    int **pp = &p;
+    *pp = 99;
+    printf("a = %d\\n", a);
+    return 0;
+}`,
+  accept: [`#include <stdio.h>
+
+int main() {
+    int a = 10;
+    int *p = &a;
+    int **pp = &p;
+    **pp = 99;
+    printf("a = %d\\n", a);
+    return 0;
+}`],
+  explain: "<code>pp</code> 指向 p，<code>*pp</code> 解引用一层得到的是<strong>指针 p 本身</strong>，<code>*pp = 99</code> 改的是 p 里存的地址（把整数当指针，编译器会警告），a 根本没变。要顺着 pp → p → a 走到 a，必须解引用两层：<code>**pp = 99;</code>。"
+});
+createQuiz("quiz5", {
+  type: "fix",
+  title: "遍历字符串：循环条件少了 *",
+  code: `#include <stdio.h>
+
+int main() {
+    char *s = "hello";
+    char *p = s;
+    while (p != '\\0') {
+        printf("%c", *p);
+        p++;
+    }
+    printf("\\n");
+    return 0;
+}`,
+  accept: [`#include <stdio.h>
+
+int main() {
+    char *s = "hello";
+    char *p = s;
+    while (*p != '\\0') {
+        printf("%c", *p);
+        p++;
+    }
+    printf("\\n");
+    return 0;
+}`, `#include <stdio.h>
+
+int main() {
+    char *s = "hello";
+    char *p = s;
+    while (*p) {
+        printf("%c", *p);
+        p++;
+    }
+    printf("\\n");
+    return 0;
+}`],
+  explain: "<code>p != '\\0'</code> 比较的是<strong>指针本身</strong>和 0，p 永远不为空，循环永不停止，最终读到字符串外崩溃。应该判断 p 指向的字符：<code>while (*p != '\\0')</code>（也可简写为 <code>while (*p)</code>）。"
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="认识C程序：从 Hello World 开始，用简单有趣的小例子了解 C 语言编程的核心思想——输出、变量、计算、循环与判断。">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<title>认识C程序 - C语言教学演示</title>
+<link rel="stylesheet" href="style.css?v=16">
+</head>
+<body>
+<nav></nav>
+<div class="container">
+<h1>认识C程序</h1>
+<div class="intro">
+<p><strong>程序</strong>就是写给计算机执行的一系列指令。C 程序从 <code>main()</code> 开始，从上到下一行一行地执行。这一章不讲语法细节，只用几个小例子带你感受编程是怎么回事：</p>
+<ul>
+<li><code>printf</code> 是程序「说话」的方式：双引号里的内容会显示到屏幕上</li>
+<li><strong>变量</strong>像一个贴了标签的盒子，里面装的值可以随时取出、更换</li>
+<li>计算机是一台超级计算器，加减乘除转瞬完成</li>
+<li><strong>循环</strong>让计算机不知疲倦地重复，<strong>判断</strong>让程序根据不同情况走不同的路</li>
+<li>每条语句以分号 <code>;</code> 结尾——这是 C 语言的「句号」</li>
+</ul>
+</div>
+<div class="demo-grid">
+  <div id="demo0"></div>
+  <div id="demo1"></div>
+  <div id="demo2"></div>
+  <div id="demo3"></div>
+  <div id="demo4"></div>
+  <div id="demo5"></div>
+</div>
+</div>
+
+<script src="demo-engine.js?v=16"></script>
+<script>
+createDemo("demo0", {
+  title: "Hello, World!",
+  subtitle: "每个程序员写的第一个程序",
+  code: `#include <stdio.h>
+
+int main() {
+    printf("Hello, World!\\n");
+    return 0;
+}`,
+  vizTypes: ["console"],
+  steps: [
+    { line: 0, info: "#include <stdio.h>：引入「标准输入输出工具箱」，printf 就装在里面" },
+    { line: 2, info: "程序从 main() 函数开始执行——每个 C 程序都有且只有一个 main" },
+    { line: 3, output: "Hello, World!", info: "printf 把双引号里的内容打印到屏幕；末尾的 \\n 表示换一行" },
+    { line: 4, info: "return 0 表示程序顺利结束。你的第一个 C 程序跑完了！" }
+  ]
+});
+createDemo("demo1", {
+  title: "printf：让程序说话",
+  subtitle: "想说几句话，就写几个 printf",
+  code: `#include <stdio.h>
+
+int main() {
+    printf("你好，我是小 C！\\n");
+    printf("我会算数、会数数、还会做决定。\\n");
+    printf("跟我一起玩吧！\\n");
+    return 0;
+}`,
+  vizTypes: ["console"],
+  steps: [
+    { line: 2, info: "main() 开始" },
+    { line: 3, output: "你好，我是小 C！", info: "打印第一句话。末尾的 \\n 让光标换到下一行" },
+    { line: 4, output: "你好，我是小 C！\n我会算数、会数数、还会做决定。", info: "第二句话另起一行——如果去掉 \\n，两句话就会挤在同一行里" },
+    { line: 5, output: "你好，我是小 C！\n我会算数、会数数、还会做决定。\n跟我一起玩吧！", info: "程序就是这样一句一句、从上到下执行的" },
+    { line: 6, info: "程序结束" }
+  ]
+});
+createDemo("demo2", {
+  title: "变量：会变的盒子",
+  subtitle: "把值装进盒子，随时可以更换",
+  code: `#include <stdio.h>
+
+int main() {
+    int age = 18;
+    printf("今年 %d 岁\\n", age);
+    age = age + 1;
+    printf("明年 %d 岁\\n", age);
+    return 0;
+}`,
+  vizTypes: ["vars","console"],
+  steps: [
+    { line: 2, info: "main() 开始" },
+    { line: 3, vars: {age:{value:18,type:"int"}}, info: "int age = 18：造一个名叫 age 的盒子（int 表示装整数），放进 18" },
+    { line: 4, output: "今年 18 岁", info: "%d 是占位符，打印时会被 age 的值替换" },
+    { line: 5, vars: {age:{value:19,type:"int"}}, info: "age = age + 1：把盒子里的旧值拿出来加 1，再放回去。盒子的内容变了！" },
+    { line: 6, output: "今年 18 岁\n明年 19 岁", info: "再次打印，%d 换成新值 19" },
+    { line: 7, info: "程序结束" }
+  ]
+});
+createDemo("demo3", {
+  title: "超级计算器",
+  subtitle: "加减乘除，转瞬完成",
+  code: `#include <stdio.h>
+
+int main() {
+    int price = 6;
+    int count = 7;
+    printf("苹果 %d 元一斤，买 %d 斤\\n", price, count);
+    printf("一共 %d 元\\n", price * count);
+    printf("顺便，1+2+...+100 = %d\\n", (1 + 100) * 100 / 2);
+    return 0;
+}`,
+  vizTypes: ["vars","console"],
+  steps: [
+    { line: 2, info: "main() 开始" },
+    { line: 3, vars: {price:{value:6,type:"int"}}, info: "单价 6 元" },
+    { line: 4, vars: {count:{value:7,type:"int"}}, info: "买 7 斤" },
+    { line: 5, output: "苹果 6 元一斤，买 7 斤", info: "一行里可以用多个 %d，按顺序依次替换成 price 和 count" },
+    { line: 6, output: "苹果 6 元一斤，买 7 斤\n一共 42 元", info: "price * count 先做乘法 6×7，再把结果填进 %d" },
+    { line: 7, output: "苹果 6 元一斤，买 7 斤\n一共 42 元\n顺便，1+2+...+100 = 5050", info: "(1+100)×100÷2 = 5050——这就是著名的「高斯求和」，计算机瞬间就算完了" },
+    { line: 8, info: "程序结束" }
+  ]
+});
+createDemo("demo4", {
+  title: "循环：不知疲倦地重复",
+  subtitle: "倒计时这种重复劳动，交给计算机最合适",
+  code: `#include <stdio.h>
+
+int main() {
+    int i;
+    for (i = 3; i >= 1; i--) {
+        printf("%d...\\n", i);
+    }
+    printf("发射！\\n");
+    return 0;
+}`,
+  vizTypes: ["vars","loop","console"],
+  steps: [
+    { line: 2, info: "main() 开始" },
+    { line: 4, vars: {i:{value:3,type:"int"}}, loop: [{label:"i=3",active:true}], info: "for 循环：i 从 3 开始，只要 i >= 1 就重复执行" },
+    { line: 5, output: "3...", info: "打印 3..." },
+    { line: 4, vars: {i:{value:2,type:"int"}}, loop: [{label:"i=3",active:false},{label:"i=2",active:true}], info: "i-- 让 i 减 1，i 变成 2，条件仍然成立，继续" },
+    { line: 5, output: "3...\n2...", info: "打印 2..." },
+    { line: 4, vars: {i:{value:1,type:"int"}}, loop: [{label:"i=3",active:false},{label:"i=2",active:false},{label:"i=1",active:true}], info: "i 变成 1，再来一轮" },
+    { line: 5, output: "3...\n2...\n1...", info: "打印 1..." },
+    { line: 4, loop: [{label:"i=1",active:false}], info: "i 变成 0，条件 i >= 1 不成立了，循环结束" },
+    { line: 7, output: "3...\n2...\n1...\n发射！", info: "循环外面的 printf 接着执行：发射！" },
+    { line: 8, info: "程序结束。注意体会：计算机把「重复 3 次」这件事包办了，一次都不偷懒" }
+  ]
+});
+createDemo("demo5", {
+  title: "判断：程序会做决定",
+  subtitle: "不同的分数，走不同的路",
+  code: `#include <stdio.h>
+
+int main() {
+    int score = 85;
+    if (score >= 60) {
+        printf("及格啦，恭喜！\\n");
+    } else {
+        printf("继续努力！\\n");
+    }
+    return 0;
+}`,
+  vizTypes: ["vars","branch","console"],
+  steps: [
+    { line: 2, info: "main() 开始" },
+    { line: 3, vars: {score:{value:85,type:"int"}}, info: "盒子里装进 85 分" },
+    { line: 4, branch: [{label:"score >= 60：及格啦",active:true},{label:"score < 60：继续努力",active:false}], info: "if 会先做判断：85 >= 60 成立（为真），所以走上面的路" },
+    { line: 5, output: "及格啦，恭喜！", info: "执行 if 分支里的 printf；else 分支被跳过，一行都不会执行" },
+    { line: 9, info: "程序结束。试试把 85 改成 50 再运行，程序会走另一条路——这就是「会做决定」的程序" }
+  ]
+});
+</script>
+</body>
+</html>

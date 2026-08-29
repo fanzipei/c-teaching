@@ -1,0 +1,589 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="C语言数据类型与赋值语句交互演示：基本类型、printf/scanf、类型转换、转义字符、常量与宏、复合赋值、自增自减，逐行执行并可视化变量状态。">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<title>数据类型与赋值语句 - C语言教学演示</title>
+<link rel="stylesheet" href="style.css?v=16">
+</head>
+<body>
+<nav></nav>
+<div class="container">
+<h1>数据类型与赋值语句</h1>
+<div class="intro">
+<p><strong>数据类型与输入输出</strong>是C语言编程的基石：</p>
+<ul>
+<li>基本类型：<code>int</code>（整数）、<code>float</code>（单精度浮点）、<code>double</code>（双精度浮点）、<code>char</code>（字符）；<code>sizeof</code> 可查看类型占用的字节数</li>
+<li><code>printf</code> 格式化输出：常用 <code>%d</code>（int）、<code>%f</code>（float/double）、<code>%c</code>（char）、<code>%s</code>（字符串）</li>
+<li><code>scanf</code> 格式化输入：变量前必须加 <code>&</code> 取地址符（数组名除外）；用返回值判断成功读取了几项</li>
+<li>转义字符：<code>\n</code>（换行）、<code>\t</code>（制表符）、<code>\\</code>（反斜杠）、<code>\"</code>（双引号）</li>
+<li>常量：<code>#define PI 3.14</code>（宏定义，编译时替换）</li>
+</ul>
+<p style="margin-top:1rem"><strong>赋值语句</strong>把值存入变量，是最基础的语句：</p>
+<ul>
+<li>C 是<strong>强类型</strong>语言：变量必须先声明类型再使用；基本形式 <code>变量 = 表达式;</code></li>
+<li>类型转换：自动隐式转换（小范围→大范围）与强制类型转换 <code>(type)expr</code>；注意整数除法会丢弃小数部分</li>
+<li><strong>复合赋值</strong>：<code>+= -= *= /= %=</code> 让代码更简洁</li>
+<li><strong>自增/自减</strong>：<code>i++</code>（先用后加）与 <code>++i</code>（先加后用）区别重大</li>
+<li>赋值表达式本身有值，因此 <code>a = b = c = 5;</code> 从右向左执行</li>
+</ul>
+</div>
+<div class="demo-grid">
+  <div id="demo0"></div>
+  <div id="demo1"></div>
+  <div id="demo2"></div>
+  <div id="demo3"></div>
+  <div id="demo4"></div>
+  <div class="scanf-try">
+    <strong>试一试</strong> 像真实终端一样输入<strong>一整行</strong>数据，观察 scanf 如何按格式串 <code>%d %f %c</code> 逐项解析：
+    <div class="scanf-input-row">
+      <span class="scanf-prompt">$</span>
+      <input id="try-line" type="text" placeholder="例如：18 92.5 B" onkeydown="if(event.key==='Enter')runScanfDemo()">
+      <button class="btn btn-primary" onclick="runScanfDemo()">▶ 输入并运行</button>
+    </div>
+    <div class="scanf-presets">
+      快速体验：
+      <button class="btn btn-secondary" onclick="presetScanf('18 92.5 B')">正常：18 92.5 B</button>
+      <button class="btn btn-secondary" onclick="presetScanf('18.2 1.1 A')">经典陷阱：18.2 1.1 A</button>
+      <button class="btn btn-secondary" onclick="presetScanf('abc 92.5 B')">类型不匹配：abc 92.5 B</button>
+      <button class="btn btn-secondary" onclick="presetScanf('18 92.5')">输入不足：18 92.5</button>
+    </div>
+    <div class="parse-map" id="parse-map"></div>
+  </div>
+  <div id="demo5"></div>
+  <div id="demo6"></div>
+  <div id="demo7"></div>
+  <div id="demo8"></div>
+  <div id="demo9"></div>
+  <div id="demo10"></div>
+</div>
+<h2>章节练习</h2>
+<div class="quiz-grid">
+  <div id="quiz0"></div>
+  <div id="quiz1"></div>
+  <div id="quiz2"></div>
+  <div id="quiz3"></div>
+  <div id="quiz4"></div>
+  <div id="quiz5"></div>
+</div>
+</div>
+
+<script src="demo-engine.js?v=16"></script>
+<script>
+/* ===== 数据类型与输入输出 ===== */
+createDemo("demo0", {
+  title: "基本数据类型",
+  subtitle: "int / float / double / char 的声明与大小",
+  code: `#include <stdio.h>
+
+int main() {
+    int a = 10;
+    float f = 3.14;
+    double d = 3.1415926535;
+    char c = 'A';
+    printf("int=%d bytes, float=%d bytes\\n", (int)sizeof(a), (int)sizeof(f));
+    printf("double=%d bytes, char=%d bytes\\n", (int)sizeof(d), (int)sizeof(c));
+    printf("a=%d, f=%.2f, d=%.10f, c=%c\\n", a, f, d, c);
+    return 0;
+}`,
+  vizTypes: ["vars","console"],
+  steps: [
+    { line: 3, info: "main() 开始" },
+    { line: 4, vars: {a:{value:10,type:"int"}}, info: "声明 int 变量 a = 10，通常占 4 字节" },
+    { line: 5, vars: {f:{value:3.14,type:"float"}}, info: "声明 float 变量 f = 3.14，通常占 4 字节" },
+    { line: 6, vars: {d:{value:3.1415926535,type:"double"}}, info: "声明 double 变量 d，通常占 8 字节，精度更高" },
+    { line: 7, vars: {c:{value:"'A'",type:"char"}}, info: "声明 char 变量 c = 'A'，占 1 字节" },
+    { line: 8, output: "int=4 bytes, float=4 bytes", info: "sizeof 返回各类型占用的字节数" },
+    { line: 9, output: "int=4 bytes, float=4 bytes\ndouble=8 bytes, char=1 bytes", info: "double 占 8 字节，char 占 1 字节" },
+    { line: 10, output: "int=4 bytes, float=4 bytes\ndouble=8 bytes, char=1 bytes\na=10, f=3.14, d=3.1415926535, c=A", info: "输出各变量的值" },
+    { line: 11, info: "程序结束" }
+  ]
+});
+createDemo("demo1", {
+  title: "基本变量声明与赋值",
+  subtitle: "int / float / char 的初始化与修改",
+  code: `#include <stdio.h>
+
+int main() {
+    int age = 20;
+    float pi = 3.14;
+    char grade = 'A';
+    age = 21;
+    pi = 3.14159;
+    grade = 'B';
+    printf("age=%d, pi=%f, grade=%c\\n", age, pi, grade);
+    return 0;
+}`,
+  vizTypes: ["vars","console"],
+  steps: [
+    { line: 3, info: "程序从 main() 开始执行" },
+    { line: 4, vars: {age:{value:20,type:"int"}}, info: "声明 int 变量 age 并初始化为 20" },
+    { line: 5, vars: {age:{value:20,type:"int"}, pi:{value:3.14,type:"float"}}, info: "声明 float 变量 pi = 3.14" },
+    { line: 6, vars: {age:{value:20,type:"int"}, pi:{value:3.14,type:"float"}, grade:{value:"'A'",type:"char"}}, info: "声明 char 变量 grade = 'A'" },
+    { line: 7, vars: {age:{value:21,type:"int"}, pi:{value:3.14,type:"float"}, grade:{value:"'A'",type:"char"}}, info: "age 被覆盖为 21" },
+    { line: 8, vars: {age:{value:21,type:"int"}, pi:{value:3.14159,type:"float"}, grade:{value:"'A'",type:"char"}}, info: "pi 更新为 3.14159" },
+    { line: 9, vars: {age:{value:21,type:"int"}, pi:{value:3.14159,type:"float"}, grade:{value:"'B'",type:"char"}}, info: "grade 更新为 'B'" },
+    { line: 10, output: "age=21, pi=3.141590, grade=B", info: "printf 输出当前所有变量的值" },
+    { line: 11, info: "main 返回 0，程序结束" }
+  ]
+});
+createDemo("demo2", {
+  title: "算术运算与赋值",
+  subtitle: "加减乘除、取模、整数除法的陷阱",
+  code: `#include <stdio.h>
+
+int main() {
+    int a = 17;
+    int b = 5;
+    int sum = a + b;
+    int diff = a - b;
+    int prod = a * b;
+    int quot = a / b;
+    int rem = a % b;
+    printf("sum=%d, diff=%d, prod=%d, quot=%d, rem=%d\\n",
+           sum, diff, prod, quot, rem);
+    return 0;
+}`,
+  vizTypes: ["vars","console"],
+  steps: [
+    { line: 3, info: "main() 开始" },
+    { line: 4, vars: {a:{value:17,type:"int"}}, info: "a = 17" },
+    { line: 5, vars: {a:{value:17,type:"int"},b:{value:5,type:"int"}}, info: "b = 5" },
+    { line: 6, vars: {a:{value:17,type:"int"},b:{value:5,type:"int"},sum:{value:22,type:"int"}}, info: "sum = a + b = 22" },
+    { line: 7, vars: {a:{value:17,type:"int"},b:{value:5,type:"int"},sum:{value:22,type:"int"},diff:{value:12,type:"int"}}, info: "diff = a - b = 12" },
+    { line: 8, vars: {prod:{value:85,type:"int"}}, info: "prod = a * b = 85" },
+    { line: 9, vars: {quot:{value:3,type:"int"}}, info: "quot = a / b = 3（整数除法截断小数）" },
+    { line: 10, vars: {rem:{value:2,type:"int"}}, info: "rem = a % b = 2（取模运算）" },
+    { line: 11, output: "sum=22, diff=12, prod=85, quot=3, rem=2", info: "输出所有运算结果" },
+    { line: 13, info: "程序结束" }
+  ]
+});
+createDemo("demo3", {
+  title: "printf 格式化输出",
+  subtitle: "掌握常用格式控制符",
+  code: `#include <stdio.h>
+
+int main() {
+    int age = 20;
+    float pi = 3.14159;
+    char grade = 'A';
+    printf("age = %d\\n", age);
+    printf("pi = %.2f\\n", pi);
+    printf("grade = %c, ASCII = %d\\n", grade, grade);
+    return 0;
+}`,
+  vizTypes: ["vars","console"],
+  steps: [
+    { line: 3, info: "main() 开始" },
+    { line: 4, vars: {age:{value:20,type:"int"}}, info: "age = 20" },
+    { line: 5, vars: {pi:{value:3.14159,type:"float"}}, info: "pi = 3.14159" },
+    { line: 6, vars: {grade:{value:"'A'",type:"char"}}, info: "grade = 'A'" },
+    { line: 7, output: "age = 20", info: "%d 输出整数" },
+    { line: 8, output: "age = 20\npi = 3.14", info: "%.2f 保留两位小数输出浮点数" },
+    { line: 9, output: "age = 20\npi = 3.14\ngrade = A, ASCII = 65", info: "%c 输出字符，%d 输出其 ASCII 码 65" },
+    { line: 10, info: "程序结束" }
+  ]
+});
+// 模拟 scanf("%d %f %c", ...) 对一行输入的逐项解析（含分段可视化数据）
+function parseScanf(input) {
+  let pos = 0;
+  const r = { age: null, score: null, grade: null, ret: 0, details: [], segs: [] };
+  const skipWs = () => {
+    const s = pos;
+    while (pos < input.length && /\s/.test(input[pos])) pos++;
+    if (pos > s) r.segs.push({ text: input.slice(s, pos), type: 'ws' });
+  };
+  // 匹配停止原因的说明
+  const stopNote = () => {
+    if (pos >= input.length) return '';
+    const c = input[pos];
+    return /\s/.test(c) ? '' : `（遇到 '${c}' 停止，它及之后的内容都留在缓冲区）`;
+  };
+  const nextToken = () => input.slice(pos).trim().split(/\s+/)[0] || '（输入结束）';
+  let m;
+  skipWs();
+  if ((m = /^[+-]?\d+/.exec(input.slice(pos)))) {
+    r.age = parseInt(m[0], 10); pos += m[0].length; r.ret++;
+    r.segs.push({ text: m[0], type: 'd' });
+    r.details.push(`%d 读取 "${m[0]}" → age = ${r.age}${stopNote()}`);
+  } else {
+    if (pos < input.length) r.segs.push({ text: input.slice(pos), type: 'bad' });
+    r.details.push(`%d 期望一个整数，但遇到 "${nextToken()}"，解析失败，scanf 就此停止`);
+    return r;
+  }
+  skipWs();
+  // %f 支持科学计数法（如 1e3、1.5e-2）
+  if ((m = /^[+-]?(\d+\.?\d*|\.\d+)([eE][+-]?\d+)?/.exec(input.slice(pos)))) {
+    r.score = parseFloat(m[0]); pos += m[0].length; r.ret++;
+    r.segs.push({ text: m[0], type: 'f' });
+    r.details.push(`%f 读取 "${m[0]}" → score = ${r.score}${stopNote()}`);
+  } else {
+    if (pos < input.length) r.segs.push({ text: input.slice(pos), type: 'bad' });
+    r.details.push(`%f 期望一个浮点数，但遇到 "${nextToken()}"，解析失败，scanf 就此停止`);
+    return r;
+  }
+  skipWs();
+  if (pos < input.length) {
+    r.grade = input[pos]; pos++; r.ret++;
+    r.segs.push({ text: r.grade, type: 'c' });
+    r.details.push(`%c 读取一个字符 '${r.grade}' → grade = '${r.grade}'`);
+  } else {
+    r.details.push(`%c 期望一个字符，但输入已结束，解析失败`);
+    return r;
+  }
+  if (pos < input.length) {
+    r.segs.push({ text: input.slice(pos), type: 'rest' });
+    r.details.push(`剩余 "${input.slice(pos)}" 留在缓冲区（会留给下一次输入函数读取）`);
+  }
+  return r;
+}
+
+// 解析过程可视化：把输入行按各格式符消费的分段着色显示
+function renderParseMap(p) {
+  const el = document.getElementById('parse-map');
+  if (!el) return;
+  const esc = t => String(t).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/ /g, '␣').replace(/\t/g, '→');
+  const legend = [['d', '%d 整数'], ['f', '%f 浮点'], ['c', '%c 字符'], ['ws', '空白被跳过'], ['bad', '匹配失败'], ['rest', '留在缓冲区']];
+  el.innerHTML = '<div class="parse-segs">' +
+    p.segs.map(s => `<span class="parse-seg parse-${s.type}">${esc(s.text)}</span>`).join('') +
+    '</div><div class="parse-legend">' +
+    legend.filter(([k]) => p.segs.some(s => s.type === k))
+      .map(([k, v]) => `<span><i class="parse-dot parse-${k}"></i>${v}</span>`).join('') +
+    '</div>';
+}
+
+// scanf 示例：输入一整行，演示 scanf 的解析过程与异常处理
+function makeScanfDemo(input) {
+  const p = parseScanf(input);
+  const ok = p.ret === 3;
+  const ageS = p.age === null ? '?' : p.age;
+  const scoreS = p.score === null ? '?' : p.score.toFixed(1);
+  const gradeS = p.grade === null ? '?' : p.grade;
+  const parseInfo = p.details.join('；') + '。' +
+    (ok
+      ? '三项全部匹配，scanf 返回成功赋值的个数 ret = 3'
+      : `ret = ${p.ret}：只有 ${p.ret} 个变量被写入，其余保持未初始化的随机值`);
+  return {
+    title: "scanf 读取输入",
+    subtitle: "格式串逐项解析输入行（注意 & 取地址符与返回值 ret）",
+    code: `#include <stdio.h>
+
+int main() {
+    int age;
+    float score;
+    char grade;
+    int ret;
+    printf("请输入年龄、成绩、等级：");
+    ret = scanf("%d %f %c", &age, &score, &grade);
+    printf("ret=%d, age=%d, score=%.1f, grade=%c\\n", ret, age, score, grade);
+    return 0;
+}`,
+    vizTypes: ["vars","console"],
+    steps: [
+      { line: 3, info: "main() 开始" },
+      { line: 4, vars: {age:{value:"?",type:"int"}}, info: "声明未初始化的 int 变量 age（里面是随机垃圾值）" },
+      { line: 5, vars: {score:{value:"?",type:"float"}}, info: "声明未初始化的 float 变量 score" },
+      { line: 6, vars: {grade:{value:"?",type:"char"}}, info: "声明未初始化的 char 变量 grade" },
+      { line: 7, vars: {ret:{value:"?",type:"int"}}, info: "ret 用来接收 scanf 的返回值（成功赋值的项数）" },
+      { line: 8, output: "请输入年龄、成绩、等级：" + input, info: "提示用户输入，程序在此阻塞等待；你输入了一整行数据" },
+      { line: 9, vars: {age:{value:ageS,type:"int"},score:{value:scoreS,type:"float"},grade:{value:gradeS === '?' ? '?' : "'" + gradeS + "'",type:"char"},ret:{value:p.ret,type:"int"}}, info: parseInfo },
+      { line: 10, output: "ret=" + p.ret + ", age=" + ageS + ", score=" + scoreS + ", grade=" + gradeS, info: ok ? "输出读取到的值" : "⚠ 注意：未匹配成功的变量仍是随机垃圾值——真实程序中打印它们是未定义行为，所以必须检查 ret" },
+      { line: 11, info: ok ? "程序结束" : "程序结束。教训：scanf 的返回值告诉你成功读取了几项，用它判断输入是否合法" }
+    ]
+  };
+}
+createDemo("demo4", makeScanfDemo('18 92.5 B'));
+renderParseMap(parseScanf('18 92.5 B'));
+function runScanfDemo() {
+  const input = document.getElementById('try-line').value.trim() || '18 92.5 B';
+  createDemo("demo4", makeScanfDemo(input));
+  renderParseMap(parseScanf(input));
+}
+function presetScanf(text) {
+  document.getElementById('try-line').value = text;
+  runScanfDemo();
+}
+/* ===== 类型转换与常量 ===== */
+createDemo("demo5", {
+  title: "类型转换",
+  subtitle: "隐式转换 vs 强制转换",
+  code: `#include <stdio.h>
+
+int main() {
+    int a = 5;
+    int b = 2;
+    float f1 = a / b;
+    float f2 = (float)a / b;
+    int c = (int)3.99;
+    printf("f1=%.2f, f2=%.2f, c=%d\\n", f1, f2, c);
+    return 0;
+}`,
+  vizTypes: ["vars","console"],
+  steps: [
+    { line: 3, info: "main() 开始" },
+    { line: 4, vars: {a:{value:5,type:"int"}}, info: "a = 5" },
+    { line: 5, vars: {b:{value:2,type:"int"}}, info: "b = 2" },
+    { line: 6, vars: {f1:{value:2.0,type:"float"}}, info: "a/b 先按 int 计算得 2，再隐式转为 float，f1 = 2.0" },
+    { line: 7, vars: {f2:{value:2.5,type:"float"}}, info: "(float)a 先强制转换，再除以 b 得 2.5" },
+    { line: 8, vars: {c:{value:3,type:"int"}}, info: "(int)3.99 强制截断小数部分，c = 3" },
+    { line: 9, output: "f1=2.00, f2=2.50, c=3", info: "输出结果，注意 f1 和 f2 的区别" },
+    { line: 10, info: "程序结束" }
+  ]
+});
+createDemo("demo6", {
+  title: "转义字符",
+  subtitle: "\\n、\\t、\\\\、\\\" 等特殊字符",
+  code: `#include <stdio.h>
+
+int main() {
+    printf("Hello\\nWorld\\n");
+    printf("Name\\tAge\\tScore\\n");
+    printf("He said \\"OK\\"\\n");
+    printf("Path: C:\\Windows\\n");
+    return 0;
+}`,
+  vizTypes: ["console"],
+  steps: [
+    { line: 3, info: "main() 开始" },
+    { line: 4, output: "Hello\nWorld\n", info: "\\n 换行：输出分两行显示" },
+    { line: 5, output: "Hello\nWorld\n\nName\tAge\tScore\n", info: "\\t 制表符：对齐列" },
+    { line: 6, output: "Hello\nWorld\n\nName\tAge\tScore\n\nHe said \"OK\"\n", info: "\\\" 输出双引号" },
+    { line: 7, output: "Hello\nWorld\n\nName\tAge\tScore\n\nHe said \"OK\"\n\nPath: C:\\Windows\n", info: "\\\\ 输出单个反斜杠" },
+    { line: 8, info: "程序结束" }
+  ]
+});
+createDemo("demo7", {
+  title: "常量与宏定义",
+  subtitle: "使用 #define 定义常量",
+  code: `#include <stdio.h>
+
+#define PI 3.14159
+#define MAX 100
+#define MIN 1
+int main() {
+    double r = 5.0;
+    double area = PI * r * r;
+    printf("MAX=%d, MIN=%d, area=%.2f\\n", MAX, MIN, area);
+    return 0;
+}`,
+  vizTypes: ["vars","console"],
+  steps: [
+    { line: 3, info: "预处理：#define PI 3.14159，编译时所有 PI 会被替换" },
+    { line: 4, info: "预处理：#define MAX 100" },
+    { line: 5, info: "预处理：#define MIN 1" },
+    { line: 6, info: "main() 开始" },
+    { line: 7, vars: {r:{value:5.0,type:"double"}}, info: "r = 5.0" },
+    { line: 8, vars: {area:{value:78.53975,type:"double"}}, info: "area = PI * r * r ≈ 78.54" },
+    { line: 9, output: "MAX=100, MIN=1, area=78.54", info: "MAX 和 MIN 都是宏替换，没有 const 关键字" },
+    { line: 10, info: "程序结束" }
+  ]
+});
+/* ===== 赋值运算符 ===== */
+createDemo("demo8", {
+  title: "复合赋值运算符",
+  subtitle: "+= -= *= /= %= 让代码更简洁",
+  code: `#include <stdio.h>
+
+int main() {
+    int score = 100;
+    score += 10;
+    score -= 20;
+    score *= 2;
+    score /= 3;
+    score %= 7;
+    printf("score = %d\\n", score);
+    return 0;
+}`,
+  vizTypes: ["vars","console"],
+  steps: [
+    { line: 3, info: "main() 开始" },
+    { line: 4, vars: {score:{value:100,type:"int"}}, info: "score 初始化为 100" },
+    { line: 5, vars: {score:{value:110,type:"int"}}, info: "score += 10  => score = 110" },
+    { line: 6, vars: {score:{value:90,type:"int"}}, info: "score -= 20  => score = 90" },
+    { line: 7, vars: {score:{value:180,type:"int"}}, info: "score *= 2   => score = 180" },
+    { line: 8, vars: {score:{value:60,type:"int"}}, info: "score /= 3   => score = 60（整数除法）" },
+    { line: 9, vars: {score:{value:4,type:"int"}}, info: "score %= 7   => score = 4（60 % 7 = 4）" },
+    { line: 10, output: "score = 4", info: "最终输出 score = 4" },
+    { line: 11, info: "程序结束" }
+  ]
+});
+createDemo("demo9", {
+  title: "自增与自减运算符",
+  subtitle: "前缀 ++i 与后缀 i++ 的本质区别",
+  code: `#include <stdio.h>
+
+int main() {
+    int i = 5;
+    int a = i++;
+    int b = ++i;
+    int c = i--;
+    int d = --i;
+    printf("a=%d, b=%d, c=%d, d=%d, i=%d\\n", a, b, c, d, i);
+    return 0;
+}`,
+  vizTypes: ["vars","console"],
+  steps: [
+    { line: 3, info: "main() 开始" },
+    { line: 4, vars: {i:{value:5,type:"int"}}, info: "i 初始化为 5" },
+    { line: 5, vars: {i:{value:6,type:"int"},a:{value:5,type:"int"}}, info: "a = i++：先把 i 的旧值 5 赋给 a，然后 i 自增为 6" },
+    { line: 6, vars: {i:{value:7,type:"int"},a:{value:5,type:"int"},b:{value:7,type:"int"}}, info: "b = ++i：先把 i 自增为 7，再把新值 7 赋给 b" },
+    { line: 7, vars: {i:{value:6,type:"int"},a:{value:5,type:"int"},b:{value:7,type:"int"},c:{value:7,type:"int"}}, info: "c = i--：先把 i 的旧值 7 赋给 c，然后 i 自减为 6" },
+    { line: 8, vars: {i:{value:5,type:"int"},a:{value:5,type:"int"},b:{value:7,type:"int"},c:{value:7,type:"int"},d:{value:5,type:"int"}}, info: "d = --i：先把 i 自减为 5，再把新值 5 赋给 d" },
+    { line: 9, output: "a=5, b=7, c=7, d=5, i=5", info: "最终 i 回到了 5，但 a/b/c/d 记录了中间状态" },
+    { line: 10, info: "程序结束" }
+  ]
+});
+createDemo("demo10", {
+  title: "连续赋值与变量交换",
+  subtitle: "赋值表达式有返回值，以及不用临时变量交换",
+  code: `#include <stdio.h>
+
+int main() {
+    int a, b, c;
+    a = b = c = 10;
+    int x = 3, y = 7;
+    x = x + y;
+    y = x - y;
+    x = x - y;
+    printf("a=%d, b=%d, c=%d, x=%d, y=%d\\n", a, b, c, x, y);
+    return 0;
+}`,
+  vizTypes: ["vars","console"],
+  steps: [
+    { line: 3, info: "main() 开始" },
+    { line: 4, vars: {a:{value:"?",type:"int"},b:{value:"?",type:"int"},c:{value:"?",type:"int"}}, info: "声明三个未初始化的 int 变量（值不确定）" },
+    { line: 5, vars: {a:{value:10,type:"int"},b:{value:10,type:"int"},c:{value:10,type:"int"}}, info: "从右向左执行：c=10, b=c=10, a=b=10" },
+    { line: 6, vars: {x:{value:3,type:"int"},y:{value:7,type:"int"}}, info: "声明 x=3, y=7" },
+    { line: 7, vars: {x:{value:10,type:"int"},y:{value:7,type:"int"}}, info: "x = x + y = 3 + 7 = 10" },
+    { line: 8, vars: {x:{value:10,type:"int"},y:{value:3,type:"int"}}, info: "y = x - y = 10 - 7 = 3（原来的 x）" },
+    { line: 9, vars: {x:{value:7,type:"int"},y:{value:3,type:"int"}}, info: "x = x - y = 10 - 3 = 7（原来的 y），完成交换" },
+    { line: 10, output: "a=10, b=10, c=10, x=7, y=3", info: "连续赋值让 a/b/c 同为 10；加减法完成 x 与 y 的交换" },
+    { line: 11, info: "程序结束" }
+  ]
+});
+/* ========== 章节练习：3 道预测输出 + 3 道改错 ========== */
+createQuiz("quiz0", {
+  type: "predict",
+  title: "printf 格式符：%.2f 与 %c/%d",
+  code: `#include <stdio.h>
+
+int main() {
+    float price = 12.345;
+    char grade = 'B';
+    printf("price=%.2f\\n", price);
+    printf("grade=%c, code=%d\\n", grade, grade);
+    return 0;
+}`,
+  answer: "price=12.35\ngrade=B, code=66",
+  explain: "<code>%.2f</code> 把浮点数四舍五入保留两位小数：12.345 输出为 12.35。同一个 char 变量用 <code>%c</code> 输出字符 B，用 <code>%d</code> 输出它的 ASCII 码 66。"
+});
+createQuiz("quiz1", {
+  type: "predict",
+  title: "整数除法与强制类型转换",
+  code: `#include <stdio.h>
+
+int main() {
+    int a = 7;
+    int b = 2;
+    printf("a/b=%d\\n", a / b);
+    printf("(double)a/b=%.1f\\n", (double)a / b);
+    printf("(int)3.99=%d\\n", (int)3.99);
+    return 0;
+}`,
+  answer: "a/b=3\n(double)a/b=3.5\n(int)3.99=3",
+  explain: "两个 int 相除是<strong>整数除法</strong>，7/2 丢弃小数得 3；先用 <code>(double)a</code> 强制转换再除，结果才是 3.5。<code>(int)3.99</code> 直接截断小数部分（不是四舍五入），得 3。"
+});
+createQuiz("quiz2", {
+  type: "predict",
+  title: "++i 与 i++ 在 printf 参数中的区别",
+  code: `#include <stdio.h>
+
+int main() {
+    int i = 3;
+    printf("%d\\n", i++);
+    printf("%d\\n", ++i);
+    printf("%d\\n", i);
+    return 0;
+}`,
+  answer: "3\n5\n5",
+  explain: "<code>i++</code> <strong>先用后加</strong>：第一次打印旧值 3，然后 i 变 4；<code>++i</code> <strong>先加后用</strong>：i 先变 5 再打印 5；最后 i 就是 5。"
+});
+createQuiz("quiz3", {
+  type: "fix",
+  title: "把赋值 == 误写成了比较 ==",
+  code: `#include <stdio.h>
+
+int main() {
+    int x = 1;
+    x == 5;
+    printf("x=%d\\n", x);
+    return 0;
+}`,
+  accept: [`#include <stdio.h>
+
+int main() {
+    int x = 1;
+    x = 5;
+    printf("x=%d\\n", x);
+    return 0;
+}`],
+  explain: "<code>x == 5;</code> 是<strong>比较</strong>运算，结果（真/假）被直接丢弃，x 的值并没有改变，程序输出 x=1。本意是赋值，应把 <code>==</code> 改成 <code>=</code>。编译器对此往往只给警告不报错，是最隐蔽的低级错误之一。改对后输出 x=5。"
+});
+createQuiz("quiz4", {
+  type: "fix",
+  title: "复合赋值 += 写反成了 =+",
+  code: `#include <stdio.h>
+
+int main() {
+    int score = 100;
+    score =+ 10;
+    printf("score=%d\\n", score);
+    return 0;
+}`,
+  accept: [`#include <stdio.h>
+
+int main() {
+    int score = 100;
+    score += 10;
+    printf("score=%d\\n", score);
+    return 0;
+}`, `#include <stdio.h>
+
+int main() {
+    int score = 100;
+    score = score + 10;
+    printf("score=%d\\n", score);
+    return 0;
+}`],
+  explain: "<code>score =+ 10;</code> 被解析为「把 <strong>+10</strong>（正十）赋给 score」，即 score 变成 10 而不是 110。想加 10 应写 <code>score += 10;</code>（或等价的 <code>score = score + 10;</code>），注意复合赋值运算符是两个符号<strong>连写</strong>、不能分开。改对后输出 score=110。"
+});
+createQuiz("quiz5", {
+  type: "fix",
+  title: "#define 末尾多了一个分号",
+  code: `#include <stdio.h>
+
+#define PI 3.14159;
+
+int main() {
+    double r = 2.0;
+    double area = PI * r * r;
+    printf("area=%.2f\\n", area);
+    return 0;
+}`,
+  accept: [`#include <stdio.h>
+
+#define PI 3.14159
+
+int main() {
+    double r = 2.0;
+    double area = PI * r * r;
+    printf("area=%.2f\\n", area);
+    return 0;
+}`],
+  explain: "<code>#define</code> 是预处理指令，做的是<strong>原样文本替换</strong>，末尾不需要也不该有分号。多了分号后，<code>PI * r * r</code> 被替换成 <code>3.14159; * r * r</code>，编译直接报错。最小修改：删掉宏定义末尾的 <code>;</code>。"
+});
+</script>
+</body>
+</html>

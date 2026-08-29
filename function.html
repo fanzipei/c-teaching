@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="C语言函数交互演示：函数定义、值传递、返回值、作用域、递归，可视化调用栈与递归调用树。">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<title>函数 - C语言教学演示</title>
+<link rel="stylesheet" href="style.css?v=16">
+</head>
+<body>
+<nav></nav>
+<div class="container">
+<h1>函数</h1>
+<div class="intro">
+<p><strong>函数</strong>是C程序的基本模块，用于封装可复用的代码。核心知识点：</p>
+<ul>
+<li>函数定义：返回类型 函数名(参数列表) { 函数体 }</li>
+<li><strong>值传递</strong>：C函数参数默认按值传递，形参的修改不影响实参</li>
+<li><strong>返回值</strong>：用 return 带回结果；void 表示不返回</li>
+<li><strong>局部变量</strong>：在函数内声明，函数结束时销毁（存于栈上）</li>
+<li><strong>递归</strong>：函数调用自身，必须有终止条件否则死循环</li>
+<li>函数必须先声明或定义后，才能被调用</li>
+</ul>
+</div>
+<div class="demo-grid">
+  <div id="demo0"></div>
+  <div id="demo1"></div>
+  <div id="demo2"></div>
+  <div id="demo3"></div>
+  <div id="demo4"></div>
+  <div id="demo5"></div>
+  <div id="demo6"></div>
+  <div id="demo7"></div>
+</div>
+<h2>章节练习</h2>
+<div class="quiz-grid">
+  <div id="quiz0"></div>
+  <div id="quiz1"></div>
+  <div id="quiz2"></div>
+  <div id="quiz3"></div>
+  <div id="quiz4"></div>
+  <div id="quiz5"></div>
+</div>
+</div>
+
+<script src="demo-engine.js?v=16"></script>
+<script>
+createDemo("demo0", {
+  title: "函数的定义与调用",
+  subtitle: "把求和逻辑封装成函数",
+  code: `#include <stdio.h>
+
+int add(int a, int b) {
+    int result = a + b;
+    return result;
+}
+
+int main() {
+    int x = add(3, 5);
+    printf("x = %d\\n", x);
+    return 0;
+}`,
+  vizTypes: ["vars","stack","console"],
+  steps: [
+    { line: 7, info: "main() 开始执行" },
+    { line: 8, vars: {x:{value:"?",type:"int"}}, info: "准备调用 add(3, 5)，x 尚未赋值" },
+    { line: 3, stack: [{name:"main",value:"x=?"},{name:"add",value:"a=3,b=5",highlight:true}], info: "跳转到 add 函数，形参 a=3, b=5 被初始化" },
+    { line: 4, vars: {a:{value:3,type:"int"},b:{value:5,type:"int"},result:{value:8,type:"int"}}, info: "计算 result = a + b = 8" },
+    { line: 5, stack: [{name:"main",value:"x=?"},{name:"add",value:"a=3, b=5",ret:8,highlight:true}], info: "return 8；add 函数执行完毕" },
+    { line: 8, vars: {x:{value:8,type:"int"}}, stack: [{name:"main",value:"x=8",highlight:true}], info: "回到 main，返回值 8 赋给 x" },
+    { line: 9, output: "x = 8", info: "打印 x = 8" },
+    { line: 10, info: "程序结束" }
+  ]
+});
+createDemo("demo1", {
+  title: "值传递的本质",
+  subtitle: "形参改变不影响实参",
+  code: `#include <stdio.h>
+
+void swap_wrong(int a, int b) {
+    int tmp = a;
+    a = b;
+    b = tmp;
+}
+
+int main() {
+    int x = 3, y = 7;
+    swap_wrong(x, y);
+    printf("x=%d, y=%d\\n", x, y);
+    return 0;
+}`,
+  vizTypes: ["vars","stack","console"],
+  steps: [
+    { line: 9, info: "main() 开始" },
+    { line: 10, vars: {x:{value:3,type:"int"},y:{value:7,type:"int"}}, info: "x=3, y=7" },
+    { line: 11, info: "调用 swap_wrong(x, y)" },
+    { line: 3, stack: [{name:"main",value:"x=3,y=7"},{name:"swap_wrong",value:"a=3,b=7",highlight:true}], vars: {a:{value:3,type:"int"},b:{value:7,type:"int"}}, info: "进入 swap_wrong：形参 a、b 是 x、y 的副本" },
+    { line: 4, vars: {tmp:{value:3,type:"int"},a:{value:3,type:"int"},b:{value:7,type:"int"}}, info: "tmp = a = 3" },
+    { line: 5, vars: {a:{value:7,type:"int"},tmp:{value:3,type:"int"},b:{value:7,type:"int"}}, info: "a = b = 7（只改了形参 a）" },
+    { line: 6, vars: {b:{value:3,type:"int"},a:{value:7,type:"int"},tmp:{value:3,type:"int"}}, info: "b = tmp = 3（只改了形参 b）" },
+    { line: 8, stack: [{name:"main",value:"x=3,y=7",highlight:true}], info: "swap_wrong 结束，形参 a、b、tmp 被销毁" },
+    { line: 11, vars: {x:{value:3,type:"int"},y:{value:7,type:"int"}}, info: "回到 main：x 和 y 根本没变" },
+    { line: 12, output: "x=3, y=7", info: "输出 x=3, y=7——交换失败！" },
+    { line: 13, info: "程序结束" }
+  ]
+});
+createDemo("demo2", {
+  title: "返回值与表达式",
+  subtitle: "函数调用可以像值一样使用",
+  code: `#include <stdio.h>
+
+int square(int n) {
+    return n * n;
+}
+
+int main() {
+    int a = 4;
+    int b = square(a) + square(a + 1);
+    printf("b = %d\\n", b);
+    return 0;
+}`,
+  vizTypes: ["vars","stack","console"],
+  steps: [
+    { line: 7, info: "main() 开始" },
+    { line: 8, vars: {a:{value:4,type:"int"}}, info: "a = 4" },
+    { line: 9, info: "计算 square(a) + square(a+1)，先调用 square(a)" },
+    { line: 3, stack: [{name:"main",value:"a=4"},{name:"square",value:"n=4",highlight:true}], vars: {n:{value:4,type:"int"}}, info: "square(4)：n = 4" },
+    { line: 4, stack: [{name:"main",value:"a=4"},{name:"square",value:"n=4",ret:16,highlight:true}], info: "return 4*4 = 16" },
+    { line: 9, info: "square(a) 返回 16；接下来计算 square(a+1)=square(5)" },
+    { line: 3, stack: [{name:"main",value:"a=4"},{name:"square",value:"n=5",highlight:true}], vars: {n:{value:5,type:"int"}}, info: "square(5)：n = 5" },
+    { line: 4, stack: [{name:"main",value:"a=4"},{name:"square",value:"n=5",ret:25,highlight:true}], info: "return 5*5 = 25" },
+    { line: 9, vars: {b:{value:41,type:"int"}}, info: "b = 16 + 25 = 41" },
+    { line: 10, output: "b = 41", info: "输出 b = 41" },
+    { line: 11, info: "程序结束" }
+  ]
+});
+createDemo("demo3", {
+  title: "局部变量与作用域",
+  subtitle: "同名变量在不同函数中互不干扰",
+  code: `#include <stdio.h>
+
+void foo() {
+    int x = 100;
+    printf("foo: x=%d\\n", x);
+}
+
+int main() {
+    int x = 10;
+    printf("main: x=%d\\n", x);
+    foo();
+    printf("main again: x=%d\\n", x);
+    return 0;
+}`,
+  vizTypes: ["vars","stack","console"],
+  steps: [
+    { line: 8, info: "main() 开始" },
+    { line: 9, vars: {x:{value:10,type:"int"}}, stack: [{name:"main",value:"x=10",highlight:true}], info: "main 中定义 x = 10" },
+    { line: 10, output: "main: x=10", info: "main 打印 x=10" },
+    { line: 11, info: "调用 foo()" },
+    { line: 3, vars: {x:{value:100,type:"int"}}, stack: [{name:"main",value:"x=10"},{name:"foo",value:"x=100",highlight:true}], info: "foo 中定义了另一个 x = 100，与 main 的 x 无关" },
+    { line: 4, output: "main: x=10\nfoo: x=100", info: "foo 打印自己的 x=100" },
+    { line: 5, stack: [{name:"main",value:"x=10",highlight:true}], info: "foo 结束，foo 的 x 被销毁" },
+    { line: 12, vars: {x:{value:10,type:"int"}}, info: "回到 main，x 仍然是 10" },
+    { line: 12, output: "main: x=10\nfoo: x=100\nmain again: x=10", info: "main 再次打印 x=10" },
+    { line: 13, info: "程序结束" }
+  ]
+});
+createDemo("demo4", {
+  title: "递归函数",
+  subtitle: "函数调用自身：以阶乘为例",
+  code: `#include <stdio.h>
+
+int factorial(int n) {
+    if (n <= 1) return 1;
+    return n * factorial(n - 1);
+}
+
+int main() {
+    int f = factorial(4);
+    printf("4! = %d\\n", f);
+    return 0;
+}`,
+  vizTypes: ["vars","stack","console"],
+  steps: [
+    { line: 8, info: "main() 开始" },
+    { line: 9, vars: {f:{value:"?",type:"int"}}, info: "准备调用 factorial(4)" },
+    { line: 3, stack: [{name:"main",value:"f=?"},{name:"factorial",value:"n=4",highlight:true}], vars: {n:{value:4,type:"int"}}, info: "factorial(4)：n=4，n<=1 为假，继续递归" },
+    { line: 5, info: "计算 4 * factorial(3)，先求 factorial(3)" },
+    { line: 3, stack: [{name:"main",value:"f=?"},{name:"factorial",value:"n=4"},{name:"factorial",value:"n=3",highlight:true}], vars: {n:{value:3,type:"int"}}, info: "factorial(3)：n=3" },
+    { line: 5, info: "计算 3 * factorial(2)" },
+    { line: 3, stack: [{name:"main",value:"f=?"},{name:"factorial",value:"n=4"},{name:"factorial",value:"n=3"},{name:"factorial",value:"n=2",highlight:true}], vars: {n:{value:2,type:"int"}}, info: "factorial(2)：n=2" },
+    { line: 5, info: "计算 2 * factorial(1)" },
+    { line: 3, stack: [{name:"main",value:"f=?"},{name:"factorial",value:"n=4"},{name:"factorial",value:"n=3"},{name:"factorial",value:"n=2"},{name:"factorial",value:"n=1",highlight:true}], vars: {n:{value:1,type:"int"}}, info: "factorial(1)：n=1，触发终止条件" },
+    { line: 4, stack: [{name:"main",value:"f=?"},{name:"factorial",value:"n=4"},{name:"factorial",value:"n=3"},{name:"factorial",value:"n=2"},{name:"factorial",value:"n=1",ret:1,highlight:true}], info: "return 1" },
+    { line: 5, stack: [{name:"main",value:"f=?"},{name:"factorial",value:"n=4"},{name:"factorial",value:"n=3"},{name:"factorial",value:"n=2",ret:2,highlight:true}], info: "factorial(2) = 2 * 1 = 2" },
+    { line: 5, stack: [{name:"main",value:"f=?"},{name:"factorial",value:"n=4"},{name:"factorial",value:"n=3",ret:6,highlight:true}], info: "factorial(3) = 3 * 2 = 6" },
+    { line: 5, stack: [{name:"main",value:"f=?"},{name:"factorial",value:"n=4",ret:24,highlight:true}], info: "factorial(4) = 4 * 6 = 24" },
+    { line: 9, vars: {f:{value:24,type:"int"}}, stack: [{name:"main",value:"f=24",highlight:true}], info: "f = 24" },
+    { line: 10, output: "4! = 24", info: "输出 4! = 24" },
+    { line: 11, info: "程序结束" }
+  ]
+});
+createDemo("demo5", {
+  title: "函数与数组",
+  subtitle: "数组作为参数时退化为指针（传递首地址）",
+  code: `#include <stdio.h>
+
+int sum_array(int arr[], int n) {
+    int s = 0;
+    int i;
+    for (i = 0; i < n; i++) {
+        s += arr[i];
+    }
+    return s;
+}
+
+int main() {
+    int a[4] = {2, 4, 6, 8};
+    int total = sum_array(a, 4);
+    printf("total = %d\\n", total);
+    return 0;
+}`,
+  vizTypes: ["vars","array","stack","console"],
+  steps: [
+    { line: 11, info: "main() 开始" },
+    { line: 12, vars: {a:{value:"int[4]",type:"array"}}, array: {name:"a", cells:[{val:2},{val:4},{val:6},{val:8}]}, info: "定义数组 a = {2,4,6,8}" },
+    { line: 13, info: "调用 sum_array(a, 4)" },
+    { line: 3, stack: [{name:"main",value:"a[4]"},{name:"sum_array",value:"arr=a, n=4",highlight:true}], vars: {n:{value:4,type:"int"},s:{value:0,type:"int"}}, info: "进入 sum_array：arr 获得数组首地址，n=4" },
+    { line: 4, vars: {s:{value:0,type:"int"}}, info: "s = 0" },
+    { line: 5, vars: {i:{value:0,type:"int"}}, info: "i=0，循环开始" },
+    { line: 6, vars: {s:{value:2,type:"int"}}, array: {name:"a", cells:[{val:2,highlight:true},{val:4},{val:6},{val:8}]}, info: "s += arr[0] => s = 2" },
+    { line: 5, vars: {i:{value:1,type:"int"}}, info: "i=1" },
+    { line: 6, vars: {s:{value:6,type:"int"}}, array: {name:"a", cells:[{val:2},{val:4,highlight:true},{val:6},{val:8}]}, info: "s += arr[1] => s = 6" },
+    { line: 5, vars: {i:{value:2,type:"int"}}, info: "i=2" },
+    { line: 6, vars: {s:{value:12,type:"int"}}, array: {name:"a", cells:[{val:2},{val:4},{val:6,highlight:true},{val:8}]}, info: "s += arr[2] => s = 12" },
+    { line: 5, vars: {i:{value:3,type:"int"}}, info: "i=3" },
+    { line: 6, vars: {s:{value:20,type:"int"}}, array: {name:"a", cells:[{val:2},{val:4},{val:6},{val:8,highlight:true}]}, info: "s += arr[3] => s = 20" },
+    { line: 5, info: "i=4，循环结束" },
+    { line: 8, stack: [{name:"main",value:"a[4]"},{name:"sum_array",value:"arr=a, n=4",ret:20,highlight:true}], info: "return 20" },
+    { line: 13, vars: {total:{value:20,type:"int"}}, stack: [{name:"main",value:"total=20",highlight:true}], info: "total = 20" },
+    { line: 14, output: "total = 20", info: "输出 total = 20" },
+    { line: 15, info: "程序结束" }
+  ]
+});
+/* ========== demo6: 递归——斐波那契数列（含递归调用树） ========== */
+createDemo("demo6", {
+  title: "递归：斐波那契数列",
+  subtitle: "右侧调用树同步生长：蓝色是当前调用，绿色是已返回的调用",
+  code: `#include <stdio.h>
+
+int fib(int n) {
+    if (n <= 1) return n;
+    return fib(n - 1) + fib(n - 2);
+}
+
+int main() {
+    int r = fib(4);
+    printf("fib(4) = %d\\n", r);
+    return 0;
+}`,
+  vizTypes: ["vars","stack","graph","console"],
+  graphTitle: "递归调用树",
+  steps: [
+    { line: 7, info: "main() 开始" },
+    { line: 8, vars: {r:{value:"?",type:"int"}}, info: "准备调用 fib(4)，r 尚未赋值" },
+    { line: 3, stack: [{name:"main",value:"r=?"},{name:"fib",value:"n=4",highlight:true}], vars: {n:{value:4,type:"int"}}, graph: {merge:true, nodes:[{id:"f4",label:"f(4)",x:140,y:10,highlight:true}]}, info: "fib(4)：n=4 > 1，需要递归" },
+    { line: 3, stack: [{name:"main",value:"r=?"},{name:"fib",value:"n=4"},{name:"fib",value:"n=3",highlight:true}], vars: {n:{value:3,type:"int"}}, graph: {merge:true, nodes:[{id:"f3",label:"f(3)",x:70,y:70,highlight:true}], edges:[{from:"f4",to:"f3",highlight:true}]}, info: "计算 fib(3)+fib(2)：先递归左半部分 fib(3)" },
+    { line: 3, stack: [{name:"main",value:"r=?"},{name:"fib",value:"n=4"},{name:"fib",value:"n=3"},{name:"fib",value:"n=2",highlight:true}], vars: {n:{value:2,type:"int"}}, graph: {merge:true, nodes:[{id:"f2a",label:"f(2)",x:30,y:135,highlight:true}], edges:[{from:"f3",to:"f2a",highlight:true}]}, info: "fib(3) 又要先求 fib(2)" },
+    { line: 4, stack: [{name:"main",value:"r=?"},{name:"fib",value:"n=4"},{name:"fib",value:"n=3"},{name:"fib",value:"n=2"},{name:"fib",value:"n=1",ret:1,highlight:true}], vars: {n:{value:1,type:"int"}}, graph: {merge:true, nodes:[{id:"f1a",label:"f(1)",x:8,y:200,done:true,sub:"= 1",highlight:true}], edges:[{from:"f2a",to:"f1a",highlight:true}]}, info: "fib(1)：触发终止条件，return 1" },
+    { line: 4, stack: [{name:"main",value:"r=?"},{name:"fib",value:"n=4"},{name:"fib",value:"n=3"},{name:"fib",value:"n=2"},{name:"fib",value:"n=0",ret:0,highlight:true}], vars: {n:{value:0,type:"int"}}, graph: {merge:true, nodes:[{id:"f0a",label:"f(0)",x:55,y:200,done:true,sub:"= 0",highlight:true}], edges:[{from:"f2a",to:"f0a",highlight:true}]}, info: "回到 fib(2)，再求 fib(0)，return 0" },
+    { line: 4, stack: [{name:"main",value:"r=?"},{name:"fib",value:"n=4"},{name:"fib",value:"n=3"},{name:"fib",value:"n=2",ret:1,highlight:true}], graph: {merge:true, nodes:[{id:"f2a",done:true,sub:"= 1"}]}, info: "fib(2) = fib(1)+fib(0) = 1+0 = 1，返回" },
+    { line: 4, stack: [{name:"main",value:"r=?"},{name:"fib",value:"n=4"},{name:"fib",value:"n=3"},{name:"fib",value:"n=1",ret:1,highlight:true}], graph: {merge:true, nodes:[{id:"f1c",label:"f(1)",x:110,y:135,done:true,sub:"= 1",highlight:true}], edges:[{from:"f3",to:"f1c",highlight:true}]}, info: "回到 fib(3)，求右半部分 fib(1)，return 1" },
+    { line: 4, stack: [{name:"main",value:"r=?"},{name:"fib",value:"n=4"},{name:"fib",value:"n=3",ret:2,highlight:true}], graph: {merge:true, nodes:[{id:"f3",done:true,sub:"= 2"}]}, info: "fib(3) = fib(2)+fib(1) = 1+1 = 2，返回" },
+    { line: 3, stack: [{name:"main",value:"r=?"},{name:"fib",value:"n=4"},{name:"fib",value:"n=2",highlight:true}], vars: {n:{value:2,type:"int"}}, graph: {merge:true, nodes:[{id:"f2b",label:"f(2)",x:210,y:70,highlight:true}], edges:[{from:"f4",to:"f2b",highlight:true}]}, info: "回到 fib(4)，求右半部分 fib(2)——注意它又从头算一遍！" },
+    { line: 4, stack: [{name:"main",value:"r=?"},{name:"fib",value:"n=4"},{name:"fib",value:"n=2"},{name:"fib",value:"n=1",ret:1,highlight:true}], vars: {n:{value:1,type:"int"}}, graph: {merge:true, nodes:[{id:"f1d",label:"f(1)",x:190,y:135,done:true,sub:"= 1",highlight:true}], edges:[{from:"f2b",to:"f1d",highlight:true}]}, info: "fib(1)，return 1" },
+    { line: 4, stack: [{name:"main",value:"r=?"},{name:"fib",value:"n=4"},{name:"fib",value:"n=2"},{name:"fib",value:"n=0",ret:0,highlight:true}], vars: {n:{value:0,type:"int"}}, graph: {merge:true, nodes:[{id:"f0b",label:"f(0)",x:235,y:135,done:true,sub:"= 0",highlight:true}], edges:[{from:"f2b",to:"f0b",highlight:true}]}, info: "fib(0)，return 0" },
+    { line: 4, stack: [{name:"main",value:"r=?"},{name:"fib",value:"n=4"},{name:"fib",value:"n=2",ret:1,highlight:true}], graph: {merge:true, nodes:[{id:"f2b",done:true,sub:"= 1"}]}, info: "fib(2) = 1+0 = 1，返回" },
+    { line: 4, stack: [{name:"main",value:"r=?"},{name:"fib",value:"n=4",ret:3,highlight:true}], graph: {merge:true, nodes:[{id:"f4",done:true,sub:"= 3"}]}, info: "fib(4) = fib(3)+fib(2) = 2+1 = 3，返回 main" },
+    { line: 8, vars: {r:{value:3,type:"int"}}, stack: [{name:"main",value:"r=3",highlight:true}], info: "r = 3。观察调用树：fib(2) 被重复计算了 2 次——n 更大时重复会爆炸式增长，这就是朴素递归低效的原因" },
+    { line: 9, output: "fib(4) = 3", info: "输出 fib(4) = 3" },
+    { line: 10, info: "程序结束" }
+  ]
+});
+/* ========== demo7: 递归——汉诺塔 ========== */
+createDemo("demo7", {
+  title: "递归：汉诺塔",
+  subtitle: "把 n 个盘子从 A 移到 C：先移上面 n-1 个，再移最大的，最后移回 n-1 个",
+  code: `#include <stdio.h>
+
+void hanoi(int n, char from, char to, char aux) {
+    if (n == 1) {
+        printf("%c -> %c\\n", from, to);
+        return;
+    }
+    hanoi(n - 1, from, aux, to);
+    printf("%c -> %c\\n", from, to);
+    hanoi(n - 1, aux, to, from);
+}
+
+int main() {
+    hanoi(3, 'A', 'C', 'B');
+    return 0;
+}`,
+  vizTypes: ["stack","hanoi","console"],
+  steps: [
+    { line: 12, info: "main() 开始" },
+    { line: 13, hanoi: [{peg:"A",disks:[3,2,1]},{peg:"B",disks:[]},{peg:"C",disks:[]}], info: "调用 hanoi(3, 'A', 'C', 'B')：把 3 个盘子从 A 移到 C，B 作辅助柱" },
+    { line: 3, stack: [{name:"main",value:""},{name:"hanoi",value:"n=3, A→C (辅B)",highlight:true}], info: "n=3 ≠ 1，拆解为三步：① 上面 2 个盘子 A→B ② 盘子 3 A→C ③ 2 个盘子 B→C" },
+    { line: 7, stack: [{name:"main",value:""},{name:"hanoi",value:"n=3, A→C (辅B)"},{name:"hanoi",value:"n=2, A→B (辅C)",highlight:true}], info: "先执行①：递归 hanoi(2, A, B, C)" },
+    { line: 3, stack: [{name:"main",value:""},{name:"hanoi",value:"n=3, A→C (辅B)"},{name:"hanoi",value:"n=2, A→B (辅C)",highlight:true}], info: "n=2 ≠ 1，同样拆解：先把盘子 1 从 A 移到 C" },
+    { line: 7, stack: [{name:"main",value:""},{name:"hanoi",value:"n=3, A→C (辅B)"},{name:"hanoi",value:"n=2, A→B (辅C)"},{name:"hanoi",value:"n=1, A→C (辅B)",highlight:true}], info: "递归 hanoi(1, A, C, B)" },
+    { line: 4, outputAppend: "A -> C", hanoi: [{peg:"A",disks:[3,2]},{peg:"B",disks:[]},{peg:"C",disks:[{size:1,highlight:true}]}], info: "n=1 到达终止条件：直接把盘子 1 从 A 移到 C" },
+    { line: 6, stack: [{name:"main",value:""},{name:"hanoi",value:"n=3, A→C (辅B)"},{name:"hanoi",value:"n=2, A→B (辅C)",highlight:true}], info: "hanoi(1) 返回，继续 hanoi(2) 自己的移动" },
+    { line: 8, outputAppend: "A -> B", hanoi: [{peg:"A",disks:[3]},{peg:"B",disks:[{size:2,highlight:true}]},{peg:"C",disks:[1]}], info: "hanoi(2) 移动盘子 2：A→B" },
+    { line: 9, stack: [{name:"main",value:""},{name:"hanoi",value:"n=3, A→C (辅B)"},{name:"hanoi",value:"n=2, A→B (辅C)"},{name:"hanoi",value:"n=1, C→B (辅A)",highlight:true}], info: "再递归 hanoi(1, C, B, A)：把盘子 1 从 C 移到 B" },
+    { line: 4, outputAppend: "C -> B", hanoi: [{peg:"A",disks:[3]},{peg:"B",disks:[2,{size:1,highlight:true}]},{peg:"C",disks:[]}], info: "盘子 1 从 C 移到 B。①完成：上面 2 个盘子已到 B" },
+    { line: 6, stack: [{name:"main",value:""},{name:"hanoi",value:"n=3, A→C (辅B)",highlight:true}], info: "hanoi(2) 返回，A 上只剩最大的盘子 3" },
+    { line: 8, outputAppend: "A -> C", hanoi: [{peg:"A",disks:[]},{peg:"B",disks:[2,1]},{peg:"C",disks:[{size:3,highlight:true}]}], info: "②hanoi(3) 移动最大的盘子 3：A→C" },
+    { line: 9, stack: [{name:"main",value:""},{name:"hanoi",value:"n=3, A→C (辅B)"},{name:"hanoi",value:"n=2, B→C (辅A)",highlight:true}], info: "③递归 hanoi(2, B, C, A)：把 B 上的 2 个盘子移到 C" },
+    { line: 7, stack: [{name:"main",value:""},{name:"hanoi",value:"n=3, A→C (辅B)"},{name:"hanoi",value:"n=2, B→C (辅A)"},{name:"hanoi",value:"n=1, B→A (辅C)",highlight:true}], info: "先递归 hanoi(1, B, A, C)：把盘子 1 从 B 移到 A" },
+    { line: 4, outputAppend: "B -> A", hanoi: [{peg:"A",disks:[{size:1,highlight:true}]},{peg:"B",disks:[2]},{peg:"C",disks:[3]}], info: "盘子 1 从 B 移到 A" },
+    { line: 8, outputAppend: "B -> C", hanoi: [{peg:"A",disks:[1]},{peg:"B",disks:[]},{peg:"C",disks:[3,{size:2,highlight:true}]}], stack: [{name:"main",value:""},{name:"hanoi",value:"n=3, A→C (辅B)"},{name:"hanoi",value:"n=2, B→C (辅A)",highlight:true}], info: "hanoi(2) 移动盘子 2：B→C" },
+    { line: 9, stack: [{name:"main",value:""},{name:"hanoi",value:"n=3, A→C (辅B)"},{name:"hanoi",value:"n=2, B→C (辅A)"},{name:"hanoi",value:"n=1, A→C (辅B)",highlight:true}], info: "递归 hanoi(1, A, C, B)：把盘子 1 从 A 移到 C" },
+    { line: 4, outputAppend: "A -> C", hanoi: [{peg:"A",disks:[]},{peg:"B",disks:[]},{peg:"C",disks:[3,2,{size:1,highlight:true}]}], info: "盘子 1 从 A 移到 C，③完成，3 个盘子全部到位！" },
+    { line: 6, stack: [{name:"main",value:""}], info: "所有递归调用依次返回。共移动 7 步 = 2³−1；n 个盘子需要 2ⁿ−1 步" },
+    { line: 14, info: "程序结束" }
+  ]
+});
+/* ========== 章节练习：3 道预测输出 + 3 道改错 ========== */
+createQuiz("quiz0", {
+  type: "predict",
+  title: "值传递：交换失败",
+  code: `#include <stdio.h>
+
+void swap(int a, int b) {
+    int tmp = a;
+    a = b;
+    b = tmp;
+}
+
+int main() {
+    int x = 3, y = 7;
+    swap(x, y);
+    printf("x=%d, y=%d\\n", x, y);
+    return 0;
+}`,
+  answer: "x=3, y=7",
+  explain: "C 语言参数是<strong>值传递</strong>：形参 a、b 只是实参 x、y 的副本。swap 函数里交换的是副本，函数结束后副本销毁，main 里的 x 和 y 纹丝不动，所以输出仍是 <code>x=3, y=7</code>。"
+});
+createQuiz("quiz1", {
+  type: "predict",
+  title: "局部变量的生存期",
+  code: `#include <stdio.h>
+
+int next() {
+    int c = 0;
+    c = c + 1;
+    return c;
+}
+
+int main() {
+    printf("%d %d %d\\n", next(), next(), next());
+    return 0;
+}`,
+  answer: "1 1 1",
+  explain: "局部变量 c 在<strong>每次调用</strong> next 时才创建，函数一结束就被销毁。三次调用互不记忆，每次都从 0 加到 1，所以输出 <code>1 1 1</code> 而不是 1 2 3。"
+});
+createQuiz("quiz2", {
+  type: "predict",
+  title: "数组作为函数参数",
+  code: `#include <stdio.h>
+
+void negate(int arr[], int n) {
+    int i;
+    for (i = 0; i < n; i++) {
+        arr[i] = -arr[i];
+    }
+}
+
+int main() {
+    int a[3] = {1, -2, 3};
+    negate(a, 3);
+    printf("%d %d %d\\n", a[0], a[1], a[2]);
+    return 0;
+}`,
+  answer: "-1 2 -3",
+  explain: "数组作为参数时传递的是<strong>首地址</strong>（退化为指针），不是副本。negate 里对 arr[i] 的取反直接改的是 main 中的原数组 a，所以调用后 a 变成 {-1, 2, -3}。"
+});
+createQuiz("quiz3", {
+  type: "fix",
+  title: "函数忘了返回值",
+  code: `#include <stdio.h>
+
+int square(int n) {
+    int s = n * n;
+}
+
+int main() {
+    printf("square(5) = %d\\n", square(5));
+    return 0;
+}`,
+  accept: [`#include <stdio.h>
+
+int square(int n) {
+    int s = n * n;
+    return s;
+}
+
+int main() {
+    printf("square(5) = %d\\n", square(5));
+    return 0;
+}`, `#include <stdio.h>
+
+int square(int n) {
+    return n * n;
+}
+
+int main() {
+    printf("square(5) = %d\\n", square(5));
+    return 0;
+}`],
+  explain: "返回类型为 <code>int</code> 的函数必须用 <code>return</code> 带回结果；square 里没有 return，main 拿到的是<strong>不确定的随机值</strong>。最小修改：补上 <code>return s;</code>（或直接 <code>return n * n;</code> 省去临时变量）。"
+});
+createQuiz("quiz4", {
+  type: "fix",
+  title: "递归缺少终止条件",
+  code: `#include <stdio.h>
+
+int factorial(int n) {
+    return n * factorial(n - 1);
+}
+
+int main() {
+    printf("5! = %d\\n", factorial(5));
+    return 0;
+}`,
+  accept: [`#include <stdio.h>
+
+int factorial(int n) {
+    if (n <= 1) return 1;
+    return n * factorial(n - 1);
+}
+
+int main() {
+    printf("5! = %d\\n", factorial(5));
+    return 0;
+}`],
+  explain: "递归函数必须有<strong>终止条件</strong>（基准情形）。这里没有它，factorial 会无限自我调用直到栈溢出崩溃。最小修改：在递归前加 <code>if (n <= 1) return 1;</code>，0! = 1! = 1 时不再递归。"
+});
+createQuiz("quiz5", {
+  type: "fix",
+  title: "函数先使用后声明",
+  code: `#include <stdio.h>
+
+int main() {
+    double r = average(3, 5);
+    printf("average = %.1f\\n", r);
+    return 0;
+}
+
+double average(int a, int b) {
+    return (a + b) / 2.0;
+}`,
+  accept: [`#include <stdio.h>
+
+double average(int a, int b);
+
+int main() {
+    double r = average(3, 5);
+    printf("average = %.1f\\n", r);
+    return 0;
+}
+
+double average(int a, int b) {
+    return (a + b) / 2.0;
+}`, `#include <stdio.h>
+
+double average(int a, int b) {
+    return (a + b) / 2.0;
+}
+
+int main() {
+    double r = average(3, 5);
+    printf("average = %.1f\\n", r);
+    return 0;
+}`],
+  explain: "函数必须先<strong>声明或定义</strong>再调用。这里编译器见到 average(3, 5) 时还不认识它，只能凭空猜测它返回 int，与实际的 double 返回值对不上，结果出错。最小修改：在 main 前加一行函数声明 <code>double average(int a, int b);</code>（或把整个函数定义搬到 main 之前）。"
+});
+</script>
+</body>
+</html>
