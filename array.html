@@ -6,7 +6,7 @@
 <meta name="description" content="C语言数组交互演示：一维数组定义、遍历、排序、栈与队列，二维矩阵、转置、行列求和、数组作为函数参数，可视化每个元素的变化。">
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
 <title>数组 - C语言教学演示</title>
-<link rel="stylesheet" href="style.css?v=26">
+<link rel="stylesheet" href="style.css?v=27">
 </head>
 <body>
 <nav></nav>
@@ -22,7 +22,6 @@
 <li>数组名是<strong>首元素地址</strong>（常量指针）：<code>arr[i]</code> 等价于 <code>*(arr+i)</code></li>
 <li>越界访问是未定义行为：访问 <code>arr[-1]</code> 或 <code>arr[5]</code> 可能崩溃</li>
 <li>数组长度必须用常量或宏定义，不能用变量（C99 前）</li>
-<li>数组作为函数参数<strong>退化为指针</strong>，函数内无法通过 sizeof 获得长度</li>
 <li><strong>字符数组与字符串</strong>：以 <code>'\0'</code> 结尾的 char 数组，<code>printf</code> 用 <code>%s</code> 整体输出；连接/比较/查找都可以逐字符手工实现</li>
 </ul>
 </div>
@@ -54,8 +53,6 @@
 <li>初始化：<code>int a[2][3] = {{1,2,3}, {4,5,6}};</code> 内层大括号代表每一行</li>
 <li>访问元素：<code>a[i][j]</code>，下标从 0 开始</li>
 <li>遍历需要<strong>嵌套循环</strong>：外层控制行，内层控制列</li>
-<li>二维数组名 <code>a</code> 是指向首行（一维数组）的指针，<code>a[i]</code> 指向第 i 行首元素</li>
-<li>函数参数可写成 <code>int a[][4]</code> 或 <code>int (*a)[4]</code>，必须指定列数</li>
 </ul>
 </div>
 <div class="intro-diagram">
@@ -92,23 +89,20 @@
   <div id="demo2"></div>
   <div id="demo3"></div>
   <div id="demo4"></div>
-  <div id="demo5"></div>
 </div>
 <h2>字符数组与字符串</h2>
 <div class="demo-grid">
+  <div id="demo5"></div>
   <div id="demo6"></div>
   <div id="demo7"></div>
-  <div id="demo8"></div>
 </div>
 <h2>二维数组</h2>
 <div class="demo-grid">
+  <div id="demo8"></div>
   <div id="demo9"></div>
   <div id="demo10"></div>
   <div id="demo11"></div>
   <div id="demo12"></div>
-  <div id="demo13"></div>
-  <div id="demo14"></div>
-  <div id="demo15"></div>
 </div>
 <h2>章节练习</h2>
 <div class="quiz-grid">
@@ -121,8 +115,8 @@
 </div>
 </main>
 
-<script src="site-config.js?v=26"></script>
-<script src="demo-engine.js?v=26"></script>
+<script src="site-config.js?v=27"></script>
+<script src="demo-engine.js?v=27"></script>
 <script>
 createDemo("demo0", {
   title: "数组的定义与初始化",
@@ -322,41 +316,6 @@ int main() {
   ]
 });
 createDemo("demo5", {
-  title: "数组作为函数参数",
-  subtitle: "传递的是首地址，函数内可修改原数组",
-  code: `#include <stdio.h>
-
-void double_arr(int arr[], int n) {
-    int i;
-    for (i = 0; i < n; i++) {
-        arr[i] *= 2;
-    }
-}
-
-int main() {
-    int a[4] = {1, 2, 3, 4};
-    double_arr(a, 4);
-    printf("%d %d %d %d\\n", a[0], a[1], a[2], a[3]);
-    return 0;
-}`,
-  vizTypes: ["vars","array","stack","console"],
-  steps: [
-    { line: 9, info: "main() 开始" },
-    { line: 10, vars: {a:{value:"int[4]",type:"array"}}, array: {name:"a", cells:[{val:1},{val:2},{val:3},{val:4}]}, info: "定义数组 a = {1,2,3,4}" },
-    { line: 11, info: "调用 double_arr(a, 4)，传递数组首地址" },
-    { line: 2, stack: [{name:"main",value:"a[4]"},{name:"double_arr",value:"arr=a,n=4",highlight:true}], vars: {n:{value:4,type:"int"}}, info: "进入 double_arr，arr 获得 a 的首地址" },
-    { line: 4, vars: {i:{value:0,type:"int"}}, loop: [{label:"i=0",active:true}], array: {name:"a", cells:[{val:2,highlight:true},{val:2},{val:3},{val:4}]}, info: "i=0：arr[0]*=2 => 2" },
-    { line: 4, vars: {i:{value:1,type:"int"}}, loop: [{label:"i=1",active:true}], array: {name:"a", cells:[{val:2},{val:4,highlight:true},{val:3},{val:4}]}, info: "i=1：arr[1]*=2 => 4" },
-    { line: 4, vars: {i:{value:2,type:"int"}}, loop: [{label:"i=2",active:true}], array: {name:"a", cells:[{val:2},{val:4},{val:6,highlight:true},{val:4}]}, info: "i=2：arr[2]*=2 => 6" },
-    { line: 4, vars: {i:{value:3,type:"int"}}, loop: [{label:"i=3",active:true}], array: {name:"a", cells:[{val:2},{val:4},{val:6},{val:8,highlight:true}]}, info: "i=3：arr[3]*=2 => 8" },
-    { line: 6, stack: [{name:"main",value:"a[4]",highlight:true}], info: "double_arr 结束，返回 main" },
-    { line: 12, vars: {a:{value:"int[4]",type:"array"}}, array: {name:"a", cells:[{val:2},{val:4},{val:6},{val:8}]}, info: "main 中的 a 已经被修改" },
-    { line: 12, output: "2 4 6 8", info: "输出修改后的数组" },
-    { line: 14, info: "程序结束" }
-  ]
-});
-/* ========== demo6: 字符串连接（手工实现 strcat） ========== */
-createDemo("demo6", {
   title: "字符数组与字符串：连接",
   subtitle: "字符串就是以 '\\0' 结尾的字符数组——手工实现 strcat",
   code: `#include <stdio.h>
@@ -395,7 +354,7 @@ int main() {
   ]
 });
 /* ========== demo7: 字符串比较（手工实现 strcmp） ========== */
-createDemo("demo7", {
+createDemo("demo6", {
   title: "字符数组与字符串：比较",
   subtitle: "逐字符比较，遇到第一个不同就出结果——手工实现 strcmp",
   code: `#include <stdio.h>
@@ -424,7 +383,7 @@ int main() {
   ]
 });
 /* ========== demo8: 字符串查找（手工实现子串查找） ========== */
-createDemo("demo8", {
+createDemo("demo7", {
   title: "字符数组与字符串：查找子串",
   subtitle: "外层挑起点、内层逐字符比对——手工实现 strstr",
   code: `#include <stdio.h>
@@ -475,7 +434,7 @@ int main() {
     { line: 22, info: "程序结束" }
   ]
 });
-createDemo("demo9", {
+createDemo("demo8", {
   title: "二维数组的定义与初始化",
   subtitle: "矩阵在内存中按行连续存放",
   code: `#include <stdio.h>
@@ -495,7 +454,7 @@ int main() {
     { line: 7, info: "程序结束" }
   ]
 });
-createDemo("demo10", {
+createDemo("demo9", {
   title: "二维数组的遍历",
   subtitle: "外层循环行，内层循环列",
   code: `#include <stdio.h>
@@ -534,7 +493,7 @@ int main() {
     { line: 11, info: "程序结束" }
   ]
 });
-createDemo("demo11", {
+createDemo("demo10", {
   title: "矩阵转置",
   subtitle: "行列互换：b[j][i] = a[i][j]",
   code: `#include <stdio.h>
@@ -568,7 +527,7 @@ int main() {
     { line: 12, info: "程序结束" }
   ]
 });
-createDemo("demo12", {
+createDemo("demo11", {
   title: "行和与列和",
   subtitle: "分别对每行、每列求和",
   code: `#include <stdio.h>
@@ -611,75 +570,7 @@ int main() {
     { line: 15, info: "程序结束" }
   ]
 });
-createDemo("demo13", {
-  title: "二维数组与指针",
-  subtitle: "a[i][j] 等价于 *(*(a+i)+j)",
-  code: `#include <stdio.h>
-
-int main() {
-    int a[2][3] = {{1, 2, 3}, {4, 5, 6}};
-    int *p = a[0];
-    printf("a[0][0]=%d, *p=%d\\n", a[0][0], *p);
-    printf("a[1][1]=%d, *(p+4)=%d\\n", a[1][1], *(p+4));
-    return 0;
-}`,
-  vizTypes: ["vars","matrix","pointer","console"],
-  steps: [
-    { line: 2, info: "main() 开始" },
-    { line: 3, vars: {a:{value:"int[2][3]",type:"array"}}, matrix: {name:"a", rows:2, cols:3, cells:[[{val:1},{val:2},{val:3}],[{val:4},{val:5},{val:6}]]}, info: "定义 2x3 矩阵" },
-    { line: 4, vars: {p:{value:"0x1000",type:"int*"}}, info: "p = a[0]，指向第 0 行首元素" },
-    { line: 5, output: "a[0][0]=1, *p=1", matrix: {name:"a", rows:2, cols:3, cells:[[{val:1,highlight:true},{val:2},{val:3}],[{val:4},{val:5},{val:6}]]}, pointer: [{name:"p", type:"int*", addr:"0x2000", value:"0x1000", targetName:"a[0][0]", targetType:"int", targetAddr:"0x1000", targetValue:1}], info: "*p 即 a[0][0]" },
-    { line: 6, output: "a[0][0]=1, *p=1\na[1][1]=5, *(p+4)=5", matrix: {name:"a", rows:2, cols:3, cells:[[{val:1},{val:2},{val:3}],[{val:4},{val:5,highlight:true},{val:6}]]}, pointer: [{name:"p", type:"int*", addr:"0x2000", value:"0x1000+16", targetName:"a[1][1]", targetType:"int", targetAddr:"0x1010", targetValue:5}], info: "p+4 跳过 4 个 int，到达 a[1][1]（行优先存储）" },
-    { line: 8, info: "程序结束" }
-  ]
-});
-createDemo("demo14", {
-  title: "二维数组作为函数参数",
-  subtitle: "必须指定列数，传递首行地址",
-  code: `#include <stdio.h>
-
-void print_matrix(int m[][3], int rows) {
-    int i, j;
-    for (i = 0; i < rows; i++) {
-        for (j = 0; j < 3; j++) {
-            printf("%d ", m[i][j]);
-        }
-        printf("\\n");
-    }
-}
-
-int main() {
-    int a[2][3] = {{1, 2, 3}, {4, 5, 6}};
-    print_matrix(a, 2);
-    return 0;
-}`,
-  vizTypes: ["vars","matrix","loop","stack","console"],
-  steps: [
-    { line: 12, info: "main() 开始" },
-    { line: 13, vars: {a:{value:"int[2][3]",type:"array"}}, matrix: {name:"a", rows:2, cols:3, cells:[[{val:1},{val:2},{val:3}],[{val:4},{val:5},{val:6}]]}, info: "定义矩阵 a" },
-    { line: 14, info: "调用 print_matrix(a, 2)" },
-    { line: 2, stack: [{name:"main",value:"a[2][3]"},{name:"print_matrix",value:"m=a,rows=2",highlight:true}], info: "进入函数，m 获得 a 的首地址，必须知道列数 3 才能正确计算偏移" },
-    { line: 4, vars: {i:{value:0,type:"int"}}, loop: [{label:"i=0",active:true}], info: "外层 i=0" },
-    { line: 5, vars: {j:{value:0,type:"int"}}, loop: [{label:"j=0",active:true}], matrix: {name:"a", rows:2, cols:3, cells:[[{val:1,highlight:true},{val:2},{val:3}],[{val:4},{val:5},{val:6}]]}, info: "内层 j=0，m[0][0]=1" },
-    { line: 6, output: "1 ", info: "打印 1" },
-    { line: 5, vars: {j:{value:1,type:"int"}}, loop: [{label:"j=1",active:true}], matrix: {name:"a", rows:2, cols:3, cells:[[{val:1,hl:true},{val:2,highlight:true},{val:3}],[{val:4},{val:5},{val:6}]]}, info: "j=1，m[0][1]=2" },
-    { line: 6, output: "1 2 ", info: "打印 2" },
-    { line: 5, vars: {j:{value:2,type:"int"}}, loop: [{label:"j=2",active:true}], matrix: {name:"a", rows:2, cols:3, cells:[[{val:1,hl:true},{val:2,hl:true},{val:3,highlight:true}],[{val:4},{val:5},{val:6}]]}, info: "j=2，m[0][2]=3" },
-    { line: 6, output: "1 2 3 ", info: "打印 3" },
-    { line: 8, output: "1 2 3 \n", info: "换行" },
-    { line: 4, vars: {i:{value:1,type:"int"}}, loop: [{label:"i=1",active:true}], info: "外层 i=1" },
-    { line: 5, vars: {j:{value:0,type:"int"}}, loop: [{label:"j=0",active:true}], matrix: {name:"a", rows:2, cols:3, cells:[[{val:1,hl:true},{val:2,hl:true},{val:3,hl:true}],[{val:4,highlight:true},{val:5},{val:6}]]}, info: "j=0，m[1][0]=4" },
-    { line: 6, output: "1 2 3 \n4 ", info: "打印 4" },
-    { line: 5, vars: {j:{value:1,type:"int"}}, loop: [{label:"j=1",active:true}], matrix: {name:"a", rows:2, cols:3, cells:[[{val:1,hl:true},{val:2,hl:true},{val:3,hl:true}],[{val:4,hl:true},{val:5,highlight:true},{val:6}]]}, info: "j=1，m[1][1]=5" },
-    { line: 6, output: "1 2 3 \n4 5 ", info: "打印 5" },
-    { line: 5, vars: {j:{value:2,type:"int"}}, loop: [{label:"j=2",active:true}], matrix: {name:"a", rows:2, cols:3, cells:[[{val:1,hl:true},{val:2,hl:true},{val:3,hl:true}],[{val:4,hl:true},{val:5,hl:true},{val:6,highlight:true}]]}, info: "j=2，m[1][2]=6" },
-    { line: 6, output: "1 2 3 \n4 5 6 ", info: "打印 6" },
-    { line: 8, output: "1 2 3 \n4 5 6 \n", info: "换行" },
-    { line: 9, stack: [{name:"main",value:"a[2][3]",highlight:true}], info: "函数结束" },
-    { line: 15, info: "程序结束" }
-  ]
-});
-createDemo("demo15", {
+createDemo("demo12", {
   title: "二维数组与图：邻接矩阵",
   subtitle: "用 g[i][j]=1 表示顶点 i 与 j 之间有边，右侧同步显示图的形态",
   code: `#include <stdio.h>

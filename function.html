@@ -6,7 +6,7 @@
 <meta name="description" content="C语言函数交互演示：函数定义、值传递、返回值、作用域、递归，可视化调用栈与递归调用树。">
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
 <title>函数 - C语言教学演示</title>
-<link rel="stylesheet" href="style.css?v=26">
+<link rel="stylesheet" href="style.css?v=27">
 </head>
 <body>
 <nav></nav>
@@ -23,6 +23,7 @@
 <li><strong>局部变量</strong>：在函数内声明，函数结束时销毁（存于栈上）</li>
 <li><strong>递归</strong>：函数调用自身，必须有终止条件否则死循环</li>
 <li>函数必须先声明或定义后，才能被调用</li>
+<li><strong>数组作为参数</strong>会退化为指针（传递首地址）：函数内可修改原数组，也无法用 sizeof 获得长度；二维数组参数必须指定列数，如 <code>int a[][4]</code></li>
 </ul>
 </div>
 <div class="intro-diagram">
@@ -64,6 +65,8 @@
   <div id="demo6"></div>
   <div id="demo7"></div>
   <div id="demo8"></div>
+  <div id="demo9"></div>
+  <div id="demo10"></div>
 </div>
 <h2>章节练习</h2>
 <div class="quiz-grid">
@@ -76,8 +79,8 @@
 </div>
 </main>
 
-<script src="site-config.js?v=26"></script>
-<script src="demo-engine.js?v=26"></script>
+<script src="site-config.js?v=27"></script>
+<script src="demo-engine.js?v=27"></script>
 <script>
 createDemo("demo0", {
   title: "函数的定义与调用",
@@ -288,6 +291,87 @@ int main() {
 });
 /* ========== demo6: 递归——斐波那契数列（含递归调用树） ========== */
 createDemo("demo5", {
+  title: "数组作为函数参数",
+  subtitle: "传递的是首地址，函数内可修改原数组",
+  code: `#include <stdio.h>
+
+void double_arr(int arr[], int n) {
+    int i;
+    for (i = 0; i < n; i++) {
+        arr[i] *= 2;
+    }
+}
+
+int main() {
+    int a[4] = {1, 2, 3, 4};
+    double_arr(a, 4);
+    printf("%d %d %d %d\\n", a[0], a[1], a[2], a[3]);
+    return 0;
+}`,
+  vizTypes: ["vars","array","stack","console"],
+  steps: [
+    { line: 9, info: "main() 开始" },
+    { line: 10, vars: {a:{value:"int[4]",type:"array"}}, array: {name:"a", cells:[{val:1},{val:2},{val:3},{val:4}]}, info: "定义数组 a = {1,2,3,4}" },
+    { line: 11, info: "调用 double_arr(a, 4)，传递数组首地址" },
+    { line: 2, stack: [{name:"main",value:"a[4]"},{name:"double_arr",value:"arr=a,n=4",highlight:true}], vars: {n:{value:4,type:"int"}}, info: "进入 double_arr，arr 获得 a 的首地址" },
+    { line: 4, vars: {i:{value:0,type:"int"}}, loop: [{label:"i=0",active:true}], array: {name:"a", cells:[{val:2,highlight:true},{val:2},{val:3},{val:4}]}, info: "i=0：arr[0]*=2 => 2" },
+    { line: 4, vars: {i:{value:1,type:"int"}}, loop: [{label:"i=1",active:true}], array: {name:"a", cells:[{val:2},{val:4,highlight:true},{val:3},{val:4}]}, info: "i=1：arr[1]*=2 => 4" },
+    { line: 4, vars: {i:{value:2,type:"int"}}, loop: [{label:"i=2",active:true}], array: {name:"a", cells:[{val:2},{val:4},{val:6,highlight:true},{val:4}]}, info: "i=2：arr[2]*=2 => 6" },
+    { line: 4, vars: {i:{value:3,type:"int"}}, loop: [{label:"i=3",active:true}], array: {name:"a", cells:[{val:2},{val:4},{val:6},{val:8,highlight:true}]}, info: "i=3：arr[3]*=2 => 8" },
+    { line: 6, stack: [{name:"main",value:"a[4]",highlight:true}], info: "double_arr 结束，返回 main" },
+    { line: 12, vars: {a:{value:"int[4]",type:"array"}}, array: {name:"a", cells:[{val:2},{val:4},{val:6},{val:8}]}, info: "main 中的 a 已经被修改" },
+    { line: 12, output: "2 4 6 8", info: "输出修改后的数组" },
+    { line: 14, info: "程序结束" }
+  ]
+});
+/* ========== demo6: 字符串连接（手工实现 strcat） ========== */
+createDemo("demo6", {
+  title: "二维数组作为函数参数",
+  subtitle: "必须指定列数，传递首行地址",
+  code: `#include <stdio.h>
+
+void print_matrix(int m[][3], int rows) {
+    int i, j;
+    for (i = 0; i < rows; i++) {
+        for (j = 0; j < 3; j++) {
+            printf("%d ", m[i][j]);
+        }
+        printf("\\n");
+    }
+}
+
+int main() {
+    int a[2][3] = {{1, 2, 3}, {4, 5, 6}};
+    print_matrix(a, 2);
+    return 0;
+}`,
+  vizTypes: ["vars","matrix","loop","stack","console"],
+  steps: [
+    { line: 12, info: "main() 开始" },
+    { line: 13, vars: {a:{value:"int[2][3]",type:"array"}}, matrix: {name:"a", rows:2, cols:3, cells:[[{val:1},{val:2},{val:3}],[{val:4},{val:5},{val:6}]]}, info: "定义矩阵 a" },
+    { line: 14, info: "调用 print_matrix(a, 2)" },
+    { line: 2, stack: [{name:"main",value:"a[2][3]"},{name:"print_matrix",value:"m=a,rows=2",highlight:true}], info: "进入函数，m 获得 a 的首地址，必须知道列数 3 才能正确计算偏移" },
+    { line: 4, vars: {i:{value:0,type:"int"}}, loop: [{label:"i=0",active:true}], info: "外层 i=0" },
+    { line: 5, vars: {j:{value:0,type:"int"}}, loop: [{label:"j=0",active:true}], matrix: {name:"a", rows:2, cols:3, cells:[[{val:1,highlight:true},{val:2},{val:3}],[{val:4},{val:5},{val:6}]]}, info: "内层 j=0，m[0][0]=1" },
+    { line: 6, output: "1 ", info: "打印 1" },
+    { line: 5, vars: {j:{value:1,type:"int"}}, loop: [{label:"j=1",active:true}], matrix: {name:"a", rows:2, cols:3, cells:[[{val:1,hl:true},{val:2,highlight:true},{val:3}],[{val:4},{val:5},{val:6}]]}, info: "j=1，m[0][1]=2" },
+    { line: 6, output: "1 2 ", info: "打印 2" },
+    { line: 5, vars: {j:{value:2,type:"int"}}, loop: [{label:"j=2",active:true}], matrix: {name:"a", rows:2, cols:3, cells:[[{val:1,hl:true},{val:2,hl:true},{val:3,highlight:true}],[{val:4},{val:5},{val:6}]]}, info: "j=2，m[0][2]=3" },
+    { line: 6, output: "1 2 3 ", info: "打印 3" },
+    { line: 8, output: "1 2 3 \n", info: "换行" },
+    { line: 4, vars: {i:{value:1,type:"int"}}, loop: [{label:"i=1",active:true}], info: "外层 i=1" },
+    { line: 5, vars: {j:{value:0,type:"int"}}, loop: [{label:"j=0",active:true}], matrix: {name:"a", rows:2, cols:3, cells:[[{val:1,hl:true},{val:2,hl:true},{val:3,hl:true}],[{val:4,highlight:true},{val:5},{val:6}]]}, info: "j=0，m[1][0]=4" },
+    { line: 6, output: "1 2 3 \n4 ", info: "打印 4" },
+    { line: 5, vars: {j:{value:1,type:"int"}}, loop: [{label:"j=1",active:true}], matrix: {name:"a", rows:2, cols:3, cells:[[{val:1,hl:true},{val:2,hl:true},{val:3,hl:true}],[{val:4,hl:true},{val:5,highlight:true},{val:6}]]}, info: "j=1，m[1][1]=5" },
+    { line: 6, output: "1 2 3 \n4 5 ", info: "打印 5" },
+    { line: 5, vars: {j:{value:2,type:"int"}}, loop: [{label:"j=2",active:true}], matrix: {name:"a", rows:2, cols:3, cells:[[{val:1,hl:true},{val:2,hl:true},{val:3,hl:true}],[{val:4,hl:true},{val:5,hl:true},{val:6,highlight:true}]]}, info: "j=2，m[1][2]=6" },
+    { line: 6, output: "1 2 3 \n4 5 6 ", info: "打印 6" },
+    { line: 8, output: "1 2 3 \n4 5 6 \n", info: "换行" },
+    { line: 9, stack: [{name:"main",value:"a[2][3]",highlight:true}], info: "函数结束" },
+    { line: 15, info: "程序结束" }
+  ]
+});
+createDemo("demo7", {
   title: "递归：斐波那契数列",
   subtitle: "右侧调用树同步生长：蓝色是当前调用，绿色是已返回的调用",
   code: `#include <stdio.h>
@@ -326,7 +410,7 @@ int main() {
   ]
 });
 /* ========== demo7: 递归——汉诺塔 ========== */
-createDemo("demo6", {
+createDemo("demo8", {
   title: "递归：汉诺塔",
   subtitle: "把 n 个盘子从 A 移到 C：先移上面 n-1 个，再移最大的，最后移回 n-1 个",
   code: `#include <stdio.h>
@@ -371,7 +455,7 @@ int main() {
   ]
 });
 /* ========== 综合应用：用函数封装栈与队列 ========== */
-createDemo("demo7", {
+createDemo("demo9", {
   title: "用数组实现栈（Stack）",
   subtitle: "把初始化、入栈、出栈、判空封装成函数：后进先出（LIFO）",
   diagram: `
@@ -470,7 +554,7 @@ int main() {
     { line: 35, info: "程序结束" }
   ]
 });
-createDemo("demo8", {
+createDemo("demo10", {
   title: "用数组实现队列（Queue）",
   subtitle: "把初始化、入队、出队、判空封装成函数：先进先出（FIFO）",
   code: `#include <stdio.h>

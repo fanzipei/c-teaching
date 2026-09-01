@@ -6,7 +6,7 @@
 <meta name="description" content="C语言指针交互演示：取地址与解引用、指针运算、指针参数、多级指针、字符串、malloc/free，直观展示指针与内存数据的关系。">
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
 <title>指针 - C语言教学演示</title>
-<link rel="stylesheet" href="style.css?v=26">
+<link rel="stylesheet" href="style.css?v=27">
 </head>
 <body>
 <nav></nav>
@@ -22,6 +22,7 @@
 <li>指针与数组关系密切：数组名本质是指向首元素的常量指针</li>
 <li><strong>指针运算</strong>：<code>p+1</code> 移动的是一个元素的大小，不是 1 个字节</li>
 <li>指针可以指向指针，形成多级指针（如 <code>int **pp;</code>）</li>
+<li><strong>二维数组与指针</strong>：二维数组按行优先连续存储，<code>a[i][j]</code> 等价于 <code>*(*(a+i)+j)</code>，<code>a[i]</code> 指向第 i 行首元素</li>
 <li>小心<strong>空指针</strong>和<strong>野指针</strong>：解引用前必须确保指向有效内存</li>
 <li><strong>动态内存</strong>：<code>malloc</code> 在堆上申请内存（需 <code>#include &lt;stdlib.h&gt;</code>），用完必须 <code>free</code> 归还，否则内存泄漏；free 后应立刻把指针置为 NULL</li>
 </ul>
@@ -54,6 +55,7 @@
   <div id="demo6"></div>
   <div id="demo7"></div>
   <div id="demo8"></div>
+  <div id="demo9"></div>
 </div>
 <h2>章节练习</h2>
 <div class="quiz-grid">
@@ -66,8 +68,8 @@
 </div>
 </main>
 
-<script src="site-config.js?v=26"></script>
-<script src="demo-engine.js?v=26"></script>
+<script src="site-config.js?v=27"></script>
+<script src="demo-engine.js?v=27"></script>
 <script>
 createDemo("demo0", {
   title: "指针基础：& 与 *",
@@ -215,6 +217,28 @@ int main() {
   ]
 });
 createDemo("demo4", {
+  title: "二维数组与指针",
+  subtitle: "a[i][j] 等价于 *(*(a+i)+j)",
+  code: `#include <stdio.h>
+
+int main() {
+    int a[2][3] = {{1, 2, 3}, {4, 5, 6}};
+    int *p = a[0];
+    printf("a[0][0]=%d, *p=%d\\n", a[0][0], *p);
+    printf("a[1][1]=%d, *(p+4)=%d\\n", a[1][1], *(p+4));
+    return 0;
+}`,
+  vizTypes: ["vars","matrix","pointer","console"],
+  steps: [
+    { line: 2, info: "main() 开始" },
+    { line: 3, vars: {a:{value:"int[2][3]",type:"array"}}, matrix: {name:"a", rows:2, cols:3, cells:[[{val:1},{val:2},{val:3}],[{val:4},{val:5},{val:6}]]}, info: "定义 2x3 矩阵" },
+    { line: 4, vars: {p:{value:"0x1000",type:"int*"}}, info: "p = a[0]，指向第 0 行首元素" },
+    { line: 5, output: "a[0][0]=1, *p=1", matrix: {name:"a", rows:2, cols:3, cells:[[{val:1,highlight:true},{val:2},{val:3}],[{val:4},{val:5},{val:6}]]}, pointer: [{name:"p", type:"int*", addr:"0x2000", value:"0x1000", targetName:"a[0][0]", targetType:"int", targetAddr:"0x1000", targetValue:1}], info: "*p 即 a[0][0]" },
+    { line: 6, output: "a[0][0]=1, *p=1\na[1][1]=5, *(p+4)=5", matrix: {name:"a", rows:2, cols:3, cells:[[{val:1},{val:2},{val:3}],[{val:4},{val:5,highlight:true},{val:6}]]}, pointer: [{name:"p", type:"int*", addr:"0x2000", value:"0x1000+16", targetName:"a[1][1]", targetType:"int", targetAddr:"0x1010", targetValue:5}], info: "p+4 跳过 4 个 int，到达 a[1][1]（行优先存储）" },
+    { line: 8, info: "程序结束" }
+  ]
+});
+createDemo("demo5", {
   title: "多级指针",
   subtitle: "指针的指针：int** pp",
   diagram: `
@@ -259,7 +283,7 @@ int main() {
     { line: 9, info: "程序结束" }
   ]
 });
-createDemo("demo5", {
+createDemo("demo6", {
   title: "指针与字符串",
   subtitle: "char* 指向字符串常量，遍历字符",
   code: `#include <stdio.h>
@@ -299,7 +323,7 @@ int main() {
 });
 /* ========== demo6: malloc 与 free ========== */
 /* ========== demo6: 字符指针数组排序 ========== */
-createDemo("demo6", {
+createDemo("demo7", {
   title: "字符指针数组：字符串字典序排序",
   subtitle: "只交换指针，字符串本身原地不动——轻量排序",
   code: `#include <stdio.h>
@@ -350,7 +374,7 @@ int main() {
     { line: 19, info: "程序结束。全程只搬了 3 次指针（每次只是一个地址），字符串常量区原地未动——对长字符串数组，这比逐个复制内容轻量得多" }
   ]
 });
-createDemo("demo7", {
+createDemo("demo8", {
   title: "动态内存：malloc 与 free",
   subtitle: "堆内存由你手动管理：申请、使用、归还",
   code: `#include <stdio.h>
@@ -378,7 +402,7 @@ int main() {
   ]
 });
 /* ========== demo7: 动态数组 ========== */
-createDemo("demo8", {
+createDemo("demo9", {
   title: "malloc 动态数组",
   subtitle: "运行时才确定大小的数组，只能用 malloc",
   code: `#include <stdio.h>
