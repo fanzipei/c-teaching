@@ -6,7 +6,7 @@
 <meta name="description" content="C语言指针交互演示：取地址与解引用、指针运算、指针参数、多级指针、字符串、malloc/free，直观展示指针与内存数据的关系。">
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
 <title>指针 - C语言教学演示</title>
-<link rel="stylesheet" href="style.css?v=20">
+<link rel="stylesheet" href="style.css?v=21">
 </head>
 <body>
 <nav></nav>
@@ -48,55 +48,7 @@
   <div id="demo0"></div>
   <div id="demo1"></div>
   <div id="demo2"></div>
-  <div class="intro-diagram">
-<svg viewBox="0 0 320 148" width="320" role="img" aria-label="指针与数组：p 指向 arr[0]，p+1 移动到 arr[1]">
-  <defs>
-    <marker id="pa-arrow-b" markerWidth="8" markerHeight="8" refX="7" refY="3" orient="auto"><path d="M0,0 L0,6 L7,3 z" fill="#89b4fa"/></marker>
-    <marker id="pa-arrow-o" markerWidth="8" markerHeight="8" refX="7" refY="3" orient="auto"><path d="M0,0 L0,6 L7,3 z" fill="#fab387"/></marker>
-  </defs>
-  <text x="42" y="14" font-family="Consolas,monospace" font-size="10" fill="#6c7086" text-anchor="middle">int *p</text>
-  <rect x="14" y="22" width="56" height="26" rx="6" fill="#313244" stroke="#45475a" stroke-width="1.5"/>
-  <text x="42" y="40" font-family="Consolas,monospace" font-size="11" fill="#a6e3a1" text-anchor="middle" font-weight="bold">0x1000</text>
-  <line x1="42" y1="48" x2="42" y2="60" stroke="#89b4fa" stroke-width="1.5" marker-end="url(#pa-arrow-b)"/>
-  <path d="M 70 32 C 98 22, 112 38, 96 60" fill="none" stroke="#fab387" stroke-width="1.5" stroke-dasharray="5 3" marker-end="url(#pa-arrow-o)"/>
-  <text x="112" y="20" font-family="Consolas,monospace" font-size="10" fill="#fab387" text-anchor="middle">p+1</text>
-  <rect x="16" y="64" width="260" height="30" rx="6" fill="#313244" stroke="#45475a" stroke-width="1.5"/>
-  <g stroke="#45475a" stroke-width="1.5">
-    <line x1="68" y1="64" x2="68" y2="94"/><line x1="120" y1="64" x2="120" y2="94"/><line x1="172" y1="64" x2="172" y2="94"/><line x1="224" y1="64" x2="224" y2="94"/>
-  </g>
-  <g font-family="Consolas,monospace" font-size="13" fill="#a6e3a1" text-anchor="middle" font-weight="bold">
-    <text x="42" y="83">10</text><text x="94" y="83">20</text><text x="146" y="83">30</text><text x="198" y="83">40</text><text x="250" y="83">50</text>
-  </g>
-  <g font-family="Consolas,monospace" font-size="10" fill="#6c7086" text-anchor="middle">
-    <text x="42" y="107">arr[0]</text><text x="94" y="107">arr[1]</text><text x="146" y="107">arr[2]</text><text x="198" y="107">arr[3]</text><text x="250" y="107">arr[4]</text>
-    <text x="42" y="120">0x1000</text><text x="94" y="120">0x1004</text><text x="146" y="120">0x1008</text><text x="198" y="120">0x100C</text><text x="250" y="120">0x1010</text>
-  </g>
-  <text x="160" y="141" font-family="Consolas,monospace" font-size="11" fill="#fab387" text-anchor="middle">p+1 移动一个元素（4 字节），不是 1 个字节</text>
-</svg>
-<div class="diagram-caption">指针运算：p+1 跳过一整个 int，指向 arr[1]</div>
-</div>
   <div id="demo3"></div>
-  <div class="intro-diagram">
-<svg viewBox="0 0 320 112" width="320" role="img" aria-label="多级指针：pp 指向 p，p 指向 x 的链式示意图">
-  <defs><marker id="pp-arrow" markerWidth="8" markerHeight="8" refX="7" refY="3" orient="auto"><path d="M0,0 L0,6 L7,3 z" fill="#89b4fa"/></marker></defs>
-  <g font-family="Consolas,monospace" font-size="10" fill="#6c7086" text-anchor="middle">
-    <text x="52" y="22">int **pp</text><text x="160" y="22">int *p</text><text x="268" y="22">int x</text>
-  </g>
-  <rect x="12" y="30" width="80" height="34" rx="6" fill="#313244" stroke="#45475a" stroke-width="1.5"/>
-  <rect x="120" y="30" width="80" height="34" rx="6" fill="#313244" stroke="#45475a" stroke-width="1.5"/>
-  <rect x="228" y="30" width="80" height="34" rx="6" fill="#313244" stroke="#45475a" stroke-width="1.5"/>
-  <g font-family="Consolas,monospace" font-size="13" fill="#a6e3a1" text-anchor="middle" font-weight="bold">
-    <text x="52" y="52">0x2000</text><text x="160" y="52">0x1000</text><text x="268" y="52">42</text>
-  </g>
-  <line x1="94" y1="47" x2="116" y2="47" stroke="#89b4fa" stroke-width="1.5" marker-end="url(#pp-arrow)"/>
-  <line x1="202" y1="47" x2="224" y2="47" stroke="#89b4fa" stroke-width="1.5" marker-end="url(#pp-arrow)"/>
-  <g font-family="Consolas,monospace" font-size="10" fill="#6c7086" text-anchor="middle">
-    <text x="52" y="80">地址 0x3000</text><text x="160" y="80">地址 0x2000</text><text x="268" y="80">地址 0x1000</text>
-  </g>
-  <text x="160" y="102" font-family="Consolas,monospace" font-size="11" fill="#a6adc8" text-anchor="middle">*pp 得到的是 p，**pp 才是 x</text>
-</svg>
-<div class="diagram-caption">多级指针：pp → p → x，必须解引用两次（**pp）才能改到 x</div>
-</div>
   <div id="demo4"></div>
   <div id="demo5"></div>
   <div id="demo6"></div>
@@ -113,7 +65,7 @@
 </div>
 </div>
 
-<script src="demo-engine.js?v=20"></script>
+<script src="demo-engine.js?v=21"></script>
 <script>
 createDemo("demo0", {
   title: "指针基础：& 与 *",
@@ -212,6 +164,33 @@ int main() {
 createDemo("demo3", {
   title: "指针运算",
   subtitle: "加减整数、两指针相减得到元素个数",
+  diagram: `
+<svg viewBox="0 0 320 148" width="320" role="img" aria-label="指针与数组：p 指向 arr[0]，p+1 移动到 arr[1]">
+  <defs>
+    <marker id="pa-arrow-b" markerWidth="8" markerHeight="8" refX="7" refY="3" orient="auto"><path d="M0,0 L0,6 L7,3 z" fill="#89b4fa"/></marker>
+    <marker id="pa-arrow-o" markerWidth="8" markerHeight="8" refX="7" refY="3" orient="auto"><path d="M0,0 L0,6 L7,3 z" fill="#fab387"/></marker>
+  </defs>
+  <text x="42" y="14" font-family="Consolas,monospace" font-size="10" fill="#6c7086" text-anchor="middle">int *p</text>
+  <rect x="14" y="22" width="56" height="26" rx="6" fill="#313244" stroke="#45475a" stroke-width="1.5"/>
+  <text x="42" y="40" font-family="Consolas,monospace" font-size="11" fill="#a6e3a1" text-anchor="middle" font-weight="bold">0x1000</text>
+  <line x1="42" y1="48" x2="42" y2="60" stroke="#89b4fa" stroke-width="1.5" marker-end="url(#pa-arrow-b)"/>
+  <path d="M 70 32 C 98 22, 112 38, 96 60" fill="none" stroke="#fab387" stroke-width="1.5" stroke-dasharray="5 3" marker-end="url(#pa-arrow-o)"/>
+  <text x="112" y="20" font-family="Consolas,monospace" font-size="10" fill="#fab387" text-anchor="middle">p+1</text>
+  <rect x="16" y="64" width="260" height="30" rx="6" fill="#313244" stroke="#45475a" stroke-width="1.5"/>
+  <g stroke="#45475a" stroke-width="1.5">
+    <line x1="68" y1="64" x2="68" y2="94"/><line x1="120" y1="64" x2="120" y2="94"/><line x1="172" y1="64" x2="172" y2="94"/><line x1="224" y1="64" x2="224" y2="94"/>
+  </g>
+  <g font-family="Consolas,monospace" font-size="13" fill="#a6e3a1" text-anchor="middle" font-weight="bold">
+    <text x="42" y="83">10</text><text x="94" y="83">20</text><text x="146" y="83">30</text><text x="198" y="83">40</text><text x="250" y="83">50</text>
+  </g>
+  <g font-family="Consolas,monospace" font-size="10" fill="#6c7086" text-anchor="middle">
+    <text x="42" y="107">arr[0]</text><text x="94" y="107">arr[1]</text><text x="146" y="107">arr[2]</text><text x="198" y="107">arr[3]</text><text x="250" y="107">arr[4]</text>
+    <text x="42" y="120">0x1000</text><text x="94" y="120">0x1004</text><text x="146" y="120">0x1008</text><text x="198" y="120">0x100C</text><text x="250" y="120">0x1010</text>
+  </g>
+  <text x="160" y="141" font-family="Consolas,monospace" font-size="11" fill="#fab387" text-anchor="middle">p+1 移动一个元素（4 字节），不是 1 个字节</text>
+</svg>
+<div class="diagram-caption">指针运算：p+1 跳过一整个 int，指向 arr[1]</div>
+`,
   code: `#include <stdio.h>
 
 int main() {
@@ -236,6 +215,27 @@ int main() {
 createDemo("demo4", {
   title: "多级指针",
   subtitle: "指针的指针：int** pp",
+  diagram: `
+<svg viewBox="0 0 320 112" width="320" role="img" aria-label="多级指针：pp 指向 p，p 指向 x 的链式示意图">
+  <defs><marker id="pp-arrow" markerWidth="8" markerHeight="8" refX="7" refY="3" orient="auto"><path d="M0,0 L0,6 L7,3 z" fill="#89b4fa"/></marker></defs>
+  <g font-family="Consolas,monospace" font-size="10" fill="#6c7086" text-anchor="middle">
+    <text x="52" y="22">int **pp</text><text x="160" y="22">int *p</text><text x="268" y="22">int x</text>
+  </g>
+  <rect x="12" y="30" width="80" height="34" rx="6" fill="#313244" stroke="#45475a" stroke-width="1.5"/>
+  <rect x="120" y="30" width="80" height="34" rx="6" fill="#313244" stroke="#45475a" stroke-width="1.5"/>
+  <rect x="228" y="30" width="80" height="34" rx="6" fill="#313244" stroke="#45475a" stroke-width="1.5"/>
+  <g font-family="Consolas,monospace" font-size="13" fill="#a6e3a1" text-anchor="middle" font-weight="bold">
+    <text x="52" y="52">0x2000</text><text x="160" y="52">0x1000</text><text x="268" y="52">42</text>
+  </g>
+  <line x1="94" y1="47" x2="116" y2="47" stroke="#89b4fa" stroke-width="1.5" marker-end="url(#pp-arrow)"/>
+  <line x1="202" y1="47" x2="224" y2="47" stroke="#89b4fa" stroke-width="1.5" marker-end="url(#pp-arrow)"/>
+  <g font-family="Consolas,monospace" font-size="10" fill="#6c7086" text-anchor="middle">
+    <text x="52" y="80">地址 0x3000</text><text x="160" y="80">地址 0x2000</text><text x="268" y="80">地址 0x1000</text>
+  </g>
+  <text x="160" y="102" font-family="Consolas,monospace" font-size="11" fill="#a6adc8" text-anchor="middle">*pp 得到的是 p，**pp 才是 x</text>
+</svg>
+<div class="diagram-caption">多级指针：pp → p → x，必须解引用两次（**pp）才能改到 x</div>
+`,
   code: `#include <stdio.h>
 
 int main() {

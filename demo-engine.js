@@ -153,6 +153,7 @@ class CDemo {
           <span style="color:var(--text-secondary);font-size:0.85rem">${c.subtitle || ''}</span>
         </div>
       </div>
+      ${c.diagram ? `<div class="demo-diagram">${c.diagram}</div>` : ''}
       <div class="demo-toolbar">
         <div class="step-counter" id="${c.id}-counter">步骤 0 / ${c.steps.length}</div>
         <div class="progress-bar"><div id="${c.id}-progress" class="progress-fill" style="width:0%"></div></div>

@@ -6,7 +6,7 @@
 <meta name="description" content="认识C程序：从 Hello World 开始，用简单有趣的小例子了解 C 语言编程的核心思想——输出、变量、计算、判断与循环。">
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
 <title>认识C程序 - C语言教学演示</title>
-<link rel="stylesheet" href="style.css?v=20">
+<link rel="stylesheet" href="style.css?v=21">
 </head>
 <body>
 <nav></nav>
@@ -54,53 +54,14 @@
 <div class="demo-grid">
   <div id="demo0"></div>
   <div id="demo1"></div>
-  <div class="intro-diagram">
-<svg viewBox="0 0 320 150" width="320" role="img" aria-label="变量 age 的盒子：旧值 18 被划掉换成 19，右侧箭头表示取出旧值加 1 再放回">
-  <defs><marker id="age-arrow" markerWidth="8" markerHeight="8" refX="7" refY="3" orient="auto"><path d="M0,0 L0,6 L7,3 z" fill="#89b4fa"/></marker></defs>
-  <rect x="24" y="24" width="56" height="22" rx="6" fill="#313244" stroke="#45475a" stroke-width="1.5"/>
-  <text x="52" y="40" font-family="Consolas,monospace" font-size="12" fill="#cdd6f4" text-anchor="middle">age</text>
-  <rect x="16" y="46" width="130" height="70" rx="6" fill="#313244" stroke="#45475a" stroke-width="1.5"/>
-  <text x="52" y="90" font-family="Consolas,monospace" font-size="22" fill="#f38ba8" text-anchor="middle">18</text>
-  <line x1="38" y1="84" x2="66" y2="84" stroke="#f38ba8" stroke-width="2"/>
-  <text x="112" y="90" font-family="Consolas,monospace" font-size="22" font-weight="bold" fill="#a6e3a1" text-anchor="middle">19</text>
-  <path d="M 146 66 C 200 30, 272 34, 282 76 C 290 112, 220 134, 150 110" fill="none" stroke="#89b4fa" stroke-width="1.5" marker-end="url(#age-arrow)"/>
-  <text x="213" y="28" font-family="Consolas,monospace" font-size="10" fill="#6c7086" text-anchor="middle">取出旧值 18</text>
-  <text x="297" y="80" font-family="Consolas,monospace" font-size="11" fill="#cdd6f4" text-anchor="middle">+1</text>
-  <text x="213" y="146" font-family="Consolas,monospace" font-size="10" fill="#a6e3a1" text-anchor="middle">放回，变成 19</text>
-</svg>
-<div class="diagram-caption">age = age + 1：把盒子里的旧值取出来加 1 再放回，age 从 18 变成 19</div>
-</div>
   <div id="demo2"></div>
   <div id="demo3"></div>
   <div id="demo4"></div>
-  <div class="intro-diagram">
-<svg viewBox="0 0 320 100" width="320" role="img" aria-label="for 循环倒计时：5、4、3、2、1 五个圆形气泡依次用箭头相连，最后箭头指向星形的发射文字块">
-  <defs><marker id="cd-arrow" markerWidth="8" markerHeight="8" refX="7" refY="3" orient="auto"><path d="M0,0 L0,6 L7,3 z" fill="#89b4fa"/></marker></defs>
-  <text x="122" y="14" font-family="Consolas,monospace" font-size="10" fill="#6c7086" text-anchor="middle">for (i = 5; i &gt;= 1; i--)</text>
-  <g fill="#313244" stroke="#45475a" stroke-width="1.5">
-    <circle cx="30" cy="45" r="15"/><circle cx="76" cy="45" r="15"/><circle cx="122" cy="45" r="15"/><circle cx="168" cy="45" r="15"/><circle cx="214" cy="45" r="15"/>
-  </g>
-  <g font-family="Consolas,monospace" font-size="14" fill="#cdd6f4" text-anchor="middle">
-    <text x="30" y="50">5</text><text x="76" y="50">4</text><text x="122" y="50">3</text><text x="168" y="50">2</text><text x="214" y="50">1</text>
-  </g>
-  <g stroke="#89b4fa" stroke-width="1.5">
-    <line x1="46" y1="45" x2="58" y2="45" marker-end="url(#cd-arrow)"/>
-    <line x1="92" y1="45" x2="104" y2="45" marker-end="url(#cd-arrow)"/>
-    <line x1="138" y1="45" x2="150" y2="45" marker-end="url(#cd-arrow)"/>
-    <line x1="184" y1="45" x2="196" y2="45" marker-end="url(#cd-arrow)"/>
-    <line x1="230" y1="45" x2="252" y2="44" marker-end="url(#cd-arrow)"/>
-  </g>
-  <polygon points="283,17 290.1,35.3 309.6,36.3 294.4,48.7 299.5,67.6 283,57 266.5,67.6 271.6,48.7 256.4,36.3 275.9,35.3" fill="#313244" stroke="#f9e2af" stroke-width="1.5"/>
-  <text x="283" y="50" font-family="Consolas,monospace" font-size="13" font-weight="bold" fill="#f9e2af" text-anchor="middle">发射！</text>
-  <text x="122" y="88" font-family="Consolas,monospace" font-size="10" fill="#6c7086" text-anchor="middle">每数一个数，i 减 1；数到 1 后循环结束</text>
-</svg>
-<div class="diagram-caption">for 循环让 i 从 5 数到 1，条件不成立后执行循环外的「发射！」</div>
-</div>
   <div id="demo5"></div>
 </div>
 </div>
 
-<script src="demo-engine.js?v=20"></script>
+<script src="demo-engine.js?v=21"></script>
 <script>
 createDemo("demo0", {
   title: "Hello, World!",
@@ -142,6 +103,22 @@ int main() {
 createDemo("demo2", {
   title: "变量：会变的盒子",
   subtitle: "把值装进盒子，随时可以更换",
+  diagram: `
+<svg viewBox="0 0 320 150" width="320" role="img" aria-label="变量 age 的盒子：旧值 18 被划掉换成 19，右侧箭头表示取出旧值加 1 再放回">
+  <defs><marker id="age-arrow" markerWidth="8" markerHeight="8" refX="7" refY="3" orient="auto"><path d="M0,0 L0,6 L7,3 z" fill="#89b4fa"/></marker></defs>
+  <rect x="24" y="24" width="56" height="22" rx="6" fill="#313244" stroke="#45475a" stroke-width="1.5"/>
+  <text x="52" y="40" font-family="Consolas,monospace" font-size="12" fill="#cdd6f4" text-anchor="middle">age</text>
+  <rect x="16" y="46" width="130" height="70" rx="6" fill="#313244" stroke="#45475a" stroke-width="1.5"/>
+  <text x="52" y="90" font-family="Consolas,monospace" font-size="22" fill="#f38ba8" text-anchor="middle">18</text>
+  <line x1="38" y1="84" x2="66" y2="84" stroke="#f38ba8" stroke-width="2"/>
+  <text x="112" y="90" font-family="Consolas,monospace" font-size="22" font-weight="bold" fill="#a6e3a1" text-anchor="middle">19</text>
+  <path d="M 146 66 C 200 30, 272 34, 282 76 C 290 112, 220 134, 150 110" fill="none" stroke="#89b4fa" stroke-width="1.5" marker-end="url(#age-arrow)"/>
+  <text x="213" y="28" font-family="Consolas,monospace" font-size="10" fill="#6c7086" text-anchor="middle">取出旧值 18</text>
+  <text x="297" y="80" font-family="Consolas,monospace" font-size="11" fill="#cdd6f4" text-anchor="middle">+1</text>
+  <text x="213" y="146" font-family="Consolas,monospace" font-size="10" fill="#a6e3a1" text-anchor="middle">放回，变成 19</text>
+</svg>
+<div class="diagram-caption">age = age + 1：把盒子里的旧值取出来加 1 再放回，age 从 18 变成 19</div>
+`,
   code: `#include <stdio.h>
 
 int main() {
@@ -250,6 +227,29 @@ createDemo("demo4", makeJudgeDemo(85));
 createDemo("demo5", {
   title: "循环：不知疲倦地重复",
   subtitle: "倒计时这种重复劳动，交给计算机最合适",
+  diagram: `
+<svg viewBox="0 0 320 100" width="320" role="img" aria-label="for 循环倒计时：5、4、3、2、1 五个圆形气泡依次用箭头相连，最后箭头指向星形的发射文字块">
+  <defs><marker id="cd-arrow" markerWidth="8" markerHeight="8" refX="7" refY="3" orient="auto"><path d="M0,0 L0,6 L7,3 z" fill="#89b4fa"/></marker></defs>
+  <text x="122" y="14" font-family="Consolas,monospace" font-size="10" fill="#6c7086" text-anchor="middle">for (i = 5; i &gt;= 1; i--)</text>
+  <g fill="#313244" stroke="#45475a" stroke-width="1.5">
+    <circle cx="30" cy="45" r="15"/><circle cx="76" cy="45" r="15"/><circle cx="122" cy="45" r="15"/><circle cx="168" cy="45" r="15"/><circle cx="214" cy="45" r="15"/>
+  </g>
+  <g font-family="Consolas,monospace" font-size="14" fill="#cdd6f4" text-anchor="middle">
+    <text x="30" y="50">5</text><text x="76" y="50">4</text><text x="122" y="50">3</text><text x="168" y="50">2</text><text x="214" y="50">1</text>
+  </g>
+  <g stroke="#89b4fa" stroke-width="1.5">
+    <line x1="46" y1="45" x2="58" y2="45" marker-end="url(#cd-arrow)"/>
+    <line x1="92" y1="45" x2="104" y2="45" marker-end="url(#cd-arrow)"/>
+    <line x1="138" y1="45" x2="150" y2="45" marker-end="url(#cd-arrow)"/>
+    <line x1="184" y1="45" x2="196" y2="45" marker-end="url(#cd-arrow)"/>
+    <line x1="230" y1="45" x2="252" y2="44" marker-end="url(#cd-arrow)"/>
+  </g>
+  <polygon points="283,17 290.1,35.3 309.6,36.3 294.4,48.7 299.5,67.6 283,57 266.5,67.6 271.6,48.7 256.4,36.3 275.9,35.3" fill="#313244" stroke="#f9e2af" stroke-width="1.5"/>
+  <text x="283" y="50" font-family="Consolas,monospace" font-size="13" font-weight="bold" fill="#f9e2af" text-anchor="middle">发射！</text>
+  <text x="122" y="88" font-family="Consolas,monospace" font-size="10" fill="#6c7086" text-anchor="middle">每数一个数，i 减 1；数到 1 后循环结束</text>
+</svg>
+<div class="diagram-caption">for 循环让 i 从 5 数到 1，条件不成立后执行循环外的「发射！」</div>
+`,
   code: `#include <stdio.h>
 
 int main() {

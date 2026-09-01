@@ -6,7 +6,7 @@
 <meta name="description" content="C语言函数交互演示：函数定义、值传递、返回值、作用域、递归，可视化调用栈与递归调用树。">
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
 <title>函数 - C语言教学演示</title>
-<link rel="stylesheet" href="style.css?v=20">
+<link rel="stylesheet" href="style.css?v=21">
 </head>
 <body>
 <nav></nav>
@@ -56,76 +56,9 @@
 </div>
 <div class="demo-grid">
   <div id="demo0"></div>
-  <div class="intro-diagram">
-<svg viewBox="0 0 320 130" width="320" role="img" aria-label="值传递示意图：main 的 x=3 被复制成副本 x'=3 传给 swap，副本被改成 99，main 的 x 仍是 3">
-  <defs>
-    <marker id="fn-copy" markerWidth="8" markerHeight="8" refX="7" refY="3" orient="auto"><path d="M0,0 L0,6 L7,3 z" fill="#89b4fa"/></marker>
-  </defs>
-  <g font-family="Consolas,monospace" font-size="10" fill="#6c7086" text-anchor="middle">
-    <text x="80" y="16">main()</text>
-    <text x="240" y="16">swap()</text>
-  </g>
-  <g fill="#313244" stroke="#45475a" stroke-width="1.5">
-    <rect x="40" y="26" width="80" height="44" rx="6"/>
-    <rect x="200" y="26" width="80" height="44" rx="6"/>
-  </g>
-  <text x="80" y="54" font-family="Consolas,monospace" font-size="14" text-anchor="middle"><tspan fill="#cdd6f4">x = </tspan><tspan fill="#a6e3a1" font-weight="bold">3</tspan></text>
-  <text x="240" y="46" font-family="Consolas,monospace" font-size="12" fill="#a6adc8" text-anchor="middle">x' = 3</text>
-  <line x1="220" y1="42" x2="260" y2="42" stroke="#f38ba8" stroke-width="1.5"/>
-  <text x="240" y="65" font-family="Consolas,monospace" font-size="12" fill="#f38ba8" font-weight="bold" text-anchor="middle">改成 99</text>
-  <line x1="122" y1="48" x2="194" y2="48" stroke="#89b4fa" stroke-width="1.5" stroke-dasharray="5,4" marker-end="url(#fn-copy)"/>
-  <text x="160" y="40" font-family="Consolas,monospace" font-size="10" fill="#89b4fa" text-anchor="middle">复制</text>
-  <text x="80" y="90" font-family="Consolas,monospace" font-size="10" fill="#a6e3a1" text-anchor="middle">✓ 原值仍是 3</text>
-  <text x="240" y="90" font-family="Consolas,monospace" font-size="10" fill="#6c7086" text-anchor="middle">函数结束副本销毁</text>
-  <text x="160" y="116" font-family="Consolas,monospace" font-size="11" text-anchor="middle"><tspan fill="#a6adc8">值传递只改副本，</tspan><tspan fill="#f38ba8">交换失败</tspan></text>
-</svg>
-<div class="diagram-caption">值传递：swap 改的只是 x 的副本，main 的 x 仍是 3——交换失败</div>
-</div>
   <div id="demo1"></div>
   <div id="demo2"></div>
   <div id="demo3"></div>
-  <div class="intro-diagram">
-<svg viewBox="0 0 320 204" width="320" role="img" aria-label="递归调用链：fact(3) 依次向下调用 fact(2)、fact(1)，再沿右侧逐层返回 1、2、6">
-  <defs>
-    <marker id="fn-call" markerWidth="8" markerHeight="8" refX="7" refY="3" orient="auto"><path d="M0,0 L0,6 L7,3 z" fill="#89b4fa"/></marker>
-    <marker id="fn-rback" markerWidth="8" markerHeight="8" refX="7" refY="3" orient="auto"><path d="M0,0 L0,6 L7,3 z" fill="#a6e3a1"/></marker>
-  </defs>
-  <g fill="#313244" stroke="#45475a" stroke-width="1.5">
-    <rect x="95" y="8" width="110" height="26" rx="6"/>
-    <rect x="95" y="56" width="110" height="34" rx="6"/>
-    <rect x="95" y="108" width="110" height="34" rx="6"/>
-    <rect x="95" y="160" width="110" height="34" rx="6"/>
-  </g>
-  <g font-family="Consolas,monospace" text-anchor="middle">
-    <text x="150" y="25" font-size="12" fill="#cdd6f4">main()</text>
-    <text x="150" y="78" font-size="13" fill="#cdd6f4">fact(3)</text>
-    <text x="150" y="130" font-size="13" fill="#cdd6f4">fact(2)</text>
-    <text x="150" y="176" font-size="13" fill="#cdd6f4">fact(1)</text>
-    <text x="150" y="189" font-size="9" fill="#a6e3a1">n&lt;=1, return 1</text>
-  </g>
-  <g stroke="#89b4fa" stroke-width="1.5">
-    <line x1="105" y1="34" x2="105" y2="52" marker-end="url(#fn-call)"/>
-    <line x1="105" y1="90" x2="105" y2="104" marker-end="url(#fn-call)"/>
-    <line x1="105" y1="142" x2="105" y2="156" marker-end="url(#fn-call)"/>
-  </g>
-  <g font-family="Consolas,monospace" font-size="10" fill="#89b4fa" text-anchor="middle">
-    <text x="83" y="48">调用</text>
-    <text x="83" y="100">调用</text>
-    <text x="83" y="152">调用</text>
-  </g>
-  <g stroke="#a6e3a1" stroke-width="1.5">
-    <line x1="195" y1="158" x2="195" y2="146" marker-end="url(#fn-rback)"/>
-    <line x1="195" y1="106" x2="195" y2="94" marker-end="url(#fn-rback)"/>
-    <line x1="195" y1="54" x2="195" y2="38" marker-end="url(#fn-rback)"/>
-  </g>
-  <g font-family="Consolas,monospace" font-size="10">
-    <text x="212" y="154"><tspan fill="#a6e3a1" font-weight="bold">1</tspan><tspan fill="#6c7086"> 返回</tspan></text>
-    <text x="212" y="102"><tspan fill="#a6e3a1" font-weight="bold">2</tspan><tspan fill="#6c7086"> 返回</tspan></text>
-    <text x="212" y="50"><tspan fill="#a6e3a1" font-weight="bold">6</tspan><tspan fill="#6c7086"> 返回</tspan></text>
-  </g>
-</svg>
-<div class="diagram-caption">递归：fact(3) 逐层调用到 fact(1) 触底，再逐层返回 1、2、6</div>
-</div>
   <div id="demo4"></div>
   <div id="demo5"></div>
   <div id="demo6"></div>
@@ -142,7 +75,7 @@
 </div>
 </div>
 
-<script src="demo-engine.js?v=20"></script>
+<script src="demo-engine.js?v=21"></script>
 <script>
 createDemo("demo0", {
   title: "函数的定义与调用",
@@ -172,35 +105,97 @@ int main() {
   ]
 });
 createDemo("demo1", {
-  title: "值传递的本质",
-  subtitle: "形参改变不影响实参",
+  title: "值传递 vs 传地址",
+  subtitle: "为什么 swap_wrong 换不动、swap_right 才行",
+  diagram: `<svg viewBox="0 0 320 148" width="320" role="img" aria-label="传值调用：副本交换示意图">
+  <defs>
+    <marker id="sw-copy" markerWidth="8" markerHeight="8" refX="7" refY="3" orient="auto"><path d="M0,0 L0,6 L7,3 z" fill="#89b4fa"/></marker>
+    <marker id="sw-swap" markerWidth="7" markerHeight="7" refX="6" refY="2.5" orient="auto-start-reverse"><path d="M0,0 L0,5 L6,2.5 z" fill="#fab387"/></marker>
+  </defs>
+  <text x="160" y="16" font-size="12" fill="#cdd6f4" text-anchor="middle">传值：swap_wrong(x, y)</text>
+  <text x="84" y="34" font-family="Consolas,monospace" font-size="10" fill="#6c7086" text-anchor="middle">main()</text>
+  <rect x="24" y="40" width="120" height="56" rx="6" fill="#313244" stroke="#45475a" stroke-width="1.5"/>
+  <rect x="32" y="52" width="50" height="28" rx="4" fill="#1a1a28" stroke="#45475a"/>
+  <rect x="90" y="52" width="50" height="28" rx="4" fill="#1a1a28" stroke="#45475a"/>
+  <text x="57" y="70" font-family="Consolas,monospace" font-size="12" fill="#cdd6f4" text-anchor="middle">x = 3</text>
+  <text x="115" y="70" font-family="Consolas,monospace" font-size="12" fill="#cdd6f4" text-anchor="middle">y = 7</text>
+  <line x1="144" y1="68" x2="196" y2="68" stroke="#89b4fa" stroke-width="1.5" stroke-dasharray="5,4" marker-end="url(#sw-copy)"/>
+  <text x="170" y="60" font-size="10" fill="#89b4fa" text-anchor="middle">复制</text>
+  <text x="252" y="34" font-family="Consolas,monospace" font-size="10" fill="#6c7086" text-anchor="middle">swap_wrong()</text>
+  <rect x="196" y="40" width="112" height="56" rx="6" fill="#313244" stroke="#45475a" stroke-width="1.5"/>
+  <rect x="204" y="52" width="46" height="28" rx="4" fill="#1a1a28" stroke="#45475a"/>
+  <rect x="258" y="52" width="46" height="28" rx="4" fill="#1a1a28" stroke="#45475a"/>
+  <text x="227" y="70" font-family="Consolas,monospace" font-size="12" fill="#cdd6f4" text-anchor="middle">a = 3</text>
+  <text x="281" y="70" font-family="Consolas,monospace" font-size="12" fill="#cdd6f4" text-anchor="middle">b = 7</text>
+  <path d="M 222 48 Q 254 30 286 48" fill="none" stroke="#fab387" stroke-width="1.5" marker-start="url(#sw-swap)" marker-end="url(#sw-swap)"/>
+  <text x="160" y="126" font-size="11" fill="#f38ba8" text-anchor="middle">副本里 a、b 交换了，main 的 x、y 根本没动 ✗</text>
+</svg>
+<div class="diagram-caption">传值：形参是实参的副本，交换只发生在副本上</div>
+<svg viewBox="0 0 320 162" width="320" role="img" aria-label="传地址调用：指针改到原件示意图">
+  <defs><marker id="sw-pt" markerWidth="8" markerHeight="8" refX="7" refY="3" orient="auto"><path d="M0,0 L0,6 L7,3 z" fill="#f38ba8"/></marker></defs>
+  <text x="160" y="16" font-size="12" fill="#cdd6f4" text-anchor="middle">传地址：swap_right(&amp;x, &amp;y)</text>
+  <text x="84" y="34" font-family="Consolas,monospace" font-size="10" fill="#6c7086" text-anchor="middle">main()</text>
+  <rect x="24" y="40" width="120" height="56" rx="6" fill="#313244" stroke="#45475a" stroke-width="1.5"/>
+  <rect x="32" y="52" width="50" height="28" rx="4" fill="#1a1a28" stroke="#45475a"/>
+  <rect x="90" y="52" width="50" height="28" rx="4" fill="#1a1a28" stroke="#45475a"/>
+  <text x="57" y="48" font-family="Consolas,monospace" font-size="9" fill="#6c7086" text-anchor="middle">x</text>
+  <text x="115" y="48" font-family="Consolas,monospace" font-size="9" fill="#6c7086" text-anchor="middle">y</text>
+  <text x="57" y="70" font-family="Consolas,monospace" font-size="12" fill="#a6e3a1" text-anchor="middle" font-weight="bold">7</text>
+  <text x="115" y="70" font-family="Consolas,monospace" font-size="12" fill="#a6e3a1" text-anchor="middle" font-weight="bold">3</text>
+  <text x="252" y="34" font-family="Consolas,monospace" font-size="10" fill="#6c7086" text-anchor="middle">swap_right()</text>
+  <rect x="196" y="40" width="112" height="56" rx="6" fill="#313244" stroke="#45475a" stroke-width="1.5"/>
+  <rect x="204" y="52" width="46" height="28" rx="4" fill="#1a1a28" stroke="#f38ba8"/>
+  <rect x="258" y="52" width="46" height="28" rx="4" fill="#1a1a28" stroke="#f38ba8"/>
+  <text x="227" y="48" font-family="Consolas,monospace" font-size="9" fill="#6c7086" text-anchor="middle">a</text>
+  <text x="281" y="48" font-family="Consolas,monospace" font-size="9" fill="#6c7086" text-anchor="middle">b</text>
+  <text x="227" y="70" font-family="Consolas,monospace" font-size="10" fill="#f38ba8" text-anchor="middle">0x1000</text>
+  <text x="281" y="70" font-family="Consolas,monospace" font-size="10" fill="#f38ba8" text-anchor="middle">0x1004</text>
+  <line x1="204" y1="64" x2="86" y2="64" stroke="#f38ba8" stroke-width="1.5" marker-end="url(#sw-pt)"/>
+  <text x="145" y="58" font-size="9" fill="#f38ba8" text-anchor="middle">*a 就是 x</text>
+  <line x1="258" y1="80" x2="144" y2="80" stroke="#f38ba8" stroke-width="1.5" marker-end="url(#sw-pt)"/>
+  <text x="201" y="94" font-size="9" fill="#f38ba8" text-anchor="middle">*b 就是 y</text>
+  <text x="160" y="142" font-size="11" fill="#a6e3a1" text-anchor="middle">顺着地址直接改到 main 的 x、y——交换成功 ✓</text>
+</svg>
+<div class="diagram-caption">传地址：形参存的是实参的地址，*a 改的就是原件（下一章《指针》详解）</div>`,
   code: `#include <stdio.h>
 
 void swap_wrong(int a, int b) {
-    int tmp = a;
+    int t = a;
     a = b;
-    b = tmp;
+    b = t;
+}
+
+void swap_right(int *a, int *b) {
+    int t = *a;
+    *a = *b;
+    *b = t;
 }
 
 int main() {
     int x = 3, y = 7;
     swap_wrong(x, y);
-    printf("x=%d, y=%d\\n", x, y);
+    printf("wrong: x=%d, y=%d\\n", x, y);
+    swap_right(&x, &y);
+    printf("right: x=%d, y=%d\\n", x, y);
     return 0;
 }`,
   vizTypes: ["vars","stack","console"],
   steps: [
-    { line: 9, info: "main() 开始" },
-    { line: 10, vars: {x:{value:3,type:"int"},y:{value:7,type:"int"}}, info: "x=3, y=7" },
-    { line: 11, info: "调用 swap_wrong(x, y)" },
-    { line: 3, stack: [{name:"main",value:"x=3,y=7"},{name:"swap_wrong",value:"a=3,b=7",highlight:true}], vars: {a:{value:3,type:"int"},b:{value:7,type:"int"}}, info: "进入 swap_wrong：形参 a、b 是 x、y 的副本" },
-    { line: 4, vars: {tmp:{value:3,type:"int"},a:{value:3,type:"int"},b:{value:7,type:"int"}}, info: "tmp = a = 3" },
-    { line: 5, vars: {a:{value:7,type:"int"},tmp:{value:3,type:"int"},b:{value:7,type:"int"}}, info: "a = b = 7（只改了形参 a）" },
-    { line: 6, vars: {b:{value:3,type:"int"},a:{value:7,type:"int"},tmp:{value:3,type:"int"}}, info: "b = tmp = 3（只改了形参 b）" },
-    { line: 8, stack: [{name:"main",value:"x=3,y=7",highlight:true}], info: "swap_wrong 结束，形参 a、b、tmp 被销毁" },
-    { line: 11, vars: {x:{value:3,type:"int"},y:{value:7,type:"int"}}, info: "回到 main：x 和 y 根本没变" },
-    { line: 12, output: "x=3, y=7", info: "输出 x=3, y=7——交换失败！" },
-    { line: 13, info: "程序结束" }
+    { line: 14, info: "main() 开始" },
+    { line: 15, vars: {x:{value:3,type:"int"},y:{value:7,type:"int"}}, info: "main 里：x = 3，y = 7" },
+    { line: 16, info: "先调用 swap_wrong(x, y)——把 x、y 的值传进去" },
+    { line: 3, stack: [{name:"main",value:"x=3, y=7"},{name:"swap_wrong",value:"a=3, b=7（副本）",highlight:true}], vars: {a:{value:3,type:"int"},b:{value:7,type:"int"},t:{value:3,type:"int"}}, info: "进入 swap_wrong：形参 a、b 是 x、y 的副本；t = a = 3" },
+    { line: 4, vars: {a:{value:7,type:"int"}}, info: "a = b → 副本 a 变成 7" },
+    { line: 5, vars: {b:{value:3,type:"int"}}, info: "b = t → 副本 b 变成 3。副本里确实交换成功了" },
+    { line: 6, stack: [{name:"main",value:"x=3, y=7",highlight:true}], info: "swap_wrong 结束，副本 a、b、t 随之销毁" },
+    { line: 17, output: "wrong: x=3, y=7", info: "main 的 x、y 根本没动——交换失败！" },
+    { line: 18, info: "再试 swap_right(&x, &y)——这次传的是 x、y 的地址" },
+    { line: 9, stack: [{name:"main",value:"x=3, y=7"},{name:"swap_right",value:"a=&x, b=&y",highlight:true}], vars: {a:{value:"0x1000",type:"int*"},b:{value:"0x1004",type:"int*"},t:{value:3,type:"int"}}, info: "进入 swap_right：形参存的是地址，*a 就是 x 本人；t = *a = 3" },
+    { line: 10, vars: {x:{value:7,type:"int"}}, info: "*a = *b：顺着地址直接改到 main 的 x——x 变成 7" },
+    { line: 11, vars: {y:{value:3,type:"int"}}, info: "*b = t：y 变成 3——原件被真正交换了" },
+    { line: 12, stack: [{name:"main",value:"x=7, y=3",highlight:true}], info: "swap_right 结束" },
+    { line: 19, output: "wrong: x=3, y=7\nright: x=7, y=3", info: "这次交换成功！" },
+    { line: 20, info: "关键区别：传值给的是副本，怎么改都碰不到原件；传地址才能顺藤摸瓜改原件（下一章《指针》详解）" }
   ]
 });
 createDemo("demo2", {
@@ -267,6 +262,48 @@ int main() {
 createDemo("demo4", {
   title: "递归函数",
   subtitle: "函数调用自身：以阶乘为例",
+  diagram: `
+<svg viewBox="0 0 320 204" width="320" role="img" aria-label="递归调用链：fact(3) 依次向下调用 fact(2)、fact(1)，再沿右侧逐层返回 1、2、6">
+  <defs>
+    <marker id="fn-call" markerWidth="8" markerHeight="8" refX="7" refY="3" orient="auto"><path d="M0,0 L0,6 L7,3 z" fill="#89b4fa"/></marker>
+    <marker id="fn-rback" markerWidth="8" markerHeight="8" refX="7" refY="3" orient="auto"><path d="M0,0 L0,6 L7,3 z" fill="#a6e3a1"/></marker>
+  </defs>
+  <g fill="#313244" stroke="#45475a" stroke-width="1.5">
+    <rect x="95" y="8" width="110" height="26" rx="6"/>
+    <rect x="95" y="56" width="110" height="34" rx="6"/>
+    <rect x="95" y="108" width="110" height="34" rx="6"/>
+    <rect x="95" y="160" width="110" height="34" rx="6"/>
+  </g>
+  <g font-family="Consolas,monospace" text-anchor="middle">
+    <text x="150" y="25" font-size="12" fill="#cdd6f4">main()</text>
+    <text x="150" y="78" font-size="13" fill="#cdd6f4">fact(3)</text>
+    <text x="150" y="130" font-size="13" fill="#cdd6f4">fact(2)</text>
+    <text x="150" y="176" font-size="13" fill="#cdd6f4">fact(1)</text>
+    <text x="150" y="189" font-size="9" fill="#a6e3a1">n&lt;=1, return 1</text>
+  </g>
+  <g stroke="#89b4fa" stroke-width="1.5">
+    <line x1="105" y1="34" x2="105" y2="52" marker-end="url(#fn-call)"/>
+    <line x1="105" y1="90" x2="105" y2="104" marker-end="url(#fn-call)"/>
+    <line x1="105" y1="142" x2="105" y2="156" marker-end="url(#fn-call)"/>
+  </g>
+  <g font-family="Consolas,monospace" font-size="10" fill="#89b4fa" text-anchor="middle">
+    <text x="83" y="48">调用</text>
+    <text x="83" y="100">调用</text>
+    <text x="83" y="152">调用</text>
+  </g>
+  <g stroke="#a6e3a1" stroke-width="1.5">
+    <line x1="195" y1="158" x2="195" y2="146" marker-end="url(#fn-rback)"/>
+    <line x1="195" y1="106" x2="195" y2="94" marker-end="url(#fn-rback)"/>
+    <line x1="195" y1="54" x2="195" y2="38" marker-end="url(#fn-rback)"/>
+  </g>
+  <g font-family="Consolas,monospace" font-size="10">
+    <text x="212" y="154"><tspan fill="#a6e3a1" font-weight="bold">1</tspan><tspan fill="#6c7086"> 返回</tspan></text>
+    <text x="212" y="102"><tspan fill="#a6e3a1" font-weight="bold">2</tspan><tspan fill="#6c7086"> 返回</tspan></text>
+    <text x="212" y="50"><tspan fill="#a6e3a1" font-weight="bold">6</tspan><tspan fill="#6c7086"> 返回</tspan></text>
+  </g>
+</svg>
+<div class="diagram-caption">递归：fact(3) 逐层调用到 fact(1) 触底，再逐层返回 1、2、6</div>
+`,
   code: `#include <stdio.h>
 
 int factorial(int n) {

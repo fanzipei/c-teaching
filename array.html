@@ -6,7 +6,7 @@
 <meta name="description" content="C语言数组交互演示：一维数组定义、遍历、排序、栈与队列，二维矩阵、转置、行列求和、数组作为函数参数，可视化每个元素的变化。">
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
 <title>数组 - C语言教学演示</title>
-<link rel="stylesheet" href="style.css?v=20">
+<link rel="stylesheet" href="style.css?v=21">
 </head>
 <body>
 <nav></nav>
@@ -90,69 +90,8 @@
   <div id="demo1"></div>
   <div id="demo2"></div>
   <div id="demo3"></div>
-  <div class="intro-diagram">
-<svg viewBox="0 0 320 126" width="320" role="img" aria-label="冒泡排序：数组 5 3 4 1 2，前两个元素比较后 5 和 3 交换，最大元素逐步冒泡到末尾">
-  <defs>
-    <marker id="bb-arrow" markerWidth="8" markerHeight="8" refX="7" refY="3" orient="auto"><path d="M0,0 L0,6 L7,3 z" fill="#89b4fa"/></marker>
-    <marker id="bb-arrow-s" markerWidth="8" markerHeight="8" refX="7" refY="3" orient="auto-start-reverse"><path d="M0,0 L0,6 L7,3 z" fill="#89b4fa"/></marker>
-  </defs>
-  <g font-family="Consolas,monospace">
-    <text x="66" y="12" font-size="10" fill="#89b4fa" text-anchor="middle">5 &gt; 3，交换</text>
-    <path d="M 30 38 Q 66 16 102 38" fill="none" stroke="#89b4fa" stroke-width="1.5" marker-start="url(#bb-arrow-s)" marker-end="url(#bb-arrow)"/>
-    <g fill="#313244" stroke="#45475a" stroke-width="1.5">
-      <rect x="12" y="40" width="54" height="36" rx="6"/><rect x="70" y="40" width="54" height="36" rx="6"/><rect x="128" y="40" width="54" height="36" rx="6"/><rect x="186" y="40" width="54" height="36" rx="6"/>
-    </g>
-    <rect x="244" y="40" width="54" height="36" rx="6" fill="#313244" stroke="#a6e3a1" stroke-width="1.5"/>
-    <g font-size="14" fill="#a6e3a1" text-anchor="middle" font-weight="bold">
-      <text x="39" y="63">5</text><text x="97" y="63">3</text><text x="155" y="63">4</text><text x="213" y="63">1</text><text x="271" y="63">2</text>
-    </g>
-    <g font-size="10" fill="#6c7086" text-anchor="middle">
-      <text x="39" y="92">arr[0]</text><text x="97" y="92">arr[1]</text><text x="155" y="92">arr[2]</text><text x="213" y="92">arr[3]</text><text x="271" y="92">arr[4]</text>
-    </g>
-    <text x="66" y="110" font-size="11" fill="#a6e3a1" text-anchor="middle">交换后：3 5</text>
-    <text x="271" y="110" font-size="10" fill="#a6e3a1" text-anchor="middle">最大元素冒泡到末尾</text>
-  </g>
-</svg>
-<div class="diagram-caption">两两比较、逆序就交换：每轮把最大元素「冒泡」到末尾</div>
-</div>
   <div id="demo4"></div>
   <div id="demo5"></div>
-  <div class="intro-diagram">
-<svg viewBox="0 0 340 190" width="320" role="img" aria-label="栈与队列对比：栈在同一端 push 进 pop 出（LIFO 后进先出），队列 rear 端进 front 端出（FIFO 先进先出）">
-  <defs>
-    <marker id="sq-arrow-b" markerWidth="8" markerHeight="8" refX="7" refY="3" orient="auto"><path d="M0,0 L0,6 L7,3 z" fill="#89b4fa"/></marker>
-    <marker id="sq-arrow-o" markerWidth="8" markerHeight="8" refX="7" refY="3" orient="auto"><path d="M0,0 L0,6 L7,3 z" fill="#fab387"/></marker>
-  </defs>
-  <g font-family="Consolas,monospace">
-    <g fill="#313244" stroke="#45475a" stroke-width="1.5">
-      <rect x="36" y="34" width="56" height="26" rx="6"/><rect x="36" y="60" width="56" height="26" rx="6"/><rect x="36" y="86" width="56" height="26" rx="6"/><rect x="36" y="112" width="56" height="26" rx="6"/><rect x="36" y="138" width="56" height="26" rx="6"/>
-    </g>
-    <g font-size="13" fill="#a6e3a1" text-anchor="middle" font-weight="bold">
-      <text x="64" y="103">30</text><text x="64" y="129">20</text><text x="64" y="155">10</text>
-    </g>
-    <line x1="52" y1="8" x2="52" y2="30" stroke="#89b4fa" stroke-width="1.5" marker-end="url(#sq-arrow-b)"/>
-    <line x1="76" y1="30" x2="76" y2="8" stroke="#fab387" stroke-width="1.5" marker-end="url(#sq-arrow-o)"/>
-    <text x="30" y="20" font-size="10" fill="#89b4fa" text-anchor="middle">push 进</text>
-    <text x="100" y="20" font-size="10" fill="#fab387" text-anchor="middle">pop 出</text>
-    <text x="98" y="103" font-size="10" fill="#6c7086">← top</text>
-    <text x="64" y="182" font-size="11" fill="#a6adc8" text-anchor="middle">栈 LIFO：后进先出</text>
-    <g fill="#313244" stroke="#45475a" stroke-width="1.5">
-      <rect x="166" y="80" width="28" height="30" rx="6"/><rect x="194" y="80" width="28" height="30" rx="6"/><rect x="222" y="80" width="28" height="30" rx="6"/><rect x="250" y="80" width="28" height="30" rx="6"/><rect x="278" y="80" width="28" height="30" rx="6"/>
-    </g>
-    <g font-size="13" fill="#a6e3a1" text-anchor="middle" font-weight="bold">
-      <text x="180" y="99">1</text><text x="208" y="99">2</text><text x="236" y="99">3</text><text x="264" y="99">4</text>
-    </g>
-    <line x1="164" y1="95" x2="142" y2="95" stroke="#fab387" stroke-width="1.5" marker-end="url(#sq-arrow-o)"/>
-    <text x="153" y="72" font-size="10" fill="#fab387" text-anchor="middle">front 出</text>
-    <line x1="330" y1="95" x2="308" y2="95" stroke="#89b4fa" stroke-width="1.5" marker-end="url(#sq-arrow-b)"/>
-    <text x="319" y="72" font-size="10" fill="#89b4fa" text-anchor="middle">rear 进</text>
-    <text x="180" y="126" font-size="10" fill="#6c7086" text-anchor="middle">front</text>
-    <text x="292" y="126" font-size="10" fill="#6c7086" text-anchor="middle">rear</text>
-    <text x="236" y="182" font-size="11" fill="#a6adc8" text-anchor="middle">队列 FIFO：先进先出</text>
-  </g>
-</svg>
-<div class="diagram-caption">栈在同一端 push/pop（LIFO）；队列 rear 进、front 出（FIFO）</div>
-</div>
   <div id="demo6"></div>
   <div id="demo7"></div>
 </div>
@@ -177,7 +116,7 @@
 </div>
 </div>
 
-<script src="demo-engine.js?v=20"></script>
+<script src="demo-engine.js?v=21"></script>
 <script>
 createDemo("demo0", {
   title: "数组的定义与初始化",
@@ -295,6 +234,31 @@ int main() {
 createDemo("demo4", {
   title: "冒泡排序",
   subtitle: "两两比较，逐渐把最大的元素「冒泡」到末尾",
+  diagram: `
+<svg viewBox="0 0 320 126" width="320" role="img" aria-label="冒泡排序：数组 5 3 4 1 2，前两个元素比较后 5 和 3 交换，最大元素逐步冒泡到末尾">
+  <defs>
+    <marker id="bb-arrow" markerWidth="8" markerHeight="8" refX="7" refY="3" orient="auto"><path d="M0,0 L0,6 L7,3 z" fill="#89b4fa"/></marker>
+    <marker id="bb-arrow-s" markerWidth="8" markerHeight="8" refX="7" refY="3" orient="auto-start-reverse"><path d="M0,0 L0,6 L7,3 z" fill="#89b4fa"/></marker>
+  </defs>
+  <g font-family="Consolas,monospace">
+    <text x="66" y="12" font-size="10" fill="#89b4fa" text-anchor="middle">5 &gt; 3，交换</text>
+    <path d="M 30 38 Q 66 16 102 38" fill="none" stroke="#89b4fa" stroke-width="1.5" marker-start="url(#bb-arrow-s)" marker-end="url(#bb-arrow)"/>
+    <g fill="#313244" stroke="#45475a" stroke-width="1.5">
+      <rect x="12" y="40" width="54" height="36" rx="6"/><rect x="70" y="40" width="54" height="36" rx="6"/><rect x="128" y="40" width="54" height="36" rx="6"/><rect x="186" y="40" width="54" height="36" rx="6"/>
+    </g>
+    <rect x="244" y="40" width="54" height="36" rx="6" fill="#313244" stroke="#a6e3a1" stroke-width="1.5"/>
+    <g font-size="14" fill="#a6e3a1" text-anchor="middle" font-weight="bold">
+      <text x="39" y="63">5</text><text x="97" y="63">3</text><text x="155" y="63">4</text><text x="213" y="63">1</text><text x="271" y="63">2</text>
+    </g>
+    <g font-size="10" fill="#6c7086" text-anchor="middle">
+      <text x="39" y="92">arr[0]</text><text x="97" y="92">arr[1]</text><text x="155" y="92">arr[2]</text><text x="213" y="92">arr[3]</text><text x="271" y="92">arr[4]</text>
+    </g>
+    <text x="66" y="110" font-size="11" fill="#a6e3a1" text-anchor="middle">交换后：3 5</text>
+    <text x="271" y="110" font-size="10" fill="#a6e3a1" text-anchor="middle">最大元素冒泡到末尾</text>
+  </g>
+</svg>
+<div class="diagram-caption">两两比较、逆序就交换：每轮把最大元素「冒泡」到末尾</div>
+`,
   code: `#include <stdio.h>
 
 int main() {
@@ -370,6 +334,42 @@ int main() {
 createDemo("demo6", {
   title: "用数组实现栈（Stack）",
   subtitle: "把初始化、入栈、出栈、判空封装成函数：后进先出（LIFO）",
+  diagram: `
+<svg viewBox="0 0 340 190" width="320" role="img" aria-label="栈与队列对比：栈在同一端 push 进 pop 出（LIFO 后进先出），队列 rear 端进 front 端出（FIFO 先进先出）">
+  <defs>
+    <marker id="sq-arrow-b" markerWidth="8" markerHeight="8" refX="7" refY="3" orient="auto"><path d="M0,0 L0,6 L7,3 z" fill="#89b4fa"/></marker>
+    <marker id="sq-arrow-o" markerWidth="8" markerHeight="8" refX="7" refY="3" orient="auto"><path d="M0,0 L0,6 L7,3 z" fill="#fab387"/></marker>
+  </defs>
+  <g font-family="Consolas,monospace">
+    <g fill="#313244" stroke="#45475a" stroke-width="1.5">
+      <rect x="36" y="34" width="56" height="26" rx="6"/><rect x="36" y="60" width="56" height="26" rx="6"/><rect x="36" y="86" width="56" height="26" rx="6"/><rect x="36" y="112" width="56" height="26" rx="6"/><rect x="36" y="138" width="56" height="26" rx="6"/>
+    </g>
+    <g font-size="13" fill="#a6e3a1" text-anchor="middle" font-weight="bold">
+      <text x="64" y="103">30</text><text x="64" y="129">20</text><text x="64" y="155">10</text>
+    </g>
+    <line x1="52" y1="8" x2="52" y2="30" stroke="#89b4fa" stroke-width="1.5" marker-end="url(#sq-arrow-b)"/>
+    <line x1="76" y1="30" x2="76" y2="8" stroke="#fab387" stroke-width="1.5" marker-end="url(#sq-arrow-o)"/>
+    <text x="30" y="20" font-size="10" fill="#89b4fa" text-anchor="middle">push 进</text>
+    <text x="100" y="20" font-size="10" fill="#fab387" text-anchor="middle">pop 出</text>
+    <text x="98" y="103" font-size="10" fill="#6c7086">← top</text>
+    <text x="64" y="182" font-size="11" fill="#a6adc8" text-anchor="middle">栈 LIFO：后进先出</text>
+    <g fill="#313244" stroke="#45475a" stroke-width="1.5">
+      <rect x="166" y="80" width="28" height="30" rx="6"/><rect x="194" y="80" width="28" height="30" rx="6"/><rect x="222" y="80" width="28" height="30" rx="6"/><rect x="250" y="80" width="28" height="30" rx="6"/><rect x="278" y="80" width="28" height="30" rx="6"/>
+    </g>
+    <g font-size="13" fill="#a6e3a1" text-anchor="middle" font-weight="bold">
+      <text x="180" y="99">1</text><text x="208" y="99">2</text><text x="236" y="99">3</text><text x="264" y="99">4</text>
+    </g>
+    <line x1="164" y1="95" x2="142" y2="95" stroke="#fab387" stroke-width="1.5" marker-end="url(#sq-arrow-o)"/>
+    <text x="153" y="72" font-size="10" fill="#fab387" text-anchor="middle">front 出</text>
+    <line x1="330" y1="95" x2="308" y2="95" stroke="#89b4fa" stroke-width="1.5" marker-end="url(#sq-arrow-b)"/>
+    <text x="319" y="72" font-size="10" fill="#89b4fa" text-anchor="middle">rear 进</text>
+    <text x="180" y="126" font-size="10" fill="#6c7086" text-anchor="middle">front</text>
+    <text x="292" y="126" font-size="10" fill="#6c7086" text-anchor="middle">rear</text>
+    <text x="236" y="182" font-size="11" fill="#a6adc8" text-anchor="middle">队列 FIFO：先进先出</text>
+  </g>
+</svg>
+<div class="diagram-caption">栈在同一端 push/pop（LIFO）；队列 rear 进、front 出（FIFO）</div>
+`,
   code: `#include <stdio.h>
 
 #define MAX 5

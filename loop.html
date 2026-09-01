@@ -6,7 +6,7 @@
 <meta name="description" content="C语言循环语句交互演示：while、for、do-while、break、continue、嵌套循环，动态程序流程图实时显示执行位置。">
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
 <title>循环语句 - C语言教学演示</title>
-<link rel="stylesheet" href="style.css?v=20">
+<link rel="stylesheet" href="style.css?v=21">
 </head>
 <body>
 <nav></nav>
@@ -24,7 +24,7 @@
 <li>循环变量通常用 <code>i, j, k</code>，注意避免死循环（条件永远为真）</li>
 <li>嵌套循环：外层循环一次，内层循环完整执行一轮</li>
 </ul>
-<p class="flow-legend">右侧<strong>程序流程图</strong>会同步高亮当前执行位置：
+<p class="flow-legend">下面每个示例的<strong>程序流程图</strong>会同步高亮当前执行位置：
 <span class="legend-item"><i class="legend-dot legend-current"></i>当前节点</span>
 <span class="legend-item"><i class="legend-dot legend-visited"></i>走过的路径</span>
 <span class="legend-item"><i class="legend-line legend-true"></i>条件为真</span>
@@ -82,28 +82,33 @@
 <div class="diagram-caption">while 与 do-while：判断和执行的先后顺序不同</div>
 </div>
 <div class="intro-diagram">
-<svg viewBox="0 0 340 132" width="320" role="img" aria-label="break 与 continue 的区别示意图">
+<svg viewBox="0 0 360 165" width="320" role="img" aria-label="continue 提前结束本次循环体与 break 跳出循环的对比示意图">
   <defs>
     <marker id="bc-arrow-b" markerWidth="8" markerHeight="8" refX="7" refY="3" orient="auto"><path d="M0,0 L0,6 L7,3 z" fill="#89b4fa"/></marker>
     <marker id="bc-arrow-o" markerWidth="8" markerHeight="8" refX="7" refY="3" orient="auto"><path d="M0,0 L0,6 L7,3 z" fill="#fab387"/></marker>
     <marker id="bc-arrow-r" markerWidth="8" markerHeight="8" refX="7" refY="3" orient="auto"><path d="M0,0 L0,6 L7,3 z" fill="#f38ba8"/></marker>
   </defs>
-  <polygon points="70,29 112,57 70,85 28,57" fill="#313244" stroke="#45475a" stroke-width="1.5"/>
-  <text x="70" y="61" font-family="Consolas,monospace" font-size="12" fill="#cdd6f4" text-anchor="middle">条件？</text>
-  <rect x="160" y="43" width="70" height="28" rx="6" fill="#313244" stroke="#45475a" stroke-width="1.5"/>
-  <text x="195" y="61" font-family="Consolas,monospace" font-size="12" fill="#cdd6f4" text-anchor="middle">循环体</text>
-  <line x1="112" y1="57" x2="160" y2="57" stroke="#89b4fa" stroke-width="1.5" marker-end="url(#bc-arrow-b)"/>
-  <text x="132" y="50" font-size="10" fill="#a6e3a1">真</text>
-  <path d="M 195 71 C 175 105, 95 107, 72 87" fill="none" stroke="#89b4fa" stroke-width="1.5" stroke-dasharray="5,4" marker-end="url(#bc-arrow-b)"/>
-  <text x="120" y="110" font-size="10" fill="#6c7086">下一轮</text>
-  <path d="M 185 43 C 165 8, 95 3, 72 27" fill="none" stroke="#fab387" stroke-width="1.5" stroke-dasharray="5,4" marker-end="url(#bc-arrow-o)"/>
-  <text x="118" y="14" font-size="10" fill="#fab387">continue 跳过本次</text>
-  <line x1="230" y1="57" x2="258" y2="57" stroke="#f38ba8" stroke-width="1.5" marker-end="url(#bc-arrow-r)"/>
-  <text x="228" y="50" font-size="10" fill="#f38ba8">break</text>
-  <rect x="262" y="43" width="64" height="28" rx="6" fill="#313244" stroke="#45475a" stroke-width="1.5"/>
-  <text x="294" y="61" font-family="Consolas,monospace" font-size="12" fill="#cdd6f4" text-anchor="middle">循环外</text>
+  <polygon points="66,42 108,72 66,102 24,72" fill="#313244" stroke="#45475a" stroke-width="1.5"/>
+  <text x="66" y="76" font-family="Consolas,monospace" font-size="12" fill="#cdd6f4" text-anchor="middle">条件？</text>
+  <rect x="160" y="44" width="110" height="28" rx="6" fill="#313244" stroke="#45475a" stroke-width="1.5"/>
+  <text x="215" y="62" font-family="Consolas,monospace" font-size="11" fill="#cdd6f4" text-anchor="middle">已执行语句</text>
+  <rect x="160" y="72" width="110" height="28" rx="6" fill="#313244" stroke="#f38ba8" stroke-width="1.5" stroke-dasharray="4 3"/>
+  <line x1="164" y1="76" x2="266" y2="96" stroke="#f38ba8" stroke-width="1" opacity="0.55"/>
+  <line x1="266" y1="76" x2="164" y2="96" stroke="#f38ba8" stroke-width="1" opacity="0.55"/>
+  <text x="215" y="90" font-family="Consolas,monospace" font-size="11" fill="#6c7086" text-anchor="middle">剩余语句被跳过</text>
+  <line x1="108" y1="66" x2="160" y2="58" stroke="#89b4fa" stroke-width="1.5" marker-end="url(#bc-arrow-b)"/>
+  <text x="126" y="52" font-size="10" fill="#a6e3a1">真</text>
+  <circle cx="160" cy="72" r="3" fill="#fab387"/>
+  <path d="M 160 72 C 132 26, 90 12, 68 40" fill="none" stroke="#fab387" stroke-width="1.5" stroke-dasharray="5,4" marker-end="url(#bc-arrow-o)"/>
+  <text x="130" y="16" font-size="10" fill="#fab387" text-anchor="middle">continue：提前结束本次循环体</text>
+  <path d="M 215 100 C 200 134, 92 134, 68 104" fill="none" stroke="#89b4fa" stroke-width="1.5" stroke-dasharray="5,4" marker-end="url(#bc-arrow-b)"/>
+  <text x="140" y="142" font-size="10" fill="#6c7086" text-anchor="middle">正常执行完剩余语句，才进入下一轮</text>
+  <line x1="270" y1="58" x2="294" y2="58" stroke="#f38ba8" stroke-width="1.5" marker-end="url(#bc-arrow-r)"/>
+  <text x="282" y="50" font-size="10" fill="#f38ba8" text-anchor="middle">break</text>
+  <rect x="298" y="44" width="58" height="28" rx="6" fill="#313244" stroke="#45475a" stroke-width="1.5"/>
+  <text x="327" y="62" font-family="Consolas,monospace" font-size="11" fill="#cdd6f4" text-anchor="middle">循环外</text>
 </svg>
-<div class="diagram-caption">continue 跳过本次回到判断；break 直接跳出整个循环</div>
+<div class="diagram-caption">continue：循环体没执行完就提前回到判断（剩余语句被跳过）；break：直接跳出整个循环</div>
 </div>
 </div>
 </div>
@@ -128,7 +133,7 @@
 </div>
 </div>
 
-<script src="demo-engine.js?v=20"></script>
+<script src="demo-engine.js?v=21"></script>
 <script>
 /* ========== demo0: while 循环 ========== */
 createDemo("demo0", {
