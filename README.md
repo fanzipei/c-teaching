@@ -14,9 +14,9 @@
 | 数据类型与赋值语句 | 基本类型、printf/scanf、类型转换、复合赋值、自增自减、常量与宏 |
 | 条件语句 | if-else、switch、三目运算符、短路求值、嵌套判断 |
 | 循环语句 | while、for、do-while、break、continue、嵌套循环（含动态程序流程图） |
-| 函数 | 函数定义、值传递、返回值、作用域、递归、数组参数 |
-| 数组 | 一维数组定义、遍历、排序、栈与队列；二维矩阵、转置、行列求和、数组参数 |
-| 指针 | 取地址与解引用、指针运算、指针参数、多级指针、字符串、malloc/free |
+| 数组 | 一维数组定义、遍历、排序、字符串连接/比较/查找；二维矩阵、转置、行列求和、数组参数 |
+| 函数 | 函数定义、返回值、作用域、递归、数组参数、栈与队列综合应用 |
+| 指针 | 取地址与解引用、指针运算、指针参数、多级指针、字符串、指针数组字典序排序、malloc/free |
 | 结构体 | 结构体定义、结构体数组、结构体指针、嵌套、typedef、链表、malloc 创建 |
 
 ## 功能特性
@@ -47,6 +47,7 @@ node tools/verify_quiz.js   # 用 gcc 实际编译运行，校验全部练习题
 node tools/check_mobile.js  # 移动端（390px 视口）横向溢出体检
 node tools/accessibility.js # 地标、控件名称、动态播报与章节导航无障碍检查
 node tools/check_flowcharts.js # 流程图箭头、标签边界和连线穿越检查
+node tools/_check_if.js       # 检查所有 demo 中的 if 条件行是否都被步骤覆盖
 node tools/bump_version.js  # 修改 style.css / demo-engine.js 后统一升级 ?v= 缓存版本号
 
 # 或一次运行全部浏览器回归

@@ -6,7 +6,7 @@
 <meta name="description" content="C语言函数交互演示：函数定义、值传递、返回值、作用域、递归，可视化调用栈与递归调用树。">
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
 <title>函数 - C语言教学演示</title>
-<link rel="stylesheet" href="style.css?v=25">
+<link rel="stylesheet" href="style.css?v=26">
 </head>
 <body>
 <nav></nav>
@@ -63,6 +63,7 @@
   <div id="demo5"></div>
   <div id="demo6"></div>
   <div id="demo7"></div>
+  <div id="demo8"></div>
 </div>
 <h2>章节练习</h2>
 <div class="quiz-grid">
@@ -75,8 +76,8 @@
 </div>
 </main>
 
-<script src="site-config.js?v=25"></script>
-<script src="demo-engine.js?v=25"></script>
+<script src="site-config.js?v=26"></script>
+<script src="demo-engine.js?v=26"></script>
 <script>
 createDemo("demo0", {
   title: "函数的定义与调用",
@@ -106,100 +107,6 @@ int main() {
   ]
 });
 createDemo("demo1", {
-  title: "值传递 vs 传地址",
-  subtitle: "为什么 swap_wrong 换不动、swap_right 才行",
-  diagram: `<svg viewBox="0 0 320 148" width="320" role="img" aria-label="传值调用：副本交换示意图">
-  <defs>
-    <marker id="sw-copy" markerWidth="8" markerHeight="8" refX="7" refY="3" orient="auto"><path d="M0,0 L0,6 L7,3 z" fill="#89b4fa"/></marker>
-    <marker id="sw-swap" markerWidth="7" markerHeight="7" refX="6" refY="2.5" orient="auto-start-reverse"><path d="M0,0 L0,5 L6,2.5 z" fill="#fab387"/></marker>
-  </defs>
-  <text x="160" y="16" font-size="12" fill="#cdd6f4" text-anchor="middle">传值：swap_wrong(x, y)</text>
-  <text x="84" y="34" font-family="Consolas,monospace" font-size="10" fill="#6c7086" text-anchor="middle">main()</text>
-  <rect x="24" y="40" width="120" height="56" rx="6" fill="#313244" stroke="#45475a" stroke-width="1.5"/>
-  <rect x="32" y="52" width="50" height="28" rx="4" fill="#1a1a28" stroke="#45475a"/>
-  <rect x="90" y="52" width="50" height="28" rx="4" fill="#1a1a28" stroke="#45475a"/>
-  <text x="57" y="70" font-family="Consolas,monospace" font-size="12" fill="#cdd6f4" text-anchor="middle">x = 3</text>
-  <text x="115" y="70" font-family="Consolas,monospace" font-size="12" fill="#cdd6f4" text-anchor="middle">y = 7</text>
-  <line x1="144" y1="68" x2="196" y2="68" stroke="#89b4fa" stroke-width="1.5" stroke-dasharray="5,4" marker-end="url(#sw-copy)"/>
-  <text x="170" y="60" font-size="10" fill="#89b4fa" text-anchor="middle">复制</text>
-  <text x="252" y="34" font-family="Consolas,monospace" font-size="10" fill="#6c7086" text-anchor="middle">swap_wrong()</text>
-  <rect x="196" y="40" width="112" height="56" rx="6" fill="#313244" stroke="#45475a" stroke-width="1.5"/>
-  <rect x="204" y="52" width="46" height="28" rx="4" fill="#1a1a28" stroke="#45475a"/>
-  <rect x="258" y="52" width="46" height="28" rx="4" fill="#1a1a28" stroke="#45475a"/>
-  <text x="227" y="70" font-family="Consolas,monospace" font-size="12" fill="#cdd6f4" text-anchor="middle">a = 3</text>
-  <text x="281" y="70" font-family="Consolas,monospace" font-size="12" fill="#cdd6f4" text-anchor="middle">b = 7</text>
-  <path d="M 222 48 Q 254 30 286 48" fill="none" stroke="#fab387" stroke-width="1.5" marker-start="url(#sw-swap)" marker-end="url(#sw-swap)"/>
-  <text x="160" y="126" font-size="11" fill="#f38ba8" text-anchor="middle">副本里 a、b 交换了，main 的 x、y 根本没动 ✗</text>
-</svg>
-<div class="diagram-caption">传值：形参是实参的副本，交换只发生在副本上</div>
-<svg viewBox="0 0 320 162" width="320" role="img" aria-label="传地址调用：指针改到原件示意图">
-  <defs><marker id="sw-pt" markerWidth="8" markerHeight="8" refX="7" refY="3" orient="auto"><path d="M0,0 L0,6 L7,3 z" fill="#f38ba8"/></marker></defs>
-  <text x="160" y="16" font-size="12" fill="#cdd6f4" text-anchor="middle">传地址：swap_right(&amp;x, &amp;y)</text>
-  <text x="84" y="34" font-family="Consolas,monospace" font-size="10" fill="#6c7086" text-anchor="middle">main()</text>
-  <rect x="24" y="40" width="120" height="56" rx="6" fill="#313244" stroke="#45475a" stroke-width="1.5"/>
-  <rect x="32" y="52" width="50" height="28" rx="4" fill="#1a1a28" stroke="#45475a"/>
-  <rect x="90" y="52" width="50" height="28" rx="4" fill="#1a1a28" stroke="#45475a"/>
-  <text x="57" y="48" font-family="Consolas,monospace" font-size="9" fill="#6c7086" text-anchor="middle">x</text>
-  <text x="115" y="48" font-family="Consolas,monospace" font-size="9" fill="#6c7086" text-anchor="middle">y</text>
-  <text x="57" y="70" font-family="Consolas,monospace" font-size="12" fill="#a6e3a1" text-anchor="middle" font-weight="bold">7</text>
-  <text x="115" y="70" font-family="Consolas,monospace" font-size="12" fill="#a6e3a1" text-anchor="middle" font-weight="bold">3</text>
-  <text x="252" y="34" font-family="Consolas,monospace" font-size="10" fill="#6c7086" text-anchor="middle">swap_right()</text>
-  <rect x="196" y="40" width="112" height="56" rx="6" fill="#313244" stroke="#45475a" stroke-width="1.5"/>
-  <rect x="204" y="52" width="46" height="28" rx="4" fill="#1a1a28" stroke="#f38ba8"/>
-  <rect x="258" y="52" width="46" height="28" rx="4" fill="#1a1a28" stroke="#f38ba8"/>
-  <text x="227" y="48" font-family="Consolas,monospace" font-size="9" fill="#6c7086" text-anchor="middle">a</text>
-  <text x="281" y="48" font-family="Consolas,monospace" font-size="9" fill="#6c7086" text-anchor="middle">b</text>
-  <text x="227" y="70" font-family="Consolas,monospace" font-size="10" fill="#f38ba8" text-anchor="middle">0x1000</text>
-  <text x="281" y="70" font-family="Consolas,monospace" font-size="10" fill="#f38ba8" text-anchor="middle">0x1004</text>
-  <line x1="204" y1="64" x2="86" y2="64" stroke="#f38ba8" stroke-width="1.5" marker-end="url(#sw-pt)"/>
-  <text x="145" y="58" font-size="9" fill="#f38ba8" text-anchor="middle">*a 就是 x</text>
-  <line x1="258" y1="80" x2="144" y2="80" stroke="#f38ba8" stroke-width="1.5" marker-end="url(#sw-pt)"/>
-  <text x="201" y="94" font-size="9" fill="#f38ba8" text-anchor="middle">*b 就是 y</text>
-  <text x="160" y="142" font-size="11" fill="#a6e3a1" text-anchor="middle">顺着地址直接改到 main 的 x、y——交换成功 ✓</text>
-</svg>
-<div class="diagram-caption">传地址：形参存的是实参的地址，*a 改的就是原件（下一章《指针》详解）</div>`,
-  code: `#include <stdio.h>
-
-void swap_wrong(int a, int b) {
-    int t = a;
-    a = b;
-    b = t;
-}
-
-void swap_right(int *a, int *b) {
-    int t = *a;
-    *a = *b;
-    *b = t;
-}
-
-int main() {
-    int x = 3, y = 7;
-    swap_wrong(x, y);
-    printf("wrong: x=%d, y=%d\\n", x, y);
-    swap_right(&x, &y);
-    printf("right: x=%d, y=%d\\n", x, y);
-    return 0;
-}`,
-  vizTypes: ["vars","stack","console"],
-  steps: [
-    { line: 14, info: "main() 开始" },
-    { line: 15, vars: {x:{value:3,type:"int"},y:{value:7,type:"int"}}, info: "main 里：x = 3，y = 7" },
-    { line: 16, info: "先调用 swap_wrong(x, y)——把 x、y 的值传进去" },
-    { line: 3, stack: [{name:"main",value:"x=3, y=7"},{name:"swap_wrong",value:"a=3, b=7（副本）",highlight:true}], vars: {a:{value:3,type:"int"},b:{value:7,type:"int"},t:{value:3,type:"int"}}, info: "进入 swap_wrong：形参 a、b 是 x、y 的副本；t = a = 3" },
-    { line: 4, vars: {a:{value:7,type:"int"}}, info: "a = b → 副本 a 变成 7" },
-    { line: 5, vars: {b:{value:3,type:"int"}}, info: "b = t → 副本 b 变成 3。副本里确实交换成功了" },
-    { line: 6, stack: [{name:"main",value:"x=3, y=7",highlight:true}], info: "swap_wrong 结束，副本 a、b、t 随之销毁" },
-    { line: 17, output: "wrong: x=3, y=7", info: "main 的 x、y 根本没动——交换失败！" },
-    { line: 18, info: "再试 swap_right(&x, &y)——这次传的是 x、y 的地址" },
-    { line: 9, stack: [{name:"main",value:"x=3, y=7"},{name:"swap_right",value:"a=&x, b=&y",highlight:true}], vars: {a:{value:"0x1000",type:"int*"},b:{value:"0x1004",type:"int*"},t:{value:3,type:"int"}}, info: "进入 swap_right：形参存的是地址，*a 就是 x 本人；t = *a = 3" },
-    { line: 10, vars: {x:{value:7,type:"int"}}, info: "*a = *b：顺着地址直接改到 main 的 x——x 变成 7" },
-    { line: 11, vars: {y:{value:3,type:"int"}}, info: "*b = t：y 变成 3——原件被真正交换了" },
-    { line: 12, stack: [{name:"main",value:"x=7, y=3",highlight:true}], info: "swap_right 结束" },
-    { line: 19, output: "wrong: x=3, y=7\nright: x=7, y=3", info: "这次交换成功！" },
-    { line: 20, info: "关键区别：传值给的是副本，怎么改都碰不到原件；传地址才能顺藤摸瓜改原件（下一章《指针》详解）" }
-  ]
-});
-createDemo("demo2", {
   title: "返回值与表达式",
   subtitle: "函数调用可以像值一样使用",
   code: `#include <stdio.h>
@@ -229,7 +136,7 @@ int main() {
     { line: 11, info: "程序结束" }
   ]
 });
-createDemo("demo3", {
+createDemo("demo2", {
   title: "局部变量与作用域",
   subtitle: "同名变量在不同函数中互不干扰",
   code: `#include <stdio.h>
@@ -260,7 +167,7 @@ int main() {
     { line: 13, info: "程序结束" }
   ]
 });
-createDemo("demo4", {
+createDemo("demo3", {
   title: "递归函数",
   subtitle: "函数调用自身：以阶乘为例",
   diagram: `
@@ -337,7 +244,7 @@ int main() {
     { line: 11, info: "程序结束" }
   ]
 });
-createDemo("demo5", {
+createDemo("demo4", {
   title: "函数与数组",
   subtitle: "数组作为参数时退化为指针（传递首地址）",
   code: `#include <stdio.h>
@@ -380,7 +287,7 @@ int main() {
   ]
 });
 /* ========== demo6: 递归——斐波那契数列（含递归调用树） ========== */
-createDemo("demo6", {
+createDemo("demo5", {
   title: "递归：斐波那契数列",
   subtitle: "右侧调用树同步生长：蓝色是当前调用，绿色是已返回的调用",
   code: `#include <stdio.h>
@@ -419,7 +326,7 @@ int main() {
   ]
 });
 /* ========== demo7: 递归——汉诺塔 ========== */
-createDemo("demo7", {
+createDemo("demo6", {
   title: "递归：汉诺塔",
   subtitle: "把 n 个盘子从 A 移到 C：先移上面 n-1 个，再移最大的，最后移回 n-1 个",
   code: `#include <stdio.h>
@@ -461,6 +368,172 @@ int main() {
     { line: 4, outputAppend: "A -> C", hanoi: [{peg:"A",disks:[]},{peg:"B",disks:[]},{peg:"C",disks:[3,2,{size:1,highlight:true}]}], info: "盘子 1 从 A 移到 C，③完成，3 个盘子全部到位！" },
     { line: 6, stack: [{name:"main",value:""}], info: "所有递归调用依次返回。共移动 7 步 = 2³−1；n 个盘子需要 2ⁿ−1 步" },
     { line: 14, info: "程序结束" }
+  ]
+});
+/* ========== 综合应用：用函数封装栈与队列 ========== */
+createDemo("demo7", {
+  title: "用数组实现栈（Stack）",
+  subtitle: "把初始化、入栈、出栈、判空封装成函数：后进先出（LIFO）",
+  diagram: `
+<svg viewBox="0 0 340 190" width="320" role="img" aria-label="栈与队列对比：栈在同一端 push 进 pop 出（LIFO 后进先出），队列 rear 端进 front 端出（FIFO 先进先出）">
+  <defs>
+    <marker id="sq-arrow-b" markerWidth="8" markerHeight="8" refX="7" refY="3" orient="auto"><path d="M0,0 L0,6 L7,3 z" fill="#89b4fa"/></marker>
+    <marker id="sq-arrow-o" markerWidth="8" markerHeight="8" refX="7" refY="3" orient="auto"><path d="M0,0 L0,6 L7,3 z" fill="#fab387"/></marker>
+  </defs>
+  <g font-family="Consolas,monospace">
+    <g fill="#313244" stroke="#45475a" stroke-width="1.5">
+      <rect x="36" y="34" width="56" height="26" rx="6"/><rect x="36" y="60" width="56" height="26" rx="6"/><rect x="36" y="86" width="56" height="26" rx="6"/><rect x="36" y="112" width="56" height="26" rx="6"/><rect x="36" y="138" width="56" height="26" rx="6"/>
+    </g>
+    <g font-size="13" fill="#a6e3a1" text-anchor="middle" font-weight="bold">
+      <text x="64" y="103">30</text><text x="64" y="129">20</text><text x="64" y="155">10</text>
+    </g>
+    <line x1="52" y1="8" x2="52" y2="30" stroke="#89b4fa" stroke-width="1.5" marker-end="url(#sq-arrow-b)"/>
+    <line x1="76" y1="30" x2="76" y2="8" stroke="#fab387" stroke-width="1.5" marker-end="url(#sq-arrow-o)"/>
+    <text x="30" y="20" font-size="10" fill="#89b4fa" text-anchor="middle">push 进</text>
+    <text x="100" y="20" font-size="10" fill="#fab387" text-anchor="middle">pop 出</text>
+    <text x="98" y="103" font-size="10" fill="#6c7086">← top</text>
+    <text x="64" y="182" font-size="11" fill="#a6adc8" text-anchor="middle">栈 LIFO：后进先出</text>
+    <g fill="#313244" stroke="#45475a" stroke-width="1.5">
+      <rect x="166" y="80" width="28" height="30" rx="6"/><rect x="194" y="80" width="28" height="30" rx="6"/><rect x="222" y="80" width="28" height="30" rx="6"/><rect x="250" y="80" width="28" height="30" rx="6"/><rect x="278" y="80" width="28" height="30" rx="6"/>
+    </g>
+    <g font-size="13" fill="#a6e3a1" text-anchor="middle" font-weight="bold">
+      <text x="180" y="99">1</text><text x="208" y="99">2</text><text x="236" y="99">3</text><text x="264" y="99">4</text>
+    </g>
+    <line x1="164" y1="95" x2="142" y2="95" stroke="#fab387" stroke-width="1.5" marker-end="url(#sq-arrow-o)"/>
+    <text x="153" y="72" font-size="10" fill="#fab387" text-anchor="middle">front 出</text>
+    <line x1="330" y1="95" x2="308" y2="95" stroke="#89b4fa" stroke-width="1.5" marker-end="url(#sq-arrow-b)"/>
+    <text x="319" y="72" font-size="10" fill="#89b4fa" text-anchor="middle">rear 进</text>
+    <text x="180" y="126" font-size="10" fill="#6c7086" text-anchor="middle">front</text>
+    <text x="292" y="126" font-size="10" fill="#6c7086" text-anchor="middle">rear</text>
+    <text x="236" y="182" font-size="11" fill="#a6adc8" text-anchor="middle">队列 FIFO：先进先出</text>
+  </g>
+</svg>
+<div class="diagram-caption">栈在同一端 push/pop（LIFO）；队列 rear 进、front 出（FIFO）</div>
+`,
+  code: `#include <stdio.h>
+
+#define MAX 5
+
+int stack[MAX];
+int top;
+
+void init() {
+    top = -1;
+}
+
+int is_empty() {
+    return top == -1;
+}
+
+void push(int x) {
+    stack[++top] = x;
+}
+
+int pop() {
+    return stack[top--];
+}
+
+int main() {
+    init();
+    push(10);
+    push(20);
+    push(30);
+    printf("pop: %d\\n", pop());
+    printf("pop: %d\\n", pop());
+    if (is_empty()) {
+        printf("栈已空\\n");
+    } else {
+        printf("栈顶下标 top = %d\\n", top);
+    }
+    return 0;
+}`,
+  vizTypes: ["vars","array","stack","console"],
+  steps: [
+    { line: 23, info: "main() 开始" },
+    { line: 24, stack: [{name:"main",value:"",highlight:true}], info: "调用 init() 初始化栈" },
+    { line: 8, vars: {top:{value:-1,type:"int"}}, array: {name:"stack", cells:[{val:null,empty:true},{val:null,empty:true},{val:null,empty:true},{val:null,empty:true},{val:null,empty:true}], markers:[{index:0,label:"top=-1"}]}, stack: [{name:"main",value:""},{name:"init",value:"",highlight:true}], info: "进入 init()：top = -1 表示空栈（标记放在下标 0 处仅作提示）" },
+    { line: 25, stack: [{name:"main",value:"",highlight:true}], info: "init() 返回，调用 push(10)" },
+    { line: 16, vars: {top:{value:0,type:"int"},x:{value:10,type:"int"}}, array: {name:"stack", cells:[{val:10,highlight:true},{val:null,empty:true},{val:null,empty:true},{val:null,empty:true},{val:null,empty:true}], markers:[{index:0,label:"top"}]}, stack: [{name:"main",value:""},{name:"push",value:"x=10",highlight:true}], info: "进入 push(10)：先 ++top（top=0），再写入 stack[0]=10" },
+    { line: 26, stack: [{name:"main",value:"",highlight:true}], info: "push 返回，调用 push(20)" },
+    { line: 16, vars: {top:{value:1,type:"int"},x:{value:20,type:"int"}}, array: {name:"stack", cells:[{val:10},{val:20,highlight:true},{val:null,empty:true},{val:null,empty:true},{val:null,empty:true}], markers:[{index:1,label:"top"}]}, stack: [{name:"main",value:""},{name:"push",value:"x=20",highlight:true}], info: "push(20)：top=1，stack[1]=20" },
+    { line: 27, stack: [{name:"main",value:"",highlight:true}], info: "push 返回，调用 push(30)" },
+    { line: 16, vars: {top:{value:2,type:"int"},x:{value:30,type:"int"}}, array: {name:"stack", cells:[{val:10},{val:20},{val:30,highlight:true},{val:null,empty:true},{val:null,empty:true}], markers:[{index:2,label:"top"}]}, stack: [{name:"main",value:""},{name:"push",value:"x=30",highlight:true}], info: "push(30)：top=2，stack[2]=30" },
+    { line: 28, stack: [{name:"main",value:"",highlight:true}], info: "printf 前先调用 pop() 取栈顶" },
+    { line: 20, vars: {top:{value:1,type:"int"}}, array: {name:"stack", cells:[{val:10},{val:20},{val:30,empty:true},{val:null,empty:true},{val:null,empty:true}], markers:[{index:1,label:"top"}]}, stack: [{name:"main",value:""},{name:"pop",value:"",highlight:true,ret:30}], info: "进入 pop()：先取 stack[2]=30 作为返回值，再 top--（top=1）。30 仍在数组里但已不属于栈" },
+    { line: 28, output: "pop: 30", stack: [{name:"main",value:"",highlight:true}], info: "pop() 返回 30，printf 输出" },
+    { line: 29, stack: [{name:"main",value:"",highlight:true}], info: "再次调用 pop()" },
+    { line: 20, vars: {top:{value:0,type:"int"}}, array: {name:"stack", cells:[{val:10},{val:20,empty:true},{val:30,empty:true},{val:null,empty:true},{val:null,empty:true}], markers:[{index:0,label:"top"}]}, stack: [{name:"main",value:""},{name:"pop",value:"",highlight:true,ret:20}], info: "pop()：返回 20，top=0" },
+    { line: 29, output: "pop: 30\npop: 20", stack: [{name:"main",value:"",highlight:true}], info: "输出 20。后进先出（LIFO）" },
+    { line: 30, stack: [{name:"main",value:"",highlight:true}], info: "调用 is_empty() 判断栈是否为空" },
+    { line: 12, stack: [{name:"main",value:""},{name:"is_empty",value:"",highlight:true,ret:0}], info: "is_empty()：top=0 ≠ -1，返回 0（假），栈非空，走 else 分支" },
+    { line: 33, output: "pop: 30\npop: 20\n栈顶下标 top = 0", stack: [{name:"main",value:"",highlight:true}], info: "输出当前栈顶下标" },
+    { line: 35, info: "程序结束" }
+  ]
+});
+createDemo("demo8", {
+  title: "用数组实现队列（Queue）",
+  subtitle: "把初始化、入队、出队、判空封装成函数：先进先出（FIFO）",
+  code: `#include <stdio.h>
+
+#define MAX 5
+
+int queue[MAX];
+int front, rear;
+
+void init() {
+    front = rear = 0;
+}
+
+int is_empty() {
+    return front == rear;
+}
+
+void enqueue(int x) {
+    queue[rear++] = x;
+}
+
+int dequeue() {
+    return queue[front++];
+}
+
+int main() {
+    init();
+    enqueue(1);
+    enqueue(2);
+    enqueue(3);
+    printf("出队: %d\\n", dequeue());
+    printf("出队: %d\\n", dequeue());
+    enqueue(4);
+    if (is_empty()) {
+        printf("队列已空\\n");
+    } else {
+        printf("front=%d rear=%d\\n", front, rear);
+    }
+    return 0;
+}`,
+  vizTypes: ["vars","array","stack","console"],
+  steps: [
+    { line: 23, info: "main() 开始" },
+    { line: 24, stack: [{name:"main",value:"",highlight:true}], info: "调用 init() 初始化队列" },
+    { line: 8, vars: {front:{value:0,type:"int"},rear:{value:0,type:"int"}}, array: {name:"queue", cells:[{val:null,empty:true},{val:null,empty:true},{val:null,empty:true},{val:null,empty:true},{val:null,empty:true}], markers:[{index:0,label:"front"},{index:0,label:"rear"}]}, stack: [{name:"main",value:""},{name:"init",value:"",highlight:true}], info: "进入 init()：front = rear = 0，空队列" },
+    { line: 25, stack: [{name:"main",value:"",highlight:true}], info: "init() 返回，调用 enqueue(1)" },
+    { line: 16, vars: {rear:{value:1,type:"int"},x:{value:1,type:"int"}}, array: {name:"queue", cells:[{val:1,highlight:true},{val:null,empty:true},{val:null,empty:true},{val:null,empty:true},{val:null,empty:true}], markers:[{index:0,label:"front"},{index:1,label:"rear"}]}, stack: [{name:"main",value:""},{name:"enqueue",value:"x=1",highlight:true}], info: "进入 enqueue(1)：queue[0]=1，rear 后移到 1" },
+    { line: 26, stack: [{name:"main",value:"",highlight:true}], info: "enqueue 返回，调用 enqueue(2)" },
+    { line: 16, vars: {rear:{value:2,type:"int"},x:{value:2,type:"int"}}, array: {name:"queue", cells:[{val:1},{val:2,highlight:true},{val:null,empty:true},{val:null,empty:true},{val:null,empty:true}], markers:[{index:0,label:"front"},{index:2,label:"rear"}]}, stack: [{name:"main",value:""},{name:"enqueue",value:"x=2",highlight:true}], info: "enqueue(2)：queue[1]=2，rear=2" },
+    { line: 27, stack: [{name:"main",value:"",highlight:true}], info: "enqueue 返回，调用 enqueue(3)" },
+    { line: 16, vars: {rear:{value:3,type:"int"},x:{value:3,type:"int"}}, array: {name:"queue", cells:[{val:1},{val:2},{val:3,highlight:true},{val:null,empty:true},{val:null,empty:true}], markers:[{index:0,label:"front"},{index:3,label:"rear"}]}, stack: [{name:"main",value:""},{name:"enqueue",value:"x=3",highlight:true}], info: "enqueue(3)：queue[2]=3，rear=3" },
+    { line: 28, stack: [{name:"main",value:"",highlight:true}], info: "printf 前先调用 dequeue() 取队首" },
+    { line: 20, vars: {front:{value:1,type:"int"}}, array: {name:"queue", cells:[{val:1,empty:true},{val:2},{val:3},{val:null,empty:true},{val:null,empty:true}], markers:[{index:1,label:"front"},{index:3,label:"rear"}]}, stack: [{name:"main",value:""},{name:"dequeue",value:"",highlight:true,ret:1}], info: "进入 dequeue()：取 queue[0]=1 作为返回值，front 后移到 1" },
+    { line: 28, output: "出队: 1", stack: [{name:"main",value:"",highlight:true}], info: "dequeue() 返回 1，printf 输出。先进先出（FIFO）" },
+    { line: 29, stack: [{name:"main",value:"",highlight:true}], info: "再次调用 dequeue()" },
+    { line: 20, vars: {front:{value:2,type:"int"}}, array: {name:"queue", cells:[{val:1,empty:true},{val:2,empty:true},{val:3},{val:null,empty:true},{val:null,empty:true}], markers:[{index:2,label:"front"},{index:3,label:"rear"}]}, stack: [{name:"main",value:""},{name:"dequeue",value:"",highlight:true,ret:2}], info: "dequeue()：返回 queue[1]=2，front=2" },
+    { line: 29, output: "出队: 1\n出队: 2", stack: [{name:"main",value:"",highlight:true}], info: "输出 2" },
+    { line: 30, stack: [{name:"main",value:"",highlight:true}], info: "调用 enqueue(4)" },
+    { line: 16, vars: {rear:{value:4,type:"int"},x:{value:4,type:"int"}}, array: {name:"queue", cells:[{val:1,empty:true},{val:2,empty:true},{val:3},{val:4,highlight:true},{val:null,empty:true}], markers:[{index:2,label:"front"},{index:4,label:"rear"}]}, stack: [{name:"main",value:""},{name:"enqueue",value:"x=4",highlight:true}], info: "enqueue(4)：queue[3]=4，rear=4" },
+    { line: 31, stack: [{name:"main",value:"",highlight:true}], info: "调用 is_empty() 判断队列是否为空" },
+    { line: 12, stack: [{name:"main",value:""},{name:"is_empty",value:"",highlight:true,ret:0}], info: "is_empty()：front=2 ≠ rear=4，返回 0（假），队列非空，走 else 分支" },
+    { line: 34, output: "出队: 1\n出队: 2\nfront=2 rear=4", stack: [{name:"main",value:"",highlight:true}], info: "队列中还剩 3 和 4（front 到 rear 之间）" },
+    { line: 36, info: "程序结束" }
   ]
 });
 /* ========== 章节练习：3 道预测输出 + 3 道改错 ========== */

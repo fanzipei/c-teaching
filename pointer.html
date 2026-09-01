@@ -6,7 +6,7 @@
 <meta name="description" content="C语言指针交互演示：取地址与解引用、指针运算、指针参数、多级指针、字符串、malloc/free，直观展示指针与内存数据的关系。">
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
 <title>指针 - C语言教学演示</title>
-<link rel="stylesheet" href="style.css?v=25">
+<link rel="stylesheet" href="style.css?v=26">
 </head>
 <body>
 <nav></nav>
@@ -53,6 +53,7 @@
   <div id="demo5"></div>
   <div id="demo6"></div>
   <div id="demo7"></div>
+  <div id="demo8"></div>
 </div>
 <h2>章节练习</h2>
 <div class="quiz-grid">
@@ -65,8 +66,8 @@
 </div>
 </main>
 
-<script src="site-config.js?v=25"></script>
-<script src="demo-engine.js?v=25"></script>
+<script src="site-config.js?v=26"></script>
+<script src="demo-engine.js?v=26"></script>
 <script>
 createDemo("demo0", {
   title: "指针基础：& 与 *",
@@ -297,7 +298,59 @@ int main() {
   ]
 });
 /* ========== demo6: malloc 与 free ========== */
+/* ========== demo6: 字符指针数组排序 ========== */
 createDemo("demo6", {
+  title: "字符指针数组：字符串字典序排序",
+  subtitle: "只交换指针，字符串本身原地不动——轻量排序",
+  code: `#include <stdio.h>
+#include <string.h>
+
+int main() {
+    char *names[4] = {"Pear", "Apple", "Kiwi", "Banana"};
+    char *tmp;
+    int i, j;
+    for (i = 0; i < 3; i++) {
+        for (j = 0; j < 3 - i; j++) {
+            if (strcmp(names[j], names[j+1]) > 0) {
+                tmp = names[j];
+                names[j] = names[j+1];
+                names[j+1] = tmp;
+            }
+        }
+    }
+    for (i = 0; i < 4; i++) {
+        printf("%s\\n", names[i]);
+    }
+    return 0;
+}`,
+  vizTypes: ["vars","array","loop","console"],
+  steps: [
+    { line: 3, info: "main() 开始" },
+    { line: 4, vars: {names:{value:"char*[4]",type:"array"}}, array: [{name:"names[]（指针）", cells:[{val:"0x1000"},{val:"0x1100"},{val:"0x1200"},{val:"0x1300"}]}, {name:"字符串常量区（不动）", cells:[{val:"Pear"},{val:"Apple"},{val:"Kiwi"},{val:"Banana"}], markers:[{index:0,label:"0x1000"},{index:1,label:"0x1100"},{index:2,label:"0x1200"},{index:3,label:"0x1300"}]}], info: "names 是 4 个字符指针的数组：每个元素存一个地址，指向常量区的字符串。注意两套格子：上面是地址，下面才是字符串本体" },
+    { line: 5, vars: {tmp:{value:"?",type:"char*"}}, info: "tmp 是交换用的临时指针" },
+    { line: 7, vars: {i:{value:0,type:"int"}}, loop: [{label:"i=0",active:true}], info: "外层 i=0：把最大的字符串冒泡到末尾" },
+    { line: 9, vars: {j:{value:0,type:"int"}}, loop: [{label:"i=0 j=0",active:true}], array: [{name:"names[]（指针）", cells:[{val:"0x1000",highlight:true},{val:"0x1100",highlight:true},{val:"0x1200"},{val:"0x1300"}]}, {name:"字符串常量区（不动）", cells:[{val:"Pear",highlight:true},{val:"Apple",highlight:true},{val:"Kiwi"},{val:"Banana"}], markers:[{index:0,label:"0x1000"},{index:1,label:"0x1100"},{index:2,label:"0x1200"},{index:3,label:"0x1300"}]}], info: "j=0：strcmp(names[0], names[1]) 即比较 \"Pear\" 和 \"Apple\"：'P' > 'A'，需要交换" },
+    { line: 10, vars: {tmp:{value:"0x1000",type:"char*"}}, info: "tmp = names[0]：暂存地址 0x1000" },
+    { line: 12, array: [{name:"names[]（指针）", cells:[{val:"0x1100",highlight:true},{val:"0x1000",highlight:true},{val:"0x1200"},{val:"0x1300"}]}, {name:"字符串常量区（不动）", cells:[{val:"Pear"},{val:"Apple"},{val:"Kiwi"},{val:"Banana"}], markers:[{index:0,label:"0x1000"},{index:1,label:"0x1100"},{index:2,label:"0x1200"},{index:3,label:"0x1300"}]}], info: "names[0]、names[1] 互换地址——看常量区：字符串一个字节都没动，动的只是上面的地址！" },
+    { line: 9, vars: {j:{value:1,type:"int"}}, loop: [{label:"i=0 j=1",active:true}], array: [{name:"names[]（指针）", cells:[{val:"0x1100"},{val:"0x1000",highlight:true},{val:"0x1200",highlight:true},{val:"0x1300"}]}, {name:"字符串常量区（不动）", cells:[{val:"Pear",highlight:true},{val:"Apple"},{val:"Kiwi",highlight:true},{val:"Banana"}], markers:[{index:0,label:"0x1000"},{index:1,label:"0x1100"},{index:2,label:"0x1200"},{index:3,label:"0x1300"}]}], info: "j=1：比较 \"Pear\" 和 \"Kiwi\"：'P' > 'K'，交换" },
+    { line: 10, vars: {tmp:{value:"0x1000",type:"char*"}}, info: "tmp = names[1]" },
+    { line: 12, array: [{name:"names[]（指针）", cells:[{val:"0x1100"},{val:"0x1200",highlight:true},{val:"0x1000",highlight:true},{val:"0x1300"}]}, {name:"字符串常量区（不动）", cells:[{val:"Pear"},{val:"Apple"},{val:"Kiwi"},{val:"Banana"}], markers:[{index:0,label:"0x1000"},{index:1,label:"0x1100"},{index:2,label:"0x1200"},{index:3,label:"0x1300"}]}], info: "names[1]、names[2] 互换地址" },
+    { line: 9, vars: {j:{value:2,type:"int"}}, loop: [{label:"i=0 j=2",active:true}], array: [{name:"names[]（指针）", cells:[{val:"0x1100"},{val:"0x1200"},{val:"0x1000",highlight:true},{val:"0x1300",highlight:true}]}, {name:"字符串常量区（不动）", cells:[{val:"Pear",highlight:true},{val:"Apple"},{val:"Kiwi"},{val:"Banana",highlight:true}], markers:[{index:0,label:"0x1000"},{index:1,label:"0x1100"},{index:2,label:"0x1200"},{index:3,label:"0x1300"}]}], info: "j=2：比较 \"Pear\" 和 \"Banana\"：'P' > 'B'，交换" },
+    { line: 10, vars: {tmp:{value:"0x1000",type:"char*"}}, info: "tmp = names[2]" },
+    { line: 12, array: [{name:"names[]（指针）", cells:[{val:"0x1100"},{val:"0x1200"},{val:"0x1300",highlight:true},{val:"0x1000",highlight:true}]}, {name:"字符串常量区（不动）", cells:[{val:"Pear"},{val:"Apple"},{val:"Kiwi"},{val:"Banana"}], markers:[{index:0,label:"0x1000"},{index:1,label:"0x1100"},{index:2,label:"0x1200"},{index:3,label:"0x1300"}]}], info: "names[2]、names[3] 互换地址——最大的 \"Pear\" 的地址冒泡到末尾" },
+    { line: 7, vars: {i:{value:1,type:"int"}}, loop: [{label:"i=1",active:true}], info: "外层 i=1" },
+    { line: 9, vars: {j:{value:0,type:"int"}}, loop: [{label:"i=1 j=0",active:true}], info: "j=0：比较 \"Apple\" 和 \"Kiwi\"：'A' < 'K'，不交换" },
+    { line: 9, vars: {j:{value:1,type:"int"}}, loop: [{label:"i=1 j=1",active:true}], array: [{name:"names[]（指针）", cells:[{val:"0x1100"},{val:"0x1200",highlight:true},{val:"0x1300",highlight:true},{val:"0x1000"}]}, {name:"字符串常量区（不动）", cells:[{val:"Pear"},{val:"Apple"},{val:"Kiwi",highlight:true},{val:"Banana",highlight:true}], markers:[{index:0,label:"0x1000"},{index:1,label:"0x1100"},{index:2,label:"0x1200"},{index:3,label:"0x1300"}]}], info: "j=1：比较 \"Kiwi\" 和 \"Banana\"：'K' > 'B'，交换" },
+    { line: 10, vars: {tmp:{value:"0x1200",type:"char*"}}, info: "tmp = names[1]" },
+    { line: 12, array: [{name:"names[]（指针）", cells:[{val:"0x1100"},{val:"0x1300",highlight:true},{val:"0x1200",highlight:true},{val:"0x1000"}]}, {name:"字符串常量区（不动）", cells:[{val:"Pear"},{val:"Apple"},{val:"Kiwi"},{val:"Banana"}], markers:[{index:0,label:"0x1000"},{index:1,label:"0x1100"},{index:2,label:"0x1200"},{index:3,label:"0x1300"}]}], info: "names[1]、names[2] 互换地址" },
+    { line: 7, vars: {i:{value:2,type:"int"}}, loop: [{label:"i=2",active:true}], info: "外层 i=2" },
+    { line: 9, vars: {j:{value:0,type:"int"}}, loop: [{label:"i=2 j=0",active:true}], info: "j=0：比较 \"Apple\" 和 \"Banana\"：'A' < 'B'，不交换。数组已有序" },
+    { line: 16, loop: [{label:"i=3",active:false}], info: "排序完成，进入输出循环" },
+    { line: 17, output: "Apple\nBanana\nKiwi\nPear", info: "按指针顺序输出：Apple、Banana、Kiwi、Pear——字典序排列" },
+    { line: 19, info: "程序结束。全程只搬了 3 次指针（每次只是一个地址），字符串常量区原地未动——对长字符串数组，这比逐个复制内容轻量得多" }
+  ]
+});
+createDemo("demo7", {
   title: "动态内存：malloc 与 free",
   subtitle: "堆内存由你手动管理：申请、使用、归还",
   code: `#include <stdio.h>
@@ -325,7 +378,7 @@ int main() {
   ]
 });
 /* ========== demo7: 动态数组 ========== */
-createDemo("demo7", {
+createDemo("demo8", {
   title: "malloc 动态数组",
   subtitle: "运行时才确定大小的数组，只能用 malloc",
   code: `#include <stdio.h>
