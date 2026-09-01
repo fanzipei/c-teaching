@@ -6,15 +6,16 @@
 <meta name="description" content="C语言交互式教学演示：通过可逐步执行的可视化 Demo 学习数据类型、条件、循环、函数、数组、指针、结构体等核心概念。">
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
 <title>C语言教学演示</title>
-<link rel="stylesheet" href="style.css?v=21">
+<link rel="stylesheet" href="style.css?v=23">
 </head>
 <body>
 <nav></nav>
-<div class="container">
+<main class="container" id="main-content">
 <div class="hero">
   <h1>C语言教学演示</h1>
   <p>通过交互式代码可视化，深入理解C语言核心概念。每个知识点配有可逐步执行的Demo，直观展示代码运行时的变量状态、内存变化和执行流程。</p>
 </div>
+<h2 class="sr-only">课程章节</h2>
 <div class="topic-grid">
   <a href="intro.html" class="topic-card">
     <div class="icon">&gt;_</div>
@@ -57,37 +58,45 @@
     <p>结构体定义、结构体数组、结构体指针、嵌套、typedef、链表、malloc 创建</p>
   </a>
 </div>
-</div>
-<script src="demo-engine.js?v=21"></script>
+</main>
+<script src="site-config.js?v=23"></script>
+<script src="demo-engine.js?v=23"></script>
 <script>
-// 首页学习进度：读取各页面 localStorage 中的完成记录，在卡片上显示进度
+// 首页学习进度：从统一章节配置读取总数，并将卡片指向第一个未完成项
 (function () {
-  var totals = {
-    'intro.html': { demo: 6, quiz: 0 },
-    'datatype.html': { demo: 11, quiz: 6 },
-    'condition.html': { demo: 6, quiz: 6 }, 'loop.html': { demo: 10, quiz: 6 },
-    'function.html': { demo: 8, quiz: 6 }, 'array.html': { demo: 15, quiz: 6 },
-    'pointer.html': { demo: 8, quiz: 6 }, 'struct.html': { demo: 10, quiz: 6 }
-  };
+  var chapters = window.CTEACHING_CHAPTERS || [];
   document.querySelectorAll('.topic-card').forEach(function (card) {
     var page = card.getAttribute('href');
-    var t = totals[page];
+    var t = chapters.find(function (chapter) { return chapter.page === page; });
     if (!t) return;
     var total = t.demo + t.quiz;
     var done = 0;
+    var nextId = '';
     try {
       for (var i = 0; i < t.demo; i++) {
-        if (localStorage.getItem('cteaching:done:' + page + ':demo' + i) === '1') done++;
+        if (localStorage.getItem('cteaching:done:' + page + ':demo' + i) === '1') {
+          done++;
+        } else if (!nextId) {
+          nextId = 'demo' + i;
+        }
       }
       for (var j = 0; j < t.quiz; j++) {
-        if (localStorage.getItem('cteaching:done:' + page + ':quiz' + j) === '1') done++;
+        if (localStorage.getItem('cteaching:done:' + page + ':quiz' + j) === '1') {
+          done++;
+        } else if (!nextId) {
+          nextId = 'quiz' + j;
+        }
       }
     } catch (e) { return; }
     if (!done) return;
     var badge = document.createElement('div');
     badge.className = 'topic-progress' + (done >= total ? ' all-done' : '');
-    badge.textContent = done >= total ? '✓ 已全部完成' : '已完成 ' + done + ' / ' + total;
+    badge.textContent = done >= total ? '✓ 已全部完成' : '继续学习 · ' + done + ' / ' + total;
     card.appendChild(badge);
+    if (nextId) {
+      card.setAttribute('href', page + '#' + nextId);
+      card.setAttribute('aria-label', t.title + '，已完成 ' + done + ' / ' + total + '，继续学习');
+    }
   });
 })();
 </script>

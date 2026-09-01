@@ -6,11 +6,11 @@
 <meta name="description" content="C语言数据类型与赋值语句交互演示：基本类型、printf/scanf、类型转换、转义字符、常量与宏、复合赋值、自增自减，逐行执行并可视化变量状态。">
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
 <title>数据类型与赋值语句 - C语言教学演示</title>
-<link rel="stylesheet" href="style.css?v=21">
+<link rel="stylesheet" href="style.css?v=23">
 </head>
 <body>
 <nav></nav>
-<div class="container">
+<main class="container" id="main-content">
 <h1>数据类型与赋值语句</h1>
 <div class="intro">
 <div class="intro-flex">
@@ -119,16 +119,17 @@
   <div class="scanf-try">
     <strong>试一试</strong> 像真实终端一样输入<strong>一整行</strong>数据，观察 scanf 如何按格式串 <code>%d %f %c</code> 逐项解析：
     <div class="scanf-input-row">
-      <span class="scanf-prompt">$</span>
+      <span class="scanf-prompt" aria-hidden="true">$</span>
+      <label class="sr-only" for="try-line">scanf 模拟输入</label>
       <input id="try-line" type="text" placeholder="例如：18 92.5 B" onkeydown="if(event.key==='Enter')runScanfDemo()">
-      <button class="btn btn-primary" onclick="runScanfDemo()">▶ 输入并运行</button>
+      <button class="btn btn-primary" type="button" onclick="runScanfDemo()">▶ 输入并运行</button>
     </div>
     <div class="scanf-presets">
       快速体验：
-      <button class="btn btn-secondary" onclick="presetScanf('18 92.5 B')">正常：18 92.5 B</button>
-      <button class="btn btn-secondary" onclick="presetScanf('18.2 1.1 A')">经典陷阱：18.2 1.1 A</button>
-      <button class="btn btn-secondary" onclick="presetScanf('abc 92.5 B')">类型不匹配：abc 92.5 B</button>
-      <button class="btn btn-secondary" onclick="presetScanf('18 92.5')">输入不足：18 92.5</button>
+      <button class="btn btn-secondary" type="button" onclick="presetScanf('18 92.5 B')">正常：18 92.5 B</button>
+      <button class="btn btn-secondary" type="button" onclick="presetScanf('18.2 1.1 A')">经典陷阱：18.2 1.1 A</button>
+      <button class="btn btn-secondary" type="button" onclick="presetScanf('abc 92.5 B')">类型不匹配：abc 92.5 B</button>
+      <button class="btn btn-secondary" type="button" onclick="presetScanf('18 92.5')">输入不足：18 92.5</button>
     </div>
     <div class="parse-map" id="parse-map"></div>
   </div>
@@ -148,9 +149,10 @@
   <div id="quiz4"></div>
   <div id="quiz5"></div>
 </div>
-</div>
+</main>
 
-<script src="demo-engine.js?v=21"></script>
+<script src="site-config.js?v=23"></script>
+<script src="demo-engine.js?v=23"></script>
 <script>
 /* ===== 数据类型与输入输出 ===== */
 createDemo("demo0", {

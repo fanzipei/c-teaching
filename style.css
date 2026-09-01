@@ -36,8 +36,36 @@ body {
   min-height: 100vh;
 }
 
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.skip-link {
+  position: fixed;
+  top: 0.5rem;
+  left: 0.5rem;
+  z-index: 1000;
+  padding: 0.6rem 1rem;
+  color: var(--bg-primary);
+  background: var(--accent);
+  border-radius: 6px;
+  transform: translateY(-150%);
+}
+
+.skip-link:focus {
+  transform: translateY(0);
+}
+
 /* ===== 导航栏 ===== */
-nav {
+.site-nav {
   background: var(--bg-secondary);
   padding: 1rem 2rem;
   display: flex;
@@ -49,24 +77,25 @@ nav {
   z-index: 100;
 }
 
-nav .logo {
+.site-nav .logo {
   font-size: 1.5rem;
   font-weight: bold;
   color: var(--accent);
+  text-decoration: none;
 }
 
-nav .logo span {
+.site-nav .logo span {
   color: var(--text-primary);
 }
 
-nav .nav-links {
+.site-nav .nav-links {
   display: flex;
   gap: 0.5rem;
   flex-wrap: wrap;
   transition: max-height 0.3s ease, opacity 0.3s ease;
 }
 
-nav .nav-toggle {
+.site-nav .nav-toggle {
   display: none;
   background: transparent;
   border: 1px solid var(--border);
@@ -77,7 +106,7 @@ nav .nav-toggle {
   cursor: pointer;
 }
 
-nav .nav-links a {
+.site-nav .nav-links a {
   color: var(--text-secondary);
   text-decoration: none;
   padding: 0.5rem 1rem;
@@ -86,8 +115,8 @@ nav .nav-links a {
   font-size: 0.9rem;
 }
 
-nav .nav-links a:hover,
-nav .nav-links a.active {
+.site-nav .nav-links a:hover,
+.site-nav .nav-links a.active {
   background: var(--accent);
   color: var(--bg-primary);
 }
@@ -1458,6 +1487,14 @@ h3 {
   flex-wrap: wrap;
   gap: 0.5rem;
   margin: -1rem 0 1.5rem;
+  padding: 0.55rem 0.65rem;
+  position: sticky;
+  top: 76px;
+  z-index: 90;
+  background: rgba(37, 37, 54, 0.96);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  backdrop-filter: blur(8px);
 }
 
 .quicknav-label {
@@ -1483,8 +1520,79 @@ h3 {
   border-color: var(--accent);
 }
 
-.demo-grid > div {
+.quicknav-chip.completed::after {
+  content: ' ✓';
+  color: var(--success);
+  font-weight: 700;
+}
+
+.quicknav-chip.is-current {
+  color: var(--bg-primary);
+  background: var(--accent);
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px rgba(137, 180, 250, 0.2);
+}
+
+.quicknav-chip.is-current.completed::after {
+  color: var(--bg-primary);
+}
+
+.demo-grid > div,
+#chapter-quiz {
   scroll-margin-top: 80px;
+}
+
+/* 章末进度与章节切换 */
+.chapter-footer-nav {
+  margin-top: 2.5rem;
+  padding: 1rem;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+}
+
+.chapter-progress-summary {
+  margin-bottom: 0.75rem;
+  color: var(--text-secondary);
+  text-align: center;
+  font-size: 0.9rem;
+}
+
+.chapter-progress-summary.all-done {
+  color: var(--success);
+}
+
+.chapter-footer-links {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+}
+
+.chapter-nav-link {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+  min-height: 64px;
+  padding: 0.65rem 0.85rem;
+  color: var(--text-primary);
+  text-decoration: none;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+}
+
+.chapter-nav-link:hover {
+  border-color: var(--accent);
+}
+
+.chapter-nav-link span {
+  color: var(--comment);
+  font-size: 0.75rem;
+}
+
+.chapter-next {
+  text-align: right;
+  align-items: flex-end;
 }
 
 /* scanf 交互输入区 */
@@ -1624,16 +1732,16 @@ h3 {
 
 /* ===== 响应式适配 ===== */
 @media (max-width: 768px) {
-  nav {
+  .site-nav {
     flex-wrap: wrap;
     padding: 1rem;
   }
 
-  nav .nav-toggle {
+  .site-nav .nav-toggle {
     display: block;
   }
 
-  nav .nav-links {
+  .site-nav .nav-links {
     width: 100%;
     flex-direction: column;
     max-height: 0;
@@ -1643,13 +1751,13 @@ h3 {
     margin-top: 0;
   }
 
-  nav .nav-links.open {
+  .site-nav .nav-links.open {
     max-height: 500px;
     opacity: 1;
     margin-top: 1rem;
   }
 
-  nav .nav-links a {
+  .site-nav .nav-links a {
     padding: 0.75rem 1rem;
     border-radius: 0;
     border-bottom: 1px solid var(--border);
@@ -1877,6 +1985,26 @@ h3 {
   margin-top: 0.25rem;
 }
 
+.quiz-hint {
+  margin-top: 0.5rem;
+  padding: 0.65rem 0.75rem;
+  color: var(--text-secondary);
+  background: rgba(249, 226, 175, 0.08);
+  border-left: 3px solid var(--warning);
+  border-radius: 6px;
+  font-size: 0.9rem;
+}
+
+.quiz-try-again {
+  margin-top: 0.5rem;
+  color: var(--comment);
+  font-size: 0.8rem;
+}
+
+.quiz-reveal {
+  margin-top: 0.65rem;
+}
+
 .quiz-result {
   font-weight: bold;
   margin-top: 0.75rem;
@@ -2045,4 +2173,83 @@ h3 {
 .demo-diagram svg {
   max-width: 100%;
   height: auto;
+}
+
+/* 浏览器仅绘制接近视口的长卡片，旧浏览器自动回退为正常渲染。 */
+@supports (content-visibility: auto) {
+  .demo-card,
+  .quiz-card {
+    content-visibility: auto;
+    contain-intrinsic-size: auto 900px;
+  }
+}
+
+/* 清晰的键盘焦点，不改变鼠标点击时的视觉表现。 */
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+textarea:focus-visible,
+[tabindex]:focus-visible {
+  outline: 3px solid var(--accent) !important;
+  outline-offset: 2px;
+}
+
+@media (max-width: 768px) {
+  .site-nav .nav-toggle {
+    width: 44px;
+    min-height: 44px;
+    padding: 0;
+  }
+
+  .btn {
+    min-height: 44px;
+    padding: 0.55rem 0.85rem;
+  }
+
+  .speed-control input[type="range"] {
+    min-height: 44px;
+  }
+
+  .code-area {
+    font-size: 0.875rem;
+  }
+
+  .demo-quicknav {
+    top: 69px;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    scrollbar-width: thin;
+  }
+
+  .quicknav-label,
+  .quicknav-chip {
+    flex: 0 0 auto;
+    white-space: nowrap;
+  }
+
+  .chapter-footer-nav {
+    padding: 0.75rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .chapter-footer-links {
+    grid-template-columns: 1fr;
+  }
+
+  .chapter-footer-links > span:empty {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }

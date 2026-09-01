@@ -2,11 +2,11 @@
 // 用法：node tools/check_mobile.js   （在 c-teaching-web 目录下运行）
 const { chromium } = require('playwright');
 const path = require('path');
+const CHAPTERS = require('../site-config');
 
 (async () => {
   const browser = await chromium.launch();
-  const pages = ['index.html', 'intro.html', 'datatype.html', 'condition.html',
-    'loop.html', 'function.html', 'array.html', 'pointer.html', 'struct.html'];
+  const pages = ['index.html', ...CHAPTERS.map(chapter => chapter.page)];
   let bad = 0;
   for (const p of pages) {
     const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
@@ -14,8 +14,8 @@ const path = require('path');
     page.on('pageerror', e => errors.push('pageerror: ' + e.message));
     page.on('console', m => { if (m.type() === 'error') errors.push('console: ' + m.text()); });
     await page.goto('file://' + path.resolve(__dirname, '..', p));
-    await page.waitForTimeout(800);
-    const overflow = await page.evaluate(() => {
+    await page.waitForSelector('.site-nav .nav-links', { state: 'attached' });
+    const audit = await page.evaluate(() => {
       const doc = document.documentElement;
       const res = { scrollW: doc.scrollWidth, clientW: doc.clientWidth, wide: [] };
       if (doc.scrollWidth > doc.clientWidth + 2) {
@@ -27,12 +27,23 @@ const path = require('path');
           }
         });
       }
-      return res;
+      const smallButtons = [...document.querySelectorAll('.btn, .nav-toggle')]
+        .filter(el => {
+          const style = getComputedStyle(el);
+          return style.display !== 'none' && style.visibility !== 'hidden' && el.getBoundingClientRect().height < 43;
+        })
+        .slice(0, 6)
+        .map(el => `${el.textContent.trim()} h=${Math.round(el.getBoundingClientRect().height)}`);
+      const code = document.querySelector('.code-area');
+      return { ...res, smallButtons, codeFont: code ? parseFloat(getComputedStyle(code).fontSize) : null };
     });
-    const ok = overflow.scrollW <= overflow.clientW + 2 && errors.length === 0;
+    const ok = audit.scrollW <= audit.clientW + 2 && audit.smallButtons.length === 0 &&
+      (audit.codeFont === null || audit.codeFont >= 14) && errors.length === 0;
     if (!ok) bad++;
-    console.log(`${ok ? 'PASS' : 'FAIL'} ${p}  scrollW=${overflow.scrollW} clientW=${overflow.clientW}` +
-      (overflow.wide.length ? `  超宽: ${overflow.wide.join(' | ')}` : '') +
+    console.log(`${ok ? 'PASS' : 'FAIL'} ${p}  scrollW=${audit.scrollW} clientW=${audit.clientW}` +
+      (audit.codeFont ? ` code=${audit.codeFont}px` : '') +
+      (audit.wide.length ? `  超宽: ${audit.wide.join(' | ')}` : '') +
+      (audit.smallButtons.length ? `  触控高度不足: ${audit.smallButtons.join(' | ')}` : '') +
       (errors.length ? `  JS错误: ${errors.join(' ; ')}` : ''));
     await page.close();
   }

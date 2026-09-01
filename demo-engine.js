@@ -8,19 +8,13 @@
    - 公共导航栏注入
    ============================================================ */
 
+const CHAPTERS = window.CTEACHING_CHAPTERS || [];
 const NAV_HTML = `
-  <div class="logo">C语言<span>教学演示</span></div>
-  <button class="nav-toggle" aria-label="切换导航" aria-expanded="false">☰</button>
-  <div class="nav-links">
+  <a class="logo" href="index.html" aria-label="C语言教学演示首页">C语言<span>教学演示</span></a>
+  <button class="nav-toggle" type="button" aria-label="切换导航" aria-controls="site-nav-links" aria-expanded="false">☰</button>
+  <div class="nav-links" id="site-nav-links">
     <a href="index.html">首页</a>
-    <a href="intro.html">认识C程序</a>
-    <a href="datatype.html">数据类型与赋值语句</a>
-    <a href="condition.html">条件语句</a>
-    <a href="loop.html">循环语句</a>
-    <a href="function.html">函数</a>
-    <a href="array.html">数组</a>
-    <a href="pointer.html">指针</a>
-    <a href="struct.html">结构体</a>
+    ${CHAPTERS.map(chapter => `<a href="${chapter.page}">${chapter.shortTitle || chapter.title}</a>`).join('')}
   </div>
 `;
 
@@ -30,12 +24,21 @@ const NAV_HTML = `
     const nav = document.querySelector('nav');
     if (!nav || nav.dataset.enhanced) return;
     nav.dataset.enhanced = 'true';
+    nav.classList.add('site-nav');
+    if (!document.querySelector('.skip-link')) {
+      const skip = document.createElement('a');
+      skip.className = 'skip-link';
+      skip.href = '#main-content';
+      skip.textContent = '跳到主要内容';
+      document.body.insertBefore(skip, nav);
+    }
     nav.innerHTML = NAV_HTML;
 
     const current = location.pathname.split('/').pop() || 'index.html';
     nav.querySelectorAll('.nav-links a').forEach(a => {
       if (a.getAttribute('href') === current) {
         a.classList.add('active');
+        a.setAttribute('aria-current', 'page');
       }
     });
 
@@ -146,34 +149,34 @@ class CDemo {
 
   render() {
     const c = this.config;
-    this.container.innerHTML = `<div class="demo-card">
+    this.container.innerHTML = `<div class="demo-card" role="region" aria-labelledby="${c.id}-title">
       <div class="demo-header">
         <div>
-          <h3>${c.title}</h3>
+          <h3 id="${c.id}-title">${c.title}</h3>
           <span style="color:var(--text-secondary);font-size:0.85rem">${c.subtitle || ''}</span>
         </div>
       </div>
       ${c.diagram ? `<div class="demo-diagram">${c.diagram}</div>` : ''}
       <div class="demo-toolbar">
         <div class="step-counter" id="${c.id}-counter">步骤 0 / ${c.steps.length}</div>
-        <div class="progress-bar"><div id="${c.id}-progress" class="progress-fill" style="width:0%"></div></div>
+        <div class="progress-bar" id="${c.id}-progressbar" role="progressbar" aria-label="${c.title}演示进度" aria-valuemin="0" aria-valuemax="${c.steps.length}" aria-valuenow="0"><div id="${c.id}-progress" class="progress-fill" style="width:0%"></div></div>
         <div class="speed-control" title="自动播放速度">
-          <label>速度</label>
-          <input type="range" id="${c.id}-speed" min="300" max="2500" step="100" value="${this.playInterval}" onchange="demos['${c.id}'].setSpeed(this.value)">
+          <label for="${c.id}-speed">速度</label>
+          <input type="range" id="${c.id}-speed" min="300" max="2500" step="100" value="${this.playInterval}" aria-valuetext="1.2 秒一步" onchange="demos['${c.id}'].setSpeed(this.value)">
         </div>
-        <button class="btn btn-copy" onclick="demos['${c.id}'].copyCode()">复制代码</button>
+        <button class="btn btn-copy" type="button" onclick="demos['${c.id}'].copyCode()">复制代码</button>
         <div class="shortcut-hint">←/→ 单步 · 空格 播放/暂停 · Home 重置</div>
       </div>
       <div class="demo-body">
         <div class="code-panel">
-          <div class="code-area" id="${c.id}-code"></div>
-          <div class="controls">
-            <button class="btn btn-secondary" onclick="demos['${c.id}'].prev()" id="${c.id}-btn-prev">⏮ 上一步</button>
-            <button class="btn btn-primary" onclick="demos['${c.id}'].play()" id="${c.id}-btn-play">▶ 运行</button>
-            <button class="btn btn-secondary" onclick="demos['${c.id}'].next()" id="${c.id}-btn-next">⏭ 下一步</button>
-            <button class="btn btn-secondary" onclick="demos['${c.id}'].reset()">&#x21bb; 重置</button>
+          <div class="code-area" id="${c.id}-code" role="region" aria-label="${c.title}示例代码"></div>
+          <div class="controls" role="group" aria-label="${c.title}演示控制">
+            <button class="btn btn-secondary" type="button" onclick="demos['${c.id}'].prev()" id="${c.id}-btn-prev">⏮ 上一步</button>
+            <button class="btn btn-primary" type="button" onclick="demos['${c.id}'].play()" id="${c.id}-btn-play">▶ 运行</button>
+            <button class="btn btn-secondary" type="button" onclick="demos['${c.id}'].next()" id="${c.id}-btn-next">⏭ 下一步</button>
+            <button class="btn btn-secondary" type="button" onclick="demos['${c.id}'].reset()">&#x21bb; 重置</button>
           </div>
-          <div class="step-info" id="${c.id}-info">${this.lastInfo}</div>
+          <div class="step-info" id="${c.id}-info" role="status" aria-live="polite" aria-atomic="true">${this.lastInfo}</div>
         </div>
         <div class="viz-panel" id="${c.id}-viz"></div>
       </div>
@@ -184,6 +187,13 @@ class CDemo {
       const inp = document.getElementById(`${this.config.id}-input`);
       if (inp) inp.addEventListener('keydown', (e) => { if (e.key === 'Enter') this.submitInput(); });
     }
+    const speed = document.getElementById(`${this.config.id}-speed`);
+    if (speed) {
+      speed.addEventListener('input', () => {
+        const seconds = (parseInt(speed.value, 10) / 1000).toFixed(1);
+        speed.setAttribute('aria-valuetext', `${seconds} 秒一步`);
+      });
+    }
   }
 
   renderCode() {
@@ -191,7 +201,7 @@ class CDemo {
     const rawCode = this.config.code || '';
     const lines = rawCode.trim().split('\n');
     codeEl.innerHTML = lines.map((line, i) => {
-      return `<div class="code-line" id="${this.config.id}-line-${i}"><span class="ln">${i + 1}</span><span class="code">${highlightCLine(line)}</span></div>`;
+      return `<div class="code-line" id="${this.config.id}-line-${i}" aria-label="第 ${i + 1} 行"><span class="ln" aria-hidden="true">${i + 1}</span><span class="code">${highlightCLine(line)}</span></div>`;
     }).join('');
   }
 
@@ -204,7 +214,7 @@ class CDemo {
     if (types.includes('vars')) parts.push(`<div class="viz-box"><h4>变量状态</h4><div class="var-table" id="${id}-vars"></div></div>`);
     if (types.includes('memory')) parts.push(`<div class="viz-box"><h4>内存视图</h4><div class="memory-view" id="${id}-memory"></div></div>`);
     if (types.includes('stack')) parts.push(`<div class="viz-box"><h4>调用栈</h4><div class="stack-frame" id="${id}-stack"></div></div>`);
-    if (types.includes('console')) parts.push(`<div class="viz-box"><h4>输出</h4><div class="console" id="${id}-console"><span class="console-prompt">$ </span></div>${this.config.input ? `<div class="demo-input-row" id="${id}-input-row"><span class="console-prompt">›</span><input class="demo-input" id="${id}-input" type="text" placeholder="${this.config.input.placeholder || ''}" autocomplete="off" spellcheck="false"></div>` : ''}</div>`);
+    if (types.includes('console')) parts.push(`<div class="viz-box"><h4>输出</h4><div class="console" id="${id}-console"><span class="console-prompt">$ </span></div>${this.config.input ? `<div class="demo-input-row" id="${id}-input-row"><span class="console-prompt" aria-hidden="true">›</span><label class="sr-only" for="${id}-input">${this.config.title}程序输入</label><input class="demo-input" id="${id}-input" type="text" placeholder="${this.config.input.placeholder || ''}" autocomplete="off" spellcheck="false"></div>` : ''}</div>`);
     if (types.includes('array')) parts.push(`<div class="viz-box"><h4>数组</h4><div class="array-panel" id="${id}-array"></div></div>`);
     if (types.includes('matrix')) parts.push(`<div class="viz-box"><h4>二维数组</h4><div class="matrix-panel" id="${id}-matrix"></div></div>`);
     if (types.includes('pointer')) parts.push(`<div class="viz-box"><h4>指针关系</h4><div class="pointer-viz" id="${id}-pointer"></div></div>`);
@@ -262,7 +272,10 @@ class CDemo {
 
     const id = this.config.id;
     const lines = this.container.querySelectorAll('.code-line');
-    lines.forEach(l => l.classList.remove('active'));
+    lines.forEach(l => {
+      l.classList.remove('active');
+      l.removeAttribute('aria-current');
+    });
 
     if (this.config.vizTypes.includes('vars')) this.renderVars();
     if (this.config.vizTypes.includes('console')) this.renderConsole();
@@ -311,7 +324,10 @@ class CDemo {
     if (inpEl) inpEl.value = '';
 
     const lines = this.container.querySelectorAll('.code-line');
-    lines.forEach(l => { l.classList.remove('active'); });
+    lines.forEach(l => {
+      l.classList.remove('active');
+      l.removeAttribute('aria-current');
+    });
 
     const id = this.config.id;
     if (this.config.vizTypes.includes('vars')) document.getElementById(`${id}-vars`).innerHTML = '<span style="color:var(--comment);font-size:0.85rem">暂无变量</span>';
@@ -367,6 +383,8 @@ class CDemo {
   showToast(msg) {
     const toast = document.createElement('div');
     toast.className = 'demo-toast';
+    toast.setAttribute('role', 'status');
+    toast.setAttribute('aria-live', 'polite');
     toast.textContent = msg;
     this.container.querySelector('.demo-card').appendChild(toast);
     requestAnimationFrame(() => toast.classList.add('show'));
@@ -581,12 +599,15 @@ class CDemo {
 
     this.container.querySelectorAll('.code-line.active').forEach(el => {
       el.classList.remove('active');
+      el.removeAttribute('aria-current');
     });
     const lineEl = document.getElementById(`${id}-line-${step.line}`);
     if (lineEl) {
       lineEl.classList.add('active');
+      lineEl.setAttribute('aria-current', 'step');
       if (lineEl.scrollIntoView) {
-        lineEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        const reducedMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        lineEl.scrollIntoView({ behavior: reducedMotion ? 'auto' : 'smooth', block: 'center' });
       }
     }
   }
@@ -603,6 +624,7 @@ class CDemo {
 
   markDone() {
     try { localStorage.setItem(this.doneKey(), '1'); } catch (e) { /* 隐私模式等场景下静默失败 */ }
+    refreshLearningNavigation();
   }
 
   updateProgress() {
@@ -612,6 +634,7 @@ class CDemo {
     const pct = total ? (current / total) * 100 : 0;
     document.getElementById(`${id}-counter`).textContent = `步骤 ${current} / ${total}`;
     document.getElementById(`${id}-progress`).style.width = `${pct}%`;
+    document.getElementById(`${id}-progressbar`).setAttribute('aria-valuenow', String(current));
     // 跑完过全部步骤（含历史上跑完过）的卡片保持完成标记
     const reachedEnd = total > 0 && this.currentStep >= total - 1;
     if (reachedEnd) this.markDone();
@@ -1046,6 +1069,7 @@ class CDemo {
 
   bindKeys() {
     this.container.tabIndex = 0;
+    this.container.setAttribute('aria-label', `${this.config.title}交互演示，使用左右方向键单步，空格播放或暂停，Home 键重置`);
     this.container.addEventListener('keydown', (e) => {
       // 避免在输入框等可编辑元素中误触发
       const tag = e.target.tagName;
@@ -1084,7 +1108,62 @@ function createDemo(id, config) {
   demos[id] = new CDemo(id, { ...config, id });
 }
 
-// 长页面快速导航：在简介下方自动生成各示例的跳转链接
+function getCurrentPageName() {
+  return location.pathname.split('/').pop() || 'index.html';
+}
+
+function readDone(key) {
+  try { return localStorage.getItem(key) === '1'; } catch (e) { return false; }
+}
+
+// 同步快速导航与章末摘要的完成状态。
+function refreshLearningNavigation() {
+  const page = getCurrentPageName();
+  document.querySelectorAll('.quicknav-chip[data-item-id]').forEach(link => {
+    const itemId = link.dataset.itemId;
+    const done = itemId === 'quiz-section'
+      ? Object.keys(quizzes).length > 0 && Object.values(quizzes).every(q => q.isDone())
+      : readDone(`cteaching:done:${page}:${itemId}`);
+    link.classList.toggle('completed', done);
+    link.setAttribute('aria-label', `${link.textContent.trim()}${done ? '，已完成' : '，未完成'}`);
+    if (done) {
+      link.dataset.status = '已完成';
+    } else {
+      delete link.dataset.status;
+    }
+  });
+
+  const demoDone = Object.values(demos).filter(d => d.isDone()).length;
+  const quizDone = Object.values(quizzes).filter(q => q.isDone()).length;
+  const total = Object.keys(demos).length + Object.keys(quizzes).length;
+  const done = demoDone + quizDone;
+  const summary = document.querySelector('.chapter-progress-summary');
+  if (summary) {
+    summary.textContent = total && done >= total ? `✓ 本章 ${total} 项已全部完成` : `本章进度 ${done} / ${total}`;
+    summary.classList.toggle('all-done', total > 0 && done >= total);
+  }
+}
+
+function injectChapterFooter() {
+  const main = document.querySelector('main.container');
+  const page = getCurrentPageName();
+  const currentIndex = CHAPTERS.findIndex(chapter => chapter.page === page);
+  if (!main || currentIndex < 0 || main.querySelector('.chapter-footer-nav')) return;
+  const previous = CHAPTERS[currentIndex - 1];
+  const next = CHAPTERS[currentIndex + 1];
+  const footer = document.createElement('nav');
+  footer.className = 'chapter-footer-nav';
+  footer.setAttribute('aria-label', '章节切换');
+  footer.innerHTML = `
+    <div class="chapter-progress-summary" role="status" aria-live="polite"></div>
+    <div class="chapter-footer-links">
+      ${previous ? `<a href="${previous.page}" class="chapter-nav-link chapter-prev"><span>上一章</span><strong>${previous.title}</strong></a>` : '<span></span>'}
+      ${next ? `<a href="${next.page}" class="chapter-nav-link chapter-next"><span>下一章</span><strong>${next.title}</strong></a>` : '<a href="index.html" class="chapter-nav-link chapter-next"><span>返回</span><strong>课程首页</strong></a>'}
+    </div>`;
+  main.appendChild(footer);
+}
+
+// 长页面快速导航：显示完成状态、当前所在示例和练习入口。
 (function injectQuickNav() {
   function init() {
     const intro = document.querySelector('.intro');
@@ -1092,11 +1171,55 @@ function createDemo(id, config) {
     const list = Object.values(demos);
     if (!list.length) return;
     intro.dataset.quicknav = 'true';
-    const nav = document.createElement('div');
+
+    const demoGrid = document.querySelector('.demo-grid');
+    if (demoGrid && (!demoGrid.previousElementSibling || demoGrid.previousElementSibling.tagName !== 'H2')) {
+      const demoHeading = document.createElement('h2');
+      demoHeading.className = 'sr-only';
+      demoHeading.textContent = '交互演示';
+      demoGrid.before(demoHeading);
+    }
+
+    const quizGrid = document.querySelector('.quiz-grid');
+    if (quizGrid) {
+      const quizHeading = quizGrid.previousElementSibling;
+      if (quizHeading && /^H[1-6]$/.test(quizHeading.tagName)) quizHeading.id = 'chapter-quiz';
+    }
+
+    const nav = document.createElement('nav');
     nav.className = 'demo-quicknav';
-    nav.innerHTML = '<span class="quicknav-label">快速跳转</span>' +
-      list.map(d => `<a href="#${d.config.id}" class="quicknav-chip">${d.config.title}</a>`).join('');
+    nav.setAttribute('aria-label', '本章快速跳转');
+    nav.innerHTML = '<span class="quicknav-label">本章导航</span>' +
+      list.map(d => `<a href="#${d.config.id}" data-item-id="${d.config.id}" class="quicknav-chip">${d.config.title}</a>`).join('') +
+      (quizGrid ? '<a href="#chapter-quiz" data-item-id="quiz-section" class="quicknav-chip quicknav-quiz">章节练习</a>' : '');
     intro.after(nav);
+
+    const links = [...nav.querySelectorAll('.quicknav-chip')];
+    let scheduled = false;
+    const updateCurrent = () => {
+      scheduled = false;
+      const threshold = window.scrollY + Math.max(120, nav.getBoundingClientRect().height + 90);
+      let current = null;
+      links.forEach(link => {
+        const target = document.querySelector(link.getAttribute('href'));
+        if (target && target.offsetTop <= threshold) current = link;
+      });
+      links.forEach(link => {
+        const active = link === current;
+        link.classList.toggle('is-current', active);
+        if (active) link.setAttribute('aria-current', 'location');
+        else link.removeAttribute('aria-current');
+      });
+    };
+    window.addEventListener('scroll', () => {
+      if (!scheduled) {
+        scheduled = true;
+        window.requestAnimationFrame(updateCurrent);
+      }
+    }, { passive: true });
+    updateCurrent();
+    injectChapterFooter();
+    refreshLearningNavigation();
   }
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', init);
@@ -1121,15 +1244,16 @@ function normQuizOutput(s) {
   return String(s).replace(/\r/g, '').split('\n')
     .map(l => l.replace(/[ \t]+$/g, '')).join('\n').replace(/\n+$/g, '');
 }
-// 代码比较：忽略所有空白字符（允许排版差异，聚焦最小修改本身）
+// 代码比较：忽略注释与空白字符（允许解释性注释和排版差异）
 function normQuizCode(s) {
-  return String(s).replace(/\s+/g, '');
+  return String(s).replace(/\/\*[\s\S]*?\*\//g, '').replace(/\/\/.*$/gm, '').replace(/\s+/g, '');
 }
 
 class CQuiz {
   constructor(id, cfg) {
     this.id = id;
     this.cfg = cfg;
+    this.attempts = 0;
     this.container = document.getElementById(id);
     if (!this.container) { console.error('CQuiz: container not found', id); return; }
     this.render();
@@ -1154,6 +1278,7 @@ class CQuiz {
 
   markDone() {
     try { localStorage.setItem(this.doneKey(), '1'); } catch (e) { /* 隐私模式下静默失败 */ }
+    refreshLearningNavigation();
   }
 
   render() {
@@ -1167,30 +1292,32 @@ class CQuiz {
     if (isPredict) {
       bodyHtml = `
       <pre class="quiz-code">${codeHl}</pre>
-      <div class="quiz-prompt">这段程序执行后，标准输出（stdout）的内容是什么？</div>
+      <div class="quiz-prompt" id="${this.id}-prompt">这段程序执行后，标准输出（stdout）的内容是什么？</div>
+      <label class="sr-only" for="${this.id}-answer">${this.esc(c.title || typeLabel)}的输出答案</label>
       <textarea class="quiz-output-input" id="${this.id}-answer" rows="3" spellcheck="false"
-        placeholder="在此填写输出内容"></textarea>`;
+        aria-describedby="${this.id}-prompt" placeholder="在此填写输出内容"></textarea>`;
     } else {
       bodyHtml = `
-      <div class="quiz-prompt">下面程序有错误，请做<strong>最小修改</strong>将其改对（直接编辑代码）：</div>
+      <div class="quiz-prompt" id="${this.id}-prompt">下面程序有错误，请做<strong>最小修改</strong>将其改对（直接编辑代码）：</div>
       <div class="quiz-edit-wrap">
         <pre class="quiz-edit-hl" id="${this.id}-hl" aria-hidden="true">${codeHl}</pre>
-        <textarea class="quiz-edit-input" id="${this.id}-editor" spellcheck="false">${this.esc(c.code.trim())}</textarea>
+        <label class="sr-only" for="${this.id}-editor">${this.esc(c.title || typeLabel)}代码编辑器</label>
+        <textarea class="quiz-edit-input" id="${this.id}-editor" aria-describedby="${this.id}-prompt" spellcheck="false">${this.esc(c.code.trim())}</textarea>
       </div>`;
     }
 
-    this.container.innerHTML = `<div class="quiz-card${done ? ' completed' : ''}">
+    this.container.innerHTML = `<div class="quiz-card${done ? ' completed' : ''}" role="region" aria-labelledby="${this.id}-title">
       <div class="quiz-head">
         <span class="quiz-type quiz-type-${c.type}">${typeLabel}</span>
-        <span class="quiz-title">${this.esc(c.title || '')}</span>
+        <span class="quiz-title" id="${this.id}-title">${this.esc(c.title || '')}</span>
         <span class="quiz-done-badge">✓ 已完成</span>
       </div>
       ${bodyHtml}
       <div class="quiz-actions">
-        <button class="btn btn-primary" onclick="quizzes['${this.id}'].submit()">提交</button>
-        ${isPredict ? '' : `<button class="btn btn-secondary" onclick="quizzes['${this.id}'].restore()">还原代码</button>`}
+        <button class="btn btn-primary" type="button" onclick="quizzes['${this.id}'].submit()">提交</button>
+        ${isPredict ? '' : `<button class="btn btn-secondary" type="button" onclick="quizzes['${this.id}'].restore()">还原代码</button>`}
       </div>
-      <div class="quiz-feedback" id="${this.id}-feedback"></div>
+      <div class="quiz-feedback" id="${this.id}-feedback" role="status" aria-live="polite" aria-atomic="true"></div>
     </div>`;
 
     if (!isPredict) {
@@ -1219,6 +1346,7 @@ class CQuiz {
 
   restore() {
     const editor = document.getElementById(`${this.id}-editor`);
+    this.attempts = 0;
     editor.value = this.cfg.code.trim();
     document.getElementById(`${this.id}-hl`).innerHTML = this.highlightCode(editor.value);
     document.getElementById(`${this.id}-feedback`).innerHTML = '';
@@ -1234,7 +1362,32 @@ class CQuiz {
       return accepted.some(a => normQuizOutput(a) === normQuizOutput(value));
     }
     if (normQuizCode(value) === normQuizCode(c.code)) return false; // 未做任何修改
+    if (typeof c.validate === 'function') {
+      try { return Boolean(c.validate(value, { normalize: normQuizCode, original: c.code })); } catch (e) { return false; }
+    }
+    if ((c.acceptPatterns || []).some(pattern => {
+      if (!(pattern instanceof RegExp)) return false;
+      pattern.lastIndex = 0;
+      return pattern.test(value);
+    })) return true;
     return (c.accept || []).some(a => normQuizCode(a) === normQuizCode(value));
+  }
+
+  referenceAnswerHtml() {
+    const c = this.cfg;
+    if (c.type === 'predict') {
+      return `<div class="quiz-answer-label">正确输出：</div><pre class="quiz-ref-output">${this.esc(c.answer)}</pre>`;
+    }
+    return `<div class="quiz-answer-label">一种参考改法：</div><pre class="quiz-code quiz-ref-code">${this.highlightCode((c.accept || [c.code])[0])}</pre>`;
+  }
+
+  showAnswer() {
+    const fb = document.getElementById(`${this.id}-feedback`);
+    if (!fb || fb.querySelector('.quiz-reference')) return;
+    const answer = document.createElement('div');
+    answer.className = 'quiz-reference';
+    answer.innerHTML = this.referenceAnswerHtml();
+    fb.appendChild(answer);
   }
 
   submit() {
@@ -1244,17 +1397,22 @@ class CQuiz {
     const ok = this.judge(value);
     const fb = document.getElementById(`${this.id}-feedback`);
 
-    let answerBlock = '';
-    if (!ok) {
-      if (isPredict) {
-        answerBlock = `<div class="quiz-answer-label">正确输出：</div><pre class="quiz-ref-output">${this.esc(c.answer)}</pre>`;
-      } else {
-        answerBlock = `<div class="quiz-answer-label">参考改法：</div><pre class="quiz-code quiz-ref-code">${this.highlightCode(c.accept[0])}</pre>`;
-      }
+    if (ok) {
+      this.attempts = 0;
+      fb.innerHTML = `<div class="quiz-result quiz-right">✓ 回答正确</div>
+        <div class="quiz-explain">${c.explain || ''}</div>`;
+    } else {
+      this.attempts++;
+      const firstHint = c.hint || (isPredict
+        ? '先按执行顺序记录每次 printf 的内容，并留意空格与换行。'
+        : '先定位编译或逻辑错误所在的最小范围，再只修改必要部分。');
+      const detail = this.attempts >= 2 && c.explain ? `<div class="quiz-explain">${c.explain}</div>` : '';
+      const reveal = this.attempts >= 2
+        ? `<button class="btn btn-secondary quiz-reveal" type="button" onclick="quizzes['${this.id}'].showAnswer()">查看参考答案</button>`
+        : '<div class="quiz-try-again">再次尝试后可选择查看参考答案</div>';
+      fb.innerHTML = `<div class="quiz-result quiz-wrong">✗ 还不对，再想想</div>
+        <div class="quiz-hint"><strong>提示：</strong>${firstHint}</div>${detail}${reveal}`;
     }
-    fb.innerHTML = `<div class="quiz-result ${ok ? 'quiz-right' : 'quiz-wrong'}">${ok ? '✓ 回答正确' : '✗ 还不对，再想想'}</div>
-      <div class="quiz-explain">${c.explain || ''}</div>
-      ${answerBlock}`;
     if (ok) {
       this.markDone();
       this.container.querySelector('.quiz-card').classList.add('completed');

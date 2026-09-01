@@ -9,9 +9,9 @@ const os = require('os');
 const path = require('path');
 const { promisify } = require('util');
 const execFileP = promisify(execFile);
+const CHAPTERS = require('../site-config');
 
-const PAGES = ['intro.html', 'datatype.html', 'condition.html', 'loop.html',
-  'function.html', 'array.html', 'pointer.html', 'struct.html'];
+const PAGES = CHAPTERS.map(chapter => chapter.page);
 
 // 与 demo-engine.js 中 normQuizOutput 保持一致
 function normOutput(s) {
@@ -26,7 +26,8 @@ async function compileAndRun(code, name, workdir) {
   try {
     execFileSync('gcc', ['-std=c90', '-o', exe, src], { stdio: 'pipe' });
   } catch (e) {
-    return { ok: false, stage: 'compile', detail: String(e.stderr || e.message).slice(0, 300) };
+    const detail = e.stderr && e.stderr.length ? e.stderr : e.message;
+    return { ok: false, stage: 'compile', detail: String(detail || 'gcc 未返回错误信息').slice(0, 300) };
   }
   try {
     const { stdout } = await execFileP(exe, [], { timeout: 5000, maxBuffer: 1024 * 1024 });

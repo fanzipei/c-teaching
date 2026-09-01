@@ -24,9 +24,9 @@
 - **逐步执行的代码可视化**：单步/自动播放/回退，高亮当前执行行，同步展示变量、内存、数组、矩阵、调用栈、链表、图等状态
 - **动态程序流程图**（条件/循环章节）：实时高亮当前节点与执行路径，break/continue/退出循环走不同颜色的路径
 - **scanf 交互模拟**：像真实终端一样输入一整行数据，观察格式串逐项解析与经典陷阱
-- **章节练习**：每章 3 道预测输出题 + 3 道改错题，代码语法高亮、自动评测、答错给出解析与参考改法
-- **学习进度**：demo 与练习的完成情况记录于浏览器 localStorage，首页卡片显示进度
-- 支持键盘快捷键（←/→ 单步、空格播放暂停、Home 重置），适配移动端
+- **章节练习**：每章 3 道预测输出题 + 3 道改错题，代码语法高亮、自动评测，答错后分层提示并可主动查看参考答案
+- **学习进度**：demo 与练习的完成情况记录于浏览器 localStorage，首页可继续未完成项，章内导航同步完成状态
+- 支持键盘快捷键（←/→ 单步、空格播放暂停、Home 重置）、屏幕阅读器与减少动画偏好，适配移动端
 
 ## 本地运行
 
@@ -44,11 +44,16 @@ npm install
 node tools/regression.js    # 全站回归：跑完所有 demo、练习判题、进度持久化、首页徽章
 node tools/verify_quiz.js   # 用 gcc 实际编译运行，校验全部练习题的参考答案（需 PATH 中有 gcc）
 node tools/check_mobile.js  # 移动端（390px 视口）横向溢出体检
+node tools/accessibility.js # 地标、控件名称、动态播报与章节导航无障碍检查
 node tools/bump_version.js  # 修改 style.css / demo-engine.js 后统一升级 ?v= 缓存版本号
+
+# 或一次运行全部浏览器回归
+npm test
 ```
 
 ## 技术说明
 
 - 纯 HTML/CSS/JavaScript，无任何前端框架
+- 全站章节配置 `site-config.js`：导航、首页进度与自动化测试共用同一份章节元数据
 - 演示引擎 `demo-engine.js`：注入公共导航栏，提供 `createDemo()`（步骤式演示）与 `createQuiz()`（练习评测）两个接口
 - 测试基于 [Playwright](https://playwright.dev/)，练习题答案用 gcc 实机验证

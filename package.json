@@ -1,4 +1,11 @@
 {
+  "scripts": {
+    "test": "node tools/regression.js && node tools/check_mobile.js && node tools/accessibility.js",
+    "test:regression": "node tools/regression.js",
+    "test:mobile": "node tools/check_mobile.js",
+    "test:a11y": "node tools/accessibility.js",
+    "test:quiz": "node tools/verify_quiz.js"
+  },
   "dependencies": {
     "jsdom": "^29.0.2",
     "playwright": "^1.59.1"
