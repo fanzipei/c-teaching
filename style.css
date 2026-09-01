@@ -215,11 +215,24 @@ h3 {
   gap: 0.5rem;
   font-size: 0.85rem;
   color: var(--text-secondary);
+  white-space: nowrap;
 }
 
 .speed-control input[type="range"] {
   width: 120px;
   accent-color: var(--accent);
+}
+
+.speed-end {
+  color: var(--comment);
+  font-size: 0.72rem;
+}
+
+.speed-value {
+  min-width: 2.5em;
+  color: var(--accent);
+  font-weight: 600;
+  text-align: center;
 }
 
 .btn-copy {

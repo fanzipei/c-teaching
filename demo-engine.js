@@ -9,6 +9,13 @@
    ============================================================ */
 
 const CHAPTERS = window.CTEACHING_CHAPTERS || [];
+const PLAY_SPEEDS = Object.freeze({
+  1: { interval: 2500, label: '慢速' },
+  2: { interval: 1800, label: '较慢' },
+  3: { interval: 1200, label: '正常' },
+  4: { interval: 700, label: '较快' },
+  5: { interval: 300, label: '快速' }
+});
 const NAV_HTML = `
   <a class="logo" href="index.html" aria-label="C语言教学演示首页">C语言<span>教学演示</span></a>
   <button class="nav-toggle" type="button" aria-label="切换导航" aria-controls="site-nav-links" aria-expanded="false">☰</button>
@@ -120,7 +127,8 @@ class CDemo {
     this.currentStep = -1;
     this.isPlaying = false;
     this.playTimer = null;
-    this.playInterval = 1200;
+    this.playSpeedLevel = 3;
+    this.playInterval = PLAY_SPEEDS[this.playSpeedLevel].interval;
     this.variables = {};
     this.output = [];
     this.history = [];           // 保存每一步前的完整状态，用于回退
@@ -160,9 +168,12 @@ class CDemo {
       <div class="demo-toolbar">
         <div class="step-counter" id="${c.id}-counter">步骤 0 / ${c.steps.length}</div>
         <div class="progress-bar" id="${c.id}-progressbar" role="progressbar" aria-label="${c.title}演示进度" aria-valuemin="0" aria-valuemax="${c.steps.length}" aria-valuenow="0"><div id="${c.id}-progress" class="progress-fill" style="width:0%"></div></div>
-        <div class="speed-control" title="自动播放速度">
-          <label for="${c.id}-speed">速度</label>
-          <input type="range" id="${c.id}-speed" min="300" max="2500" step="100" value="${this.playInterval}" aria-valuetext="1.2 秒一步" onchange="demos['${c.id}'].setSpeed(this.value)">
+        <div class="speed-control" title="向右调节，自动播放会更快">
+          <label for="${c.id}-speed">播放速度</label>
+          <span class="speed-end" aria-hidden="true">慢</span>
+          <input type="range" id="${c.id}-speed" min="1" max="5" step="1" value="${this.playSpeedLevel}" aria-valuetext="正常，每步 1.2 秒" aria-describedby="${c.id}-speed-value">
+          <span class="speed-end" aria-hidden="true">快</span>
+          <output class="speed-value" id="${c.id}-speed-value" for="${c.id}-speed">正常</output>
         </div>
         <button class="btn btn-copy" type="button" onclick="demos['${c.id}'].copyCode()">复制代码</button>
         <div class="shortcut-hint">←/→ 单步 · 空格 播放/暂停 · Home 重置</div>
@@ -189,10 +200,7 @@ class CDemo {
     }
     const speed = document.getElementById(`${this.config.id}-speed`);
     if (speed) {
-      speed.addEventListener('input', () => {
-        const seconds = (parseInt(speed.value, 10) / 1000).toFixed(1);
-        speed.setAttribute('aria-valuetext', `${seconds} 秒一步`);
-      });
+      speed.addEventListener('input', () => this.setSpeed(speed.value));
     }
   }
 
@@ -351,8 +359,18 @@ class CDemo {
     this.updateProgress();
   }
 
-  setSpeed(ms) {
-    this.playInterval = parseInt(ms, 10) || 1200;
+  setSpeed(level) {
+    const parsed = parseInt(level, 10);
+    this.playSpeedLevel = Math.min(5, Math.max(1, Number.isFinite(parsed) ? parsed : 3));
+    const setting = PLAY_SPEEDS[this.playSpeedLevel];
+    this.playInterval = setting.interval;
+    const speed = document.getElementById(`${this.config.id}-speed`);
+    const output = document.getElementById(`${this.config.id}-speed-value`);
+    if (speed) {
+      speed.value = String(this.playSpeedLevel);
+      speed.setAttribute('aria-valuetext', `${setting.label}，每步 ${(setting.interval / 1000).toFixed(1)} 秒`);
+    }
+    if (output) output.textContent = setting.label;
     if (this.isPlaying) {
       clearInterval(this.playTimer);
       this.playTimer = setInterval(() => {

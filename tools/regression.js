@@ -108,7 +108,7 @@ const PAGES = CHAPTERS.map(chapter => chapter.page);
     (errors.length ? `  JS错误: ${errors.join(' ; ')}` : ''));
   await ctx.close();
 
-  // 3) 真实交互：移动导航可展开；Demo 获得焦点后可用键盘单步与回退。
+  // 3) 真实交互：移动导航、键盘单步，以及「滑块向右 = 播放更快」的速度语义。
   const interactionCtx = await browser.newContext({ viewport: { width: 390, height: 844 } });
   const interactionPage = await interactionCtx.newPage();
   await interactionPage.goto('file://' + path.resolve(__dirname, '..', 'intro.html'));
@@ -120,9 +120,23 @@ const PAGES = CHAPTERS.map(chapter => chapter.page);
   const afterNext = await interactionPage.evaluate(() => demos.demo0.currentStep);
   await interactionPage.keyboard.press('ArrowLeft');
   const afterPrevious = await interactionPage.evaluate(() => demos.demo0.currentStep);
-  const interactionOk = navExpanded === 'true' && afterNext === 0 && afterPrevious === -1;
+  const speed = interactionPage.locator('#demo0-speed');
+  await speed.focus();
+  await interactionPage.keyboard.press('Home');
+  const slowInterval = await interactionPage.evaluate(() => demos.demo0.playInterval);
+  await interactionPage.keyboard.press('End');
+  const fastState = await interactionPage.evaluate(() => ({
+    interval: demos.demo0.playInterval,
+    value: document.getElementById('demo0-speed').value,
+    label: document.getElementById('demo0-speed-value').textContent,
+    aria: document.getElementById('demo0-speed').getAttribute('aria-valuetext')
+  }));
+  const speedOk = fastState.interval < slowInterval && fastState.value === '5' &&
+    fastState.label === '快速' && fastState.aria.startsWith('快速');
+  const interactionOk = navExpanded === 'true' && afterNext === 0 && afterPrevious === -1 && speedOk;
   if (!interactionOk) failures++;
-  console.log(`${interactionOk ? 'PASS' : 'FAIL'} 真实交互  移动导航=${navExpanded} 键盘前进=${afterNext} 键盘回退=${afterPrevious}`);
+  console.log(`${interactionOk ? 'PASS' : 'FAIL'} 真实交互  移动导航=${navExpanded}` +
+    ` 键盘前进=${afterNext} 键盘回退=${afterPrevious} 慢=${slowInterval}ms 快=${fastState.interval}ms(${fastState.label})`);
   await interactionCtx.close();
 
   await browser.close();
