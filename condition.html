@@ -6,7 +6,7 @@
 <meta name="description" content="C语言条件语句交互演示：if-else、switch、三目运算符、短路求值，配合动态程序流程图展示分支执行过程。">
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
 <title>条件语句 - C语言教学演示</title>
-<link rel="stylesheet" href="style.css?v=24">
+<link rel="stylesheet" href="style.css?v=25">
 </head>
 <body>
 <nav></nav>
@@ -134,8 +134,8 @@
 </div>
 </main>
 
-<script src="site-config.js?v=24"></script>
-<script src="demo-engine.js?v=24"></script>
+<script src="site-config.js?v=25"></script>
+<script src="demo-engine.js?v=25"></script>
 <script>
 /* ========== demo0: if 语句基础 ========== */
 createDemo("demo0", {
@@ -217,7 +217,7 @@ int main() {
       { from: "c2", to: "neg", fromSide: "right", toSide: "left", label: "真", kind: "true" },
       { from: "c2", to: "zero", label: "假", kind: "false" },
       { from: "zero", to: "end" },
-      { from: "pos", to: "end", fromSide: "right", toSide: "right", curve: { cx: 540, cy: 250 }, label: "跳过其余分支", kind: "back" },
+      { from: "pos", to: "end", fromSide: "right", toSide: "right", curve: { cx: 620, cy: 330 }, label: "跳过其余分支", kind: "back" },
       { from: "neg", to: "end", fromSide: "right", toSide: "right", curve: { cx: 545, cy: 300 }, kind: "back" }
     ]
   },
@@ -311,11 +311,11 @@ int main() {
       { from: "sw", to: "c3", fromSide: "right", toSide: "left", label: "day=3" },
       { from: "sw", to: "c4", fromSide: "right", toSide: "left", label: "day=4" },
       { from: "sw", to: "def", fromSide: "right", toSide: "left", label: "其他" },
-      { from: "c1", to: "end", fromSide: "bottom", toSide: "right", curve: { cx: 560, cy: 210 } },
-      { from: "c2", to: "end", fromSide: "bottom", toSide: "right", curve: { cx: 555, cy: 240 } },
-      { from: "c3", to: "end", fromSide: "bottom", toSide: "right", curve: { cx: 550, cy: 265 }, label: "break 跳出" },
-      { from: "c4", to: "end", fromSide: "bottom", toSide: "right", curve: { cx: 545, cy: 290 } },
-      { from: "def", to: "end", fromSide: "bottom", toSide: "right", curve: { cx: 530, cy: 320 } }
+      { from: "c1", to: "end", fromSide: "right", toSide: "right", points: [{ x: 590, y: 73 }, { x: 590, y: 305 }] },
+      { from: "c2", to: "end", fromSide: "right", toSide: "right", points: [{ x: 610, y: 121 }, { x: 610, y: 310 }] },
+      { from: "c3", to: "end", fromSide: "right", toSide: "right", points: [{ x: 630, y: 169 }, { x: 630, y: 315 }], label: "break 跳出", labelPos: { x: 622, y: 245 } },
+      { from: "c4", to: "end", fromSide: "right", toSide: "right", points: [{ x: 650, y: 217 }, { x: 650, y: 320 }] },
+      { from: "def", to: "end", fromSide: "right", toSide: "right", points: [{ x: 670, y: 265 }, { x: 670, y: 325 }] }
     ]
   },
   steps: [
@@ -347,7 +347,7 @@ int main() {
   vizTypes: ["flowchart","vars","console"],
   flowchart: {
     nodes: [
-      { id: "start", type: "start",    label: "开始",        x: 185, y: 8,   w: 90,  h: 34 },
+      { id: "start", type: "start",    label: "开始",        x: 185, y: 0,   w: 90,  h: 34 },
       { id: "init",  type: "process",  label: "a = 5, b = 8",x: 160, y: 52,  w: 140, h: 36 },
       { id: "c1",    type: "decision", label: "a > b ?",     x: 155, y: 104, w: 150, h: 58 },
       { id: "maxa",  type: "process",  label: "max = a",     x: 10,  y: 196, w: 130, h: 36 },
@@ -400,7 +400,7 @@ int main() {
   vizTypes: ["flowchart","vars","console"],
   flowchart: {
     nodes: [
-      { id: "start", type: "start",    label: "开始",         x: 185, y: 8,   w: 90,  h: 34 },
+      { id: "start", type: "start",    label: "开始",         x: 185, y: 0,   w: 90,  h: 34 },
       { id: "init",  type: "process",  label: "a = 0, b = 5", x: 160, y: 50,  w: 140, h: 36 },
       { id: "c1",    type: "decision", label: "a != 0 ?",     x: 155, y: 102, w: 150, h: 58 },
       { id: "c1r",   type: "decision", label: "b/a > 2 ?",    x: 360, y: 110, w: 150, h: 52 },

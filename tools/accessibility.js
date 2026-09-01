@@ -32,6 +32,7 @@ const pages = ['index.html', ...CHAPTERS.map(chapter => chapter.page)];
       const headingJumps = headings.slice(1)
         .filter((heading, index) => heading.level > headings[index].level + 1)
         .map(heading => `${heading.level}:${heading.text}`);
+      const feedbackLink = document.querySelector('.nav-feedback');
       return {
         main: document.querySelectorAll('main#main-content').length,
         h1: document.querySelectorAll('h1').length,
@@ -40,6 +41,12 @@ const pages = ['index.html', ...CHAPTERS.map(chapter => chapter.page)];
         liveRegions: document.querySelectorAll('[aria-live]').length,
         quickNav: Boolean(document.querySelector('.demo-quicknav[aria-label]')),
         chapterFooter: Boolean(document.querySelector('.chapter-footer-nav[aria-label]')),
+        feedback: feedbackLink ? {
+          href: feedbackLink.href,
+          target: feedbackLink.target,
+          rel: feedbackLink.rel,
+          name: feedbackLink.getAttribute('aria-label') || feedbackLink.textContent.trim()
+        } : null,
         unnamed,
         duplicateIds,
         headingJumps
@@ -47,13 +54,17 @@ const pages = ['index.html', ...CHAPTERS.map(chapter => chapter.page)];
     });
 
     const isChapter = pageName !== 'index.html';
+    const feedbackOk = result.feedback &&
+      result.feedback.href.startsWith('https://github.com/fanzipei/c-teaching/issues/new?') &&
+      result.feedback.target === '_blank' && result.feedback.rel.includes('noopener') &&
+      result.feedback.name.includes('反馈');
     const ok = errors.length === 0 && result.main === 1 && result.h1 === 1 && result.skipLink &&
-      result.currentPage === 1 && result.unnamed.length === 0 && result.duplicateIds.length === 0 &&
+      result.currentPage === 1 && feedbackOk && result.unnamed.length === 0 && result.duplicateIds.length === 0 &&
       result.headingJumps.length === 0 &&
       (!isChapter || (result.liveRegions > 0 && result.quickNav && result.chapterFooter));
     if (!ok) failures++;
     console.log(`${ok ? 'PASS' : 'FAIL'} ${pageName}  main=${result.main} h1=${result.h1}` +
-      ` 当前页=${result.currentPage} live=${result.liveRegions} 快速导航=${result.quickNav} 章末导航=${result.chapterFooter}` +
+      ` 当前页=${result.currentPage} 反馈=${feedbackOk} live=${result.liveRegions} 快速导航=${result.quickNav} 章末导航=${result.chapterFooter}` +
       (result.unnamed.length ? ` 未命名控件=[${result.unnamed.join(', ')}]` : '') +
       (result.duplicateIds.length ? ` 重复id=[${result.duplicateIds.join(', ')}]` : '') +
       (result.headingJumps.length ? ` 标题跳级=[${result.headingJumps.join(', ')}]` : '') +

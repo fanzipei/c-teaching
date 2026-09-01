@@ -9,6 +9,21 @@
    ============================================================ */
 
 const CHAPTERS = window.CTEACHING_CHAPTERS || [];
+const PROJECT_ISSUES_URL = 'https://github.com/fanzipei/c-teaching/issues/new';
+
+function buildFeedbackIssueUrl() {
+  const page = location.pathname.split('/').pop() || 'index.html';
+  const chapter = CHAPTERS.find(item => item.page === page);
+  const pageName = chapter ? chapter.title : '课程首页';
+  const publishedPage = `https://fanzipei.github.io/c-teaching/${page === 'index.html' ? '' : page}`;
+  const title = `[教学反馈] ${pageName}`;
+  const body = `感谢你帮助改进这个 C 语言教学网站！\n\n` +
+    `### 反馈页面\n${publishedPage}\n\n` +
+    `### 问题类型\n- [ ] 内容或答案错误\n- [ ] 演示或流程图问题\n- [ ] 操作体验问题\n- [ ] 功能建议\n\n` +
+    `### 具体描述\n请说明你发现的问题、所在示例，以及建议如何改进。`;
+  return `${PROJECT_ISSUES_URL}?title=${encodeURIComponent(title)}&body=${encodeURIComponent(body)}`;
+}
+
 const PLAY_SPEEDS = Object.freeze({
   1: { interval: 2500, label: '慢速' },
   2: { interval: 1800, label: '较慢' },
@@ -22,6 +37,7 @@ const NAV_HTML = `
   <div class="nav-links" id="site-nav-links">
     <a href="index.html">首页</a>
     ${CHAPTERS.map(chapter => `<a href="${chapter.page}">${chapter.shortTitle || chapter.title}</a>`).join('')}
+    <a class="nav-feedback" href="${buildFeedbackIssueUrl()}" target="_blank" rel="noopener noreferrer" aria-label="在 GitHub 提交反馈建议（新窗口打开）">反馈建议 <span aria-hidden="true">↗</span></a>
   </div>
 `;
 
@@ -905,6 +921,101 @@ class CDemo {
     el.innerHTML = iters.map(i => `<span class="loop-iter ${i.active ? 'active' : ''}">${i.label}</span>`).join('');
   }
 
+  flowNodeBorderPoint(node, targetX, targetY) {
+    const w = node.w || 120, h = node.h || 44;
+    const cx = node.x + w / 2, cy = node.y + h / 2;
+    const dx = targetX - cx, dy = targetY - cy;
+    const type = node.type || 'process';
+    let scale;
+    if (type === 'decision') {
+      // 菱形边界：|x|/(w/2) + |y|/(h/2) = 1。
+      scale = 1 / ((Math.abs(dx) / (w / 2)) + (Math.abs(dy) / (h / 2)) || 1e-6);
+    } else if (type === 'start' || type === 'end') {
+      // 起止节点是胶囊形，使用椭圆近似比矩形交点更自然。
+      scale = 1 / (Math.hypot(dx / (w / 2), dy / (h / 2)) || 1e-6);
+    } else {
+      scale = Math.min((w / 2) / (Math.abs(dx) || 1e-6), (h / 2) / (Math.abs(dy) || 1e-6));
+    }
+    return { x: cx + dx * scale, y: cy + dy * scale };
+  }
+
+  flowNodePort(node, side, aim, isTarget = false) {
+    const w = node.w || 120, h = node.h || 44;
+    const cx = node.x + w / 2, cy = node.y + h / 2;
+    // 菱形的四个“侧边点”实际是尖角；斜向箭头若强行接到尖角，会擦边而过。
+    // 目标为判断节点时按来向落到对应斜边，确保箭头真正指入节点。
+    if (isTarget && (node.type || 'process') === 'decision') {
+      return this.flowNodeBorderPoint(node, aim.x, aim.y);
+    }
+    if (side === 'right') return { x: node.x + w, y: cy };
+    if (side === 'left') return { x: node.x, y: cy };
+    if (side === 'top') return { x: cx, y: node.y };
+    if (side === 'bottom') return { x: cx, y: node.y + h };
+    return this.flowNodeBorderPoint(node, aim.x, aim.y);
+  }
+
+  flowEdgeGeometry(edge, nodeById) {
+    const from = nodeById[edge.from], to = nodeById[edge.to];
+    if (!from || !to) return null;
+    const fromCenter = { x: from.x + (from.w || 120) / 2, y: from.y + (from.h || 44) / 2 };
+    const toCenter = { x: to.x + (to.w || 120) / 2, y: to.y + (to.h || 44) / 2 };
+    const points = Array.isArray(edge.points)
+      ? edge.points.map(point => ({ x: point.x, y: point.y }))
+      : [];
+    const control = !points.length && edge.curve ? { x: edge.curve.cx, y: edge.curve.cy } : null;
+    const startAim = points[0] || control || toCenter;
+    const endAim = points[points.length - 1] || control || fromCenter;
+    const borderStart = this.flowNodePort(from, edge.fromSide, startAim);
+    const borderEnd = this.flowNodePort(to, edge.toSide, endAim, true);
+    const unit = (dx, dy) => {
+      const length = Math.hypot(dx, dy) || 1;
+      return { x: dx / length, y: dy / length };
+    };
+
+    // 起点略离开节点描边；箭头尖端与目标节点保留 4px 间隙，兼顾清晰度和紧凑节点间距。
+    const startDirection = unit(startAim.x - borderStart.x, startAim.y - borderStart.y);
+    const endDirection = unit(borderEnd.x - endAim.x, borderEnd.y - endAim.y);
+    const start = { x: borderStart.x + startDirection.x * 2, y: borderStart.y + startDirection.y * 2 };
+    const end = { x: borderEnd.x - endDirection.x * 4, y: borderEnd.y - endDirection.y * 4 };
+    const dx = end.x - start.x, dy = end.y - start.y;
+    const length = Math.hypot(dx, dy) || 1;
+    const routeMidpoint = route => {
+      const segments = route.slice(1).map((point, index) => ({
+        from: route[index],
+        to: point,
+        length: Math.hypot(point.x - route[index].x, point.y - route[index].y)
+      }));
+      const total = segments.reduce((sum, segment) => sum + segment.length, 0);
+      let remaining = total / 2;
+      for (const segment of segments) {
+        if (remaining <= segment.length) {
+          const ratio = segment.length ? remaining / segment.length : 0;
+          return {
+            x: segment.from.x + (segment.to.x - segment.from.x) * ratio,
+            y: segment.from.y + (segment.to.y - segment.from.y) * ratio
+          };
+        }
+        remaining -= segment.length;
+      }
+      return route[route.length - 1];
+    };
+    const labelPos = edge.labelPos || (points.length
+      ? routeMidpoint([start, ...points, end])
+      : control
+      ? {
+          x: 0.25 * start.x + 0.5 * control.x + 0.25 * end.x,
+          y: 0.25 * start.y + 0.5 * control.y + 0.25 * end.y
+        }
+      : (() => {
+          const mx = (start.x + end.x) / 2, my = (start.y + end.y) / 2;
+          if (Math.abs(dx) < 2) return { x: mx + 18, y: my };
+          if (Math.abs(dy) < 2) return { x: mx, y: my - 12 };
+          const direction = edge.labelSide === -1 ? -1 : 1;
+          return { x: mx - (dy / length) * 14 * direction, y: my + (dx / length) * 14 * direction };
+        })());
+    return { edge, start, end, control, points, labelPos, borderEnd };
+  }
+
   renderFlowchart() {
     const el = document.getElementById(`${this.config.id}-flowchart`);
     if (!el) return;
@@ -915,128 +1026,81 @@ class CDemo {
     }
     const nodes = fc.nodes;
     const edges = fc.edges || [];
-    const curvePts = edges.filter(e => e.curve);
-    const minX = Math.min(...nodes.map(n => n.x), ...curvePts.map(e => e.curve.cx));
-    const minY = Math.min(...nodes.map(n => n.y), ...curvePts.map(e => e.curve.cy));
-    const maxX = Math.max(...nodes.map(n => n.x + (n.w || 120)), ...curvePts.map(e => e.curve.cx));
-    const maxY = Math.max(...nodes.map(n => n.y + (n.h || 44)), ...curvePts.map(e => e.curve.cy));
-    const pad = 16;
+    const nodeById = {};
+    nodes.forEach(node => { nodeById[node.id] = node; });
+    const geometries = edges.map(edge => this.flowEdgeGeometry(edge, nodeById)).filter(Boolean);
+    const bounds = [];
+    nodes.forEach(node => {
+      bounds.push({ x: node.x, y: node.y }, { x: node.x + (node.w || 120), y: node.y + (node.h || 44) });
+    });
+    geometries.forEach(geometry => {
+      bounds.push(geometry.start, geometry.end);
+      if (geometry.control) bounds.push(geometry.control);
+      if (geometry.points.length) bounds.push(...geometry.points);
+      if (geometry.edge.label) {
+        const labelWidth = Math.max(30, [...String(geometry.edge.label)].length * 7);
+        bounds.push(
+          { x: geometry.labelPos.x - labelWidth / 2, y: geometry.labelPos.y - 14 },
+          { x: geometry.labelPos.x + labelWidth / 2, y: geometry.labelPos.y + 8 }
+        );
+      }
+    });
+    const minX = Math.min(...bounds.map(point => point.x));
+    const minY = Math.min(...bounds.map(point => point.y));
+    const maxX = Math.max(...bounds.map(point => point.x));
+    const maxY = Math.max(...bounds.map(point => point.y));
+    const pad = 24;
     const width = maxX - minX + pad * 2;
     const height = maxY - minY + pad * 2;
-
-    const nodeById = {};
-    nodes.forEach(n => nodeById[n.id] = n);
-
-    const esc = s => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/\n/g, '<br>');
-
     const ox = -minX + pad, oy = -minY + pad;
+    const esc = value => String(value).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    const escAttr = value => esc(value).replace(/"/g, '&quot;');
 
-    // 计算从节点中心朝目标点方向与节点边框的交点（让边止于节点边界而不是中心）
-    const borderPoint = (n, cx, cy, tx, ty) => {
-      const w = n.w || 120, h = n.h || 44;
-      const dx = tx - cx, dy = ty - cy;
-      const t = Math.min((w / 2) / (Math.abs(dx) || 1e-6), (h / 2) / (Math.abs(dy) || 1e-6));
-      return { x: cx + dx * t, y: cy + dy * t };
-    };
-
-    const edgeSvg = edges.map(e => {
-      const a = nodeById[e.from], b = nodeById[e.to];
-      if (!a || !b) return '';
-      const aw = a.w || 120, ah = a.h || 44;
-      const bw = b.w || 120, bh = b.h || 44;
-      const ax = a.x + aw / 2, ay = a.y + ah / 2;
-      const bx = b.x + bw / 2, by = b.y + bh / 2;
-      let sx, sy, ex, ey;
-      if (e.fromSide === 'right')       { sx = a.x + aw; sy = ay; }
-      else if (e.fromSide === 'left')   { sx = a.x;      sy = ay; }
-      else if (e.fromSide === 'top')    { sx = ax;       sy = a.y; }
-      else if (e.fromSide === 'bottom') { sx = ax;       sy = a.y + ah; }
-      else { const p = borderPoint(a, ax, ay, bx, by); sx = p.x; sy = p.y; }
-      if (e.toSide === 'right')         { ex = b.x + bw; ey = by; }
-      else if (e.toSide === 'left')     { ex = b.x;      ey = by; }
-      else if (e.toSide === 'top')      { ex = bx;       ey = b.y; }
-      else if (e.toSide === 'bottom')   { ex = bx;       ey = b.y + bh; }
-      else { const p = borderPoint(b, bx, by, ax, ay); ex = p.x; ey = p.y; }
-      // 箭头与目标节点之间留一点间隙，避免箭头压住节点边框
-      const gdx = ex - sx, gdy = ey - sy;
-      const glen = Math.hypot(gdx, gdy) || 1;
-      ex -= (gdx / glen) * 4;
-      ey -= (gdy / glen) * 4;
-      const path = e.curve
-        ? `M ${sx + ox} ${sy + oy} Q ${e.curve.cx + ox} ${e.curve.cy + oy} ${ex + ox} ${ey + oy}`
-        : `M ${sx + ox} ${sy + oy} L ${ex + ox} ${ey + oy}`;
-      const labelPos = e.labelPos
-        || (e.curve
-          ? { x: 0.25 * sx + 0.5 * e.curve.cx + 0.25 * ex, y: 0.25 * sy + 0.5 * e.curve.cy + 0.25 * ey }
-          : (() => {
-              const mx = (sx + ex) / 2, my = (sy + ey) / 2;
-              if (Math.abs(sx - ex) < 2) return { x: mx + 14, y: my };   // 竖直边：标签放右侧
-              const nx = -(ey - sy) / glen, ny = (ex - sx) / glen;       // 斜边：沿法线方向避让
-              return { x: mx + nx * 12, y: my + ny * 12 };
-            })());
-      const kind = e.kind ? ` flow-edge-${e.kind}` : '';
-      return `<path class="flow-edge${kind}" data-edge="${e.from}->${e.to}" d="${path}" marker-end="url(#flow-arrow-${this.config.id})"/>`;
+    const edgeSvg = geometries.map(geometry => {
+      const edge = geometry.edge;
+      const path = geometry.points.length
+        ? `M ${geometry.start.x + ox} ${geometry.start.y + oy} ${geometry.points.map(point => `L ${point.x + ox} ${point.y + oy}`).join(' ')} L ${geometry.end.x + ox} ${geometry.end.y + oy}`
+        : geometry.control
+          ? `M ${geometry.start.x + ox} ${geometry.start.y + oy} Q ${geometry.control.x + ox} ${geometry.control.y + oy} ${geometry.end.x + ox} ${geometry.end.y + oy}`
+          : `M ${geometry.start.x + ox} ${geometry.start.y + oy} L ${geometry.end.x + ox} ${geometry.end.y + oy}`;
+      const kind = edge.kind ? ` flow-edge-${edge.kind}` : '';
+      const arrowGap = Math.hypot(geometry.borderEnd.x - geometry.end.x, geometry.borderEnd.y - geometry.end.y);
+      return `<path class="flow-edge${kind}" data-edge="${edge.from}->${edge.to}" data-from="${edge.from}" data-to="${edge.to}" data-arrow-gap="${arrowGap.toFixed(2)}" d="${path}" vector-effect="non-scaling-stroke" marker-end="url(#flow-arrow-${this.config.id})"/>`;
     }).join('');
 
-    // 边标签单独收集，最后绘制（位于最顶层，不会被节点遮挡；配合 CSS 光晕保持可读）
-    const labelSvg = edges.map(e => {
-      if (!e.label) return '';
-      const a = nodeById[e.from], b = nodeById[e.to];
-      if (!a || !b) return '';
-      const aw = a.w || 120, ah = a.h || 44;
-      const bw = b.w || 120, bh = b.h || 44;
-      const ax = a.x + aw / 2, ay = a.y + ah / 2;
-      const bx = b.x + bw / 2, by = b.y + bh / 2;
-      let sx, sy, ex, ey;
-      if (e.fromSide === 'right')       { sx = a.x + aw; sy = ay; }
-      else if (e.fromSide === 'left')   { sx = a.x;      sy = ay; }
-      else if (e.fromSide === 'top')    { sx = ax;       sy = a.y; }
-      else if (e.fromSide === 'bottom') { sx = ax;       sy = a.y + ah; }
-      else { sx = ax; sy = ay; }
-      if (e.toSide === 'right')         { ex = b.x + bw; ey = by; }
-      else if (e.toSide === 'left')     { ex = b.x;      ey = by; }
-      else if (e.toSide === 'top')      { ex = bx;       ey = b.y; }
-      else if (e.toSide === 'bottom')   { ex = bx;       ey = b.y + bh; }
-      else { ex = bx; ey = by; }
-      const gdx = ex - sx, gdy = ey - sy;
-      const glen = Math.hypot(gdx, gdy) || 1;
-      const labelPos = e.labelPos
-        || (e.curve
-          ? { x: 0.25 * sx + 0.5 * e.curve.cx + 0.25 * ex, y: 0.25 * sy + 0.5 * e.curve.cy + 0.25 * ey }
-          : (() => {
-              const mx = (sx + ex) / 2, my = (sy + ey) / 2;
-              if (Math.abs(sx - ex) < 2) return { x: mx + 14, y: my };
-              const nx = -(ey - sy) / glen, ny = (ex - sx) / glen;
-              return { x: mx + nx * 12, y: my + ny * 12 };
-            })());
-      const kind = e.kind ? ` flow-edge-${e.kind}` : '';
-      return `<text class="flow-edge-label${kind}" data-edge="${e.from}->${e.to}" x="${labelPos.x + ox}" y="${labelPos.y + oy - 4}" text-anchor="middle">${esc(e.label)}</text>`;
+    const labelSvg = geometries.map(geometry => {
+      const edge = geometry.edge;
+      if (!edge.label) return '';
+      const kind = edge.kind ? ` flow-edge-${edge.kind}` : '';
+      return `<text class="flow-edge-label${kind}" data-edge="${edge.from}->${edge.to}" x="${geometry.labelPos.x + ox}" y="${geometry.labelPos.y + oy - 4}" text-anchor="middle">${esc(edge.label)}</text>`;
     }).join('');
 
-    const nodeSvg = nodes.map(n => {
-      const w = n.w || 120, h = n.h || 44;
-      const x = n.x - minX + pad, y = n.y - minY + pad;
-      const type = n.type || 'process';
+    const nodeSvg = nodes.map(node => {
+      const w = node.w || 120, h = node.h || 44;
+      const x = node.x + ox, y = node.y + oy;
+      const type = node.type || 'process';
       let shape = '';
       if (type === 'start' || type === 'end') {
-        shape = `<rect class="flow-node flow-node-${type}" data-node="${n.id}" x="${x}" y="${y}" rx="${h/2}" ry="${h/2}" width="${w}" height="${h}"/>`;
+        shape = `<rect class="flow-node flow-node-${type}" data-node="${node.id}" x="${x}" y="${y}" rx="${h / 2}" ry="${h / 2}" width="${w}" height="${h}" vector-effect="non-scaling-stroke"/>`;
       } else if (type === 'decision') {
         const cx = x + w / 2, cy = y + h / 2;
-        const pts = `${cx},${y} ${x + w},${cy} ${cx},${y + h} ${x},${cy}`;
-        shape = `<polygon class="flow-node flow-node-decision" data-node="${n.id}" points="${pts}"/>`;
+        const points = `${cx},${y} ${x + w},${cy} ${cx},${y + h} ${x},${cy}`;
+        shape = `<polygon class="flow-node flow-node-decision" data-node="${node.id}" points="${points}" vector-effect="non-scaling-stroke"/>`;
       } else {
-        shape = `<rect class="flow-node flow-node-process" data-node="${n.id}" x="${x}" y="${y}" rx="6" ry="6" width="${w}" height="${h}"/>`;
+        shape = `<rect class="flow-node flow-node-process" data-node="${node.id}" x="${x}" y="${y}" rx="6" ry="6" width="${w}" height="${h}" vector-effect="non-scaling-stroke"/>`;
       }
       const tx = x + w / 2, ty = y + h / 2;
-      const lines = String(n.label).split('\n');
-      const text = lines.map((line, i) => `<tspan x="${tx}" dy="${i === 0 ? (lines.length > 1 ? -((lines.length - 1) * 8) : 4) : 16}">${esc(line)}</tspan>`).join('');
-      return `${shape}<text class="flow-label" data-node="${n.id}" x="${tx}" y="${ty}" text-anchor="middle">${text}</text>`;
+      const lines = String(node.label).split('\n');
+      const text = lines.map((line, index) => `<tspan x="${tx}" dy="${index === 0 ? (lines.length > 1 ? -((lines.length - 1) * 8) : 4) : 16}">${esc(line)}</tspan>`).join('');
+      return `${shape}<text class="flow-label" data-node="${node.id}" x="${tx}" y="${ty}" text-anchor="middle">${text}</text>`;
     }).join('');
 
-    el.innerHTML = `<svg class="flowchart" viewBox="0 0 ${width} ${height}" preserveAspectRatio="xMidYMid meet">
+    const flowchartLabel = `${this.config.title}程序流程图`;
+    el.innerHTML = `<svg class="flowchart" viewBox="0 0 ${width} ${height}" preserveAspectRatio="xMidYMid meet" role="img" aria-label="${escAttr(flowchartLabel)}">
+      <title>${esc(flowchartLabel)}</title>
       <defs>
-        <marker id="flow-arrow-${this.config.id}" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto" markerUnits="strokeWidth">
-          <path d="M0,0 L0,6 L9,3 z" class="flow-arrow"/>
+        <marker id="flow-arrow-${this.config.id}" markerWidth="9" markerHeight="9" refX="8" refY="3" orient="auto" markerUnits="userSpaceOnUse">
+          <path d="M0,0 L0,6 L8,3 z" class="flow-arrow"/>
         </marker>
       </defs>
       ${edgeSvg}

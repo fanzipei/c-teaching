@@ -121,6 +121,18 @@ body {
   color: var(--bg-primary);
 }
 
+.site-nav .nav-links .nav-feedback {
+  margin-left: 0.25rem;
+  color: var(--warning);
+  border: 1px solid rgba(249, 226, 175, 0.45);
+}
+
+.site-nav .nav-links .nav-feedback:hover {
+  color: var(--bg-primary);
+  background: var(--warning);
+  border-color: var(--warning);
+}
+
 /* ===== 主容器 ===== */
 .container {
   max-width: 1400px;
@@ -1292,10 +1304,13 @@ h3 {
 /* ===== 程序流程图可视化 ===== */
 .flowchart-viz {
   overflow-x: auto;
+  padding-bottom: 0.25rem;
+  scrollbar-width: thin;
 }
 
 .flowchart {
   width: 100%;
+  min-width: 460px;
   height: auto;
   display: block;
 }
@@ -1379,6 +1394,8 @@ h3 {
   fill: none;
   stroke: var(--ec);
   stroke-width: 1.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
   opacity: 0.45;
   transition: stroke 0.25s, opacity 0.25s, filter 0.25s;
 }
@@ -1774,6 +1791,11 @@ h3 {
     padding: 0.75rem 1rem;
     border-radius: 0;
     border-bottom: 1px solid var(--border);
+  }
+
+  .site-nav .nav-links .nav-feedback {
+    margin-left: 0;
+    border-width: 0 0 1px;
   }
 
   .container {

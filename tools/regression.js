@@ -101,10 +101,16 @@ const PAGES = CHAPTERS.map(chapter => chapter.page);
   const navCount = await page.evaluate(() => document.querySelectorAll('nav .nav-links a').length);
   const badges = await page.evaluate(() =>
     [...document.querySelectorAll('.topic-progress')].map(b => b.textContent));
-  const indexOk = navCount === CHAPTERS.length + 1 && badges.includes('✓ 已全部完成') &&
-    badges.includes('继续学习 · 1 / 16') && errors.length === 0;
+  const feedback = await page.evaluate(() => {
+    const link = document.querySelector('.nav-feedback');
+    return link ? { href: link.href, target: link.target } : null;
+  });
+  const indexOk = navCount === CHAPTERS.length + 2 && badges.includes('✓ 已全部完成') &&
+    badges.includes('继续学习 · 1 / 16') && feedback &&
+    feedback.href.startsWith('https://github.com/fanzipei/c-teaching/issues/new?') && feedback.target === '_blank' &&
+    errors.length === 0;
   if (!indexOk) failures++;
-  console.log(`${indexOk ? 'PASS' : 'FAIL'} index.html  导航链接=${navCount} 徽章=[${badges.join(' | ')}]` +
+  console.log(`${indexOk ? 'PASS' : 'FAIL'} index.html  导航链接=${navCount} 反馈链接=${Boolean(feedback)} 徽章=[${badges.join(' | ')}]` +
     (errors.length ? `  JS错误: ${errors.join(' ; ')}` : ''));
   await ctx.close();
 

@@ -6,7 +6,7 @@
 <meta name="description" content="C语言循环语句交互演示：while、for、do-while、break、continue、嵌套循环，动态程序流程图实时显示执行位置。">
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
 <title>循环语句 - C语言教学演示</title>
-<link rel="stylesheet" href="style.css?v=24">
+<link rel="stylesheet" href="style.css?v=25">
 </head>
 <body>
 <nav></nav>
@@ -138,8 +138,8 @@
 </div>
 </main>
 
-<script src="site-config.js?v=24"></script>
-<script src="demo-engine.js?v=24"></script>
+<script src="site-config.js?v=25"></script>
+<script src="demo-engine.js?v=25"></script>
 <script>
 /* ========== demo0: while 循环 ========== */
 createDemo("demo0", {
@@ -172,7 +172,7 @@ int main() {
       { from: "init", to: "cond" },
       { from: "cond", to: "print", fromSide: "left", toSide: "top", label: "真", kind: "true", labelPos: { x: 95, y: 218 } },
       { from: "print", to: "inc" },
-      { from: "inc", to: "cond", fromSide: "left", toSide: "left", curve: { cx: -30, cy: 235 }, label: "继续循环", kind: "back" },
+      { from: "inc", to: "cond", fromSide: "left", toSide: "left", curve: { cx: -110, cy: 235 }, label: "继续循环", kind: "back" },
       { from: "cond", to: "println", fromSide: "right", toSide: "top", label: "假·退出循环", kind: "exit" },
       { from: "println", to: "end" }
     ]
@@ -231,7 +231,7 @@ int main() {
       { from: "init", to: "cond", label: "i = 1（只执行一次）" },
       { from: "cond", to: "body", fromSide: "left", toSide: "top", label: "真", kind: "true", labelPos: { x: 93, y: 232 } },
       { from: "body", to: "update" },
-      { from: "update", to: "cond", fromSide: "left", toSide: "left", curve: { cx: -30, cy: 249 }, label: "继续循环", kind: "back" },
+      { from: "update", to: "cond", fromSide: "left", toSide: "left", curve: { cx: -110, cy: 249 }, label: "继续循环", kind: "back" },
       { from: "cond", to: "print", fromSide: "right", toSide: "top", label: "假·退出循环", kind: "exit" },
       { from: "print", to: "end" }
     ]
@@ -406,7 +406,7 @@ int main() {
       { from: "init", to: "cond", label: "i = 0" },
       { from: "cond", to: "body", fromSide: "left", toSide: "top", label: "真", kind: "true", labelPos: { x: 97, y: 230 } },
       { from: "body", to: "update" },
-      { from: "update", to: "cond", fromSide: "left", toSide: "left", curve: { cx: -30, cy: 230 }, label: "继续循环", kind: "back" },
+      { from: "update", to: "cond", fromSide: "left", toSide: "left", curve: { cx: -110, cy: 230 }, label: "继续循环", kind: "back" },
       { from: "cond", to: "print", fromSide: "right", toSide: "top", label: "假·退出循环", kind: "exit" },
       { from: "print", to: "end" }
     ]
@@ -533,8 +533,8 @@ int main() {
       { id: "even",    type: "process",  label: "n = n / 2",       x: 10,  y: 302, w: 140, h: 38 },
       { id: "odd",     type: "process",  label: "n = n*3 + 1",     x: 330, y: 302, w: 140, h: 38 },
       { id: "print",   type: "process",  label: "steps++, printf", x: 170, y: 372, w: 130, h: 38 },
-      { id: "println", type: "process",  label: "printf 共几步",   x: 350, y: 240, w: 140, h: 38 },
-      { id: "end",     type: "end",      label: "结束",            x: 390, y: 360, w: 90,  h: 34 }
+      { id: "println", type: "process",  label: "printf 共几步",   x: 500, y: 122, w: 140, h: 38 },
+      { id: "end",     type: "end",      label: "结束",            x: 525, y: 210, w: 90,  h: 34 }
     ],
     edges: [
       { from: "start", to: "init" },
@@ -544,8 +544,8 @@ int main() {
       { from: "parity", to: "odd", fromSide: "right", toSide: "top", label: "假·奇数", kind: "false", labelPos: { x: 380, y: 290 } },
       { from: "even", to: "print", toSide: "left" },
       { from: "odd", to: "print", toSide: "right" },
-      { from: "print", to: "cond", fromSide: "left", toSide: "left", curve: { cx: 40, cy: 260 }, label: "继续循环", kind: "back", labelPos: { x: 50, y: 210 } },
-      { from: "cond", to: "println", fromSide: "right", toSide: "top", label: "假·退出循环", kind: "exit" },
+      { from: "print", to: "cond", fromSide: "left", toSide: "left", points: [{ x: -20, y: 391 }, { x: -20, y: 180 }], label: "继续循环", kind: "back", labelPos: { x: 28, y: 210 } },
+      { from: "cond", to: "println", fromSide: "right", toSide: "left", label: "假·退出循环", kind: "exit" },
       { from: "println", to: "end" }
     ]
   },
@@ -768,7 +768,7 @@ int main() {
       { from: "ck", to: "set", label: "真·找到了", kind: "true" },
       { from: "ck", to: "ju", fromSide: "right", toSide: "right", curve: { cx: 345, cy: 465 }, label: "假", kind: "false" },
       { from: "set", to: "ju" },
-      { from: "ju", to: "ic", fromSide: "left", toSide: "left", curve: { cx: 70, cy: 380 }, label: "j++ 继续内层", kind: "back" },
+      { from: "ju", to: "ic", fromSide: "left", toSide: "left", curve: { cx: -100, cy: 380 }, label: "j++ 继续内层", kind: "back", labelPos: { x: 35, y: 370 } },
       { from: "ic", to: "iu", fromSide: "right", toSide: "left", label: "假·内层结束", kind: "false", labelPos: { x: 330, y: 225 } },
       { from: "iu", to: "oc", fromSide: "top", toSide: "right", label: "i++ 回外层判断", kind: "back" },
       { from: "oc", to: "out", fromSide: "left", toSide: "top", curve: { cx: -50, cy: 360 }, label: "假·外层结束", kind: "exit", labelPos: { x: 20, y: 350 } },
