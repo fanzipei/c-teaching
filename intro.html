@@ -6,7 +6,7 @@
 <meta name="description" content="认识C程序：从 Hello World 开始，用简单有趣的小例子了解 C 语言编程的核心思想——输出、变量、计算、判断与循环。">
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
 <title>认识C程序 - C语言教学演示</title>
-<link rel="stylesheet" href="style.css?v=27">
+<link rel="stylesheet" href="style.css?v=28">
 </head>
 <body>
 <nav></nav>
@@ -21,6 +21,7 @@
 <li><strong>变量</strong>像一个贴了标签的盒子，里面装的值可以随时取出、更换</li>
 <li>计算机是一台超级计算器：平时、期中、期末成绩一加权，总评立刻算出来</li>
 <li><strong>判断</strong>让程序根据不同情况走不同的路，<strong>循环</strong>让计算机不知疲倦地重复</li>
+<li><strong>数组</strong>：一排带编号的盒子，适合存放一组同类数据（比如 12 个月的平均气温）</li>
 <li>每条语句以分号 <code>;</code> 结尾——这是 C 语言的「句号」</li>
 </ul>
 </div>
@@ -58,11 +59,12 @@
   <div id="demo3"></div>
   <div id="demo4"></div>
   <div id="demo5"></div>
+  <div id="demo6"></div>
 </div>
 </main>
 
-<script src="site-config.js?v=27"></script>
-<script src="demo-engine.js?v=27"></script>
+<script src="site-config.js?v=28"></script>
+<script src="demo-engine.js?v=28"></script>
 <script>
 createDemo("demo0", {
   title: "Hello, World!",
@@ -277,6 +279,55 @@ int main() {
     { line: 4, loop: [{label:"i=1",active:false}], info: "i 变成 0，条件 i >= 1 不成立了，循环结束" },
     { line: 7, output: "5...\n4...\n3...\n2...\n1...\n发射！", info: "循环外面的 printf 接着执行：发射！" },
     { line: 8, info: "程序结束。注意体会：计算机把「重复 5 次」这件事包办了，一次都不偷懒" }
+  ]
+});
+createDemo("demo6", {
+  title: "数组：长春气温年鉴",
+  subtitle: "一排格子存下 12 个月的平均气温，找出最热和最冷的月份",
+  code: `#include <stdio.h>
+
+int main() {
+    double temps[12] = {-14.7, -8.7, 2.5, 9.7, 16.5, 20.0,
+                        25.9, 21.5, 17.2, 8.4, -1.9, -9.6};
+    int i;
+    int hottest = 0, coldest = 0;
+    for (i = 0; i < 12; i++) {
+        printf("%d 月: %.1f°C\\n", i + 1, temps[i]);
+        if (temps[i] > temps[hottest]) hottest = i;
+        if (temps[i] < temps[coldest]) coldest = i;
+    }
+    printf("最热是 %d 月（%.1f°C）\\n", hottest + 1, temps[hottest]);
+    printf("最冷是 %d 月（%.1f°C）\\n", coldest + 1, temps[coldest]);
+    return 0;
+}`,
+  vizTypes: ["vars","array","loop","console"],
+  steps: [
+    { line: 2, info: "main() 开始" },
+    { line: 3, vars: {temps:{value:"double[12]",type:"array"}}, array: {name:"temps", cells:[{val:-14.7},{val:-8.7},{val:2.5},{val:9.7},{val:16.5},{val:20.0},{val:25.9},{val:21.5},{val:17.2},{val:8.4},{val:-1.9},{val:-9.6}]}, info: "数组 temps 存下长春 12 个月的平均气温（2021 年数据）：一排带编号的格子，下标从 0 开始" },
+    { line: 6, vars: {hottest:{value:0,type:"int"},coldest:{value:0,type:"int"}}, info: "先假设 1 月（下标 0）暂时既是最热也是最冷" },
+    { line: 7, vars: {i:{value:0,type:"int"}}, loop: [{label:"i=0",active:true}], info: "开始逐月检查" },
+    { line: 8, output: "1 月: -14.7°C", array: {name:"temps", cells:[{val:-14.7,highlight:true},{val:-8.7},{val:2.5},{val:9.7},{val:16.5},{val:20.0},{val:25.9},{val:21.5},{val:17.2},{val:8.4},{val:-1.9},{val:-9.6}], markers:[{index:0,label:"最热"},{index:0,label:"最冷"}]}, info: "1 月：-14.7°C" },
+    { line: 9, info: "和当前最热记录（就是自己）持平，不刷新" },
+    { line: 8, output: "1 月: -14.7°C\n2 月: -8.7°C", vars: {i:{value:1,type:"int"}}, loop: [{label:"i=1",active:true}], array: {name:"temps", cells:[{val:-14.7},{val:-8.7,highlight:true},{val:2.5},{val:9.7},{val:16.5},{val:20.0},{val:25.9},{val:21.5},{val:17.2},{val:8.4},{val:-1.9},{val:-9.6}], markers:[{index:0,label:"最热"},{index:0,label:"最冷"}]}, info: "2 月：-8.7°C" },
+    { line: 9, vars: {hottest:{value:1,type:"int"}}, info: "-8.7 > -14.7，比 1 月暖和！最热记录刷新为 2 月" },
+    { line: 10, info: "那它比最冷的 1 月还冷吗？-8.7 > -14.7，不够冷——最冷记录不变（还是 1 月）" },
+    { line: 8, output: "1 月: -14.7°C\n2 月: -8.7°C\n3 月: 2.5°C", vars: {i:{value:2,type:"int"}}, loop: [{label:"i=2",active:true}], array: {name:"temps", cells:[{val:-14.7},{val:-8.7},{val:2.5,highlight:true},{val:9.7},{val:16.5},{val:20.0},{val:25.9},{val:21.5},{val:17.2},{val:8.4},{val:-1.9},{val:-9.6}], markers:[{index:1,label:"最热"},{index:0,label:"最冷"}]}, info: "3 月：2.5°C，开春了" },
+    { line: 9, vars: {hottest:{value:2,type:"int"}}, info: "2.5 > -8.7，最热记录刷新为 3 月" },
+    { line: 8, output: "1 月: -14.7°C\n2 月: -8.7°C\n3 月: 2.5°C\n4 月: 9.7°C", vars: {i:{value:3,type:"int"}}, loop: [{label:"i=3",active:true}], array: {name:"temps", cells:[{val:-14.7},{val:-8.7},{val:2.5},{val:9.7,highlight:true},{val:16.5},{val:20.0},{val:25.9},{val:21.5},{val:17.2},{val:8.4},{val:-1.9},{val:-9.6}], markers:[{index:2,label:"最热"},{index:0,label:"最冷"}]}, info: "4 月：9.7°C" },
+    { line: 9, vars: {hottest:{value:3,type:"int"}}, info: "最热记录刷新为 4 月" },
+    { line: 8, output: "1 月: -14.7°C\n2 月: -8.7°C\n3 月: 2.5°C\n4 月: 9.7°C\n5 月: 16.5°C", vars: {i:{value:4,type:"int"}}, loop: [{label:"i=4",active:true}], array: {name:"temps", cells:[{val:-14.7},{val:-8.7},{val:2.5},{val:9.7},{val:16.5,highlight:true},{val:20.0},{val:25.9},{val:21.5},{val:17.2},{val:8.4},{val:-1.9},{val:-9.6}], markers:[{index:3,label:"最热"},{index:0,label:"最冷"}]}, info: "5 月：16.5°C" },
+    { line: 9, vars: {hottest:{value:4,type:"int"}}, info: "最热记录刷新为 5 月" },
+    { line: 8, output: "1 月: -14.7°C\n2 月: -8.7°C\n3 月: 2.5°C\n4 月: 9.7°C\n5 月: 16.5°C\n6 月: 20.0°C", vars: {i:{value:5,type:"int"}}, loop: [{label:"i=5",active:true}], array: {name:"temps", cells:[{val:-14.7},{val:-8.7},{val:2.5},{val:9.7},{val:16.5},{val:20.0,highlight:true},{val:25.9},{val:21.5},{val:17.2},{val:8.4},{val:-1.9},{val:-9.6}], markers:[{index:4,label:"最热"},{index:0,label:"最冷"}]}, info: "6 月：20.0°C" },
+    { line: 9, vars: {hottest:{value:5,type:"int"}}, info: "最热记录刷新为 6 月" },
+    { line: 8, output: "1 月: -14.7°C\n2 月: -8.7°C\n3 月: 2.5°C\n4 月: 9.7°C\n5 月: 16.5°C\n6 月: 20.0°C\n7 月: 25.9°C", vars: {i:{value:6,type:"int"}}, loop: [{label:"i=6",active:true}], array: {name:"temps", cells:[{val:-14.7},{val:-8.7},{val:2.5},{val:9.7},{val:16.5},{val:20.0},{val:25.9,highlight:true},{val:21.5},{val:17.2},{val:8.4},{val:-1.9},{val:-9.6}], markers:[{index:5,label:"最热"},{index:0,label:"最冷"}]}, info: "7 月：25.9°C" },
+    { line: 9, vars: {hottest:{value:6,type:"int"}}, info: "又刷新了！最热记录变为 7 月（25.9°C）" },
+    { line: 8, output: "1 月: -14.7°C\n2 月: -8.7°C\n3 月: 2.5°C\n4 月: 9.7°C\n5 月: 16.5°C\n6 月: 20.0°C\n7 月: 25.9°C\n8 月: 21.5°C", vars: {i:{value:7,type:"int"}}, loop: [{label:"i=7",active:true}], array: {name:"temps", cells:[{val:-14.7},{val:-8.7},{val:2.5},{val:9.7},{val:16.5},{val:20.0},{val:25.9},{val:21.5,highlight:true},{val:17.2},{val:8.4},{val:-1.9},{val:-9.6}], markers:[{index:6,label:"最热"},{index:0,label:"最冷"}]}, info: "8 月：21.5°C——没有 7 月热，记录不变（加快节奏）" },
+    { line: 8, output: "1 月: -14.7°C\n2 月: -8.7°C\n3 月: 2.5°C\n4 月: 9.7°C\n5 月: 16.5°C\n6 月: 20.0°C\n7 月: 25.9°C\n8 月: 21.5°C\n9 月: 17.2°C\n10 月: 8.4°C", vars: {i:{value:9,type:"int"}}, loop: [{label:"i=9",active:true}], array: {name:"temps", cells:[{val:-14.7},{val:-8.7},{val:2.5},{val:9.7},{val:16.5},{val:20.0},{val:25.9},{val:21.5},{val:17.2},{val:8.4,highlight:true},{val:-1.9},{val:-9.6}], markers:[{index:6,label:"最热"},{index:0,label:"最冷"}]}, info: "9 月、10 月也都没超过 7 月，记录不变" },
+    { line: 8, output: "1 月: -14.7°C\n2 月: -8.7°C\n3 月: 2.5°C\n4 月: 9.7°C\n5 月: 16.5°C\n6 月: 20.0°C\n7 月: 25.9°C\n8 月: 21.5°C\n9 月: 17.2°C\n10 月: 8.4°C\n11 月: -1.9°C\n12 月: -9.6°C", vars: {i:{value:11,type:"int"}}, loop: [{label:"i=11",active:true}], array: {name:"temps", cells:[{val:-14.7},{val:-8.7},{val:2.5},{val:9.7},{val:16.5},{val:20.0},{val:25.9},{val:21.5},{val:17.2},{val:8.4},{val:-1.9},{val:-9.6,highlight:true}], markers:[{index:6,label:"最热"},{index:0,label:"最冷"}]}, info: "11 月、12 月够冷，但都没冷过 1 月——最冷记录不变" },
+    { line: 7, loop: [{label:"i=11",active:false}], info: "12 个月全部检查完，循环结束" },
+    { line: 12, output: "1 月: -14.7°C\n2 月: -8.7°C\n3 月: 2.5°C\n4 月: 9.7°C\n5 月: 16.5°C\n6 月: 20.0°C\n7 月: 25.9°C\n8 月: 21.5°C\n9 月: 17.2°C\n10 月: 8.4°C\n11 月: -1.9°C\n12 月: -9.6°C\n最热是 7 月（25.9°C）", info: "公布结果：最热是 7 月" },
+    { line: 13, output: "1 月: -14.7°C\n2 月: -8.7°C\n3 月: 2.5°C\n4 月: 9.7°C\n5 月: 16.5°C\n6 月: 20.0°C\n7 月: 25.9°C\n8 月: 21.5°C\n9 月: 17.2°C\n10 月: 8.4°C\n11 月: -1.9°C\n12 月: -9.6°C\n最热是 7 月（25.9°C）\n最冷是 1 月（-14.7°C）", info: "最冷是 1 月" },
+    { line: 14, info: "程序结束。体会一下：数组存下一组同类数据，循环负责重复，判断负责比较——三者合体，就是数据分析的雏形" }
   ]
 });
 </script>

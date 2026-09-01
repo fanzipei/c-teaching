@@ -5,7 +5,7 @@
   if (typeof module === 'object' && module.exports) module.exports = chapters;
 })(typeof window !== 'undefined' ? window : null, function createChapterConfig() {
   return Object.freeze([
-    Object.freeze({ page: 'intro.html', title: '认识C程序', shortTitle: '认识C程序', demo: 6, quiz: 0 }),
+    Object.freeze({ page: 'intro.html', title: '认识C程序', shortTitle: '认识C程序', demo: 7, quiz: 0 }),
     Object.freeze({ page: 'datatype.html', title: '数据类型与赋值语句', shortTitle: '数据类型与赋值语句', demo: 11, quiz: 6 }),
     Object.freeze({ page: 'condition.html', title: '条件语句', shortTitle: '条件语句', demo: 6, quiz: 6 }),
     Object.freeze({ page: 'loop.html', title: '循环语句', shortTitle: '循环语句', demo: 10, quiz: 6 }),
