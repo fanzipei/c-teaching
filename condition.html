@@ -224,9 +224,10 @@ int main() {
   steps: [
     { line: 2, info: "main() 开始", flow: { node: "start" } },
     { line: 3, vars: {n:{value:-5,type:"int"}}, info: "n = -5", flow: { node: "init", edge: { from: "start", to: "init" } } },
-    { line: 6, info: "n > 0 ? 否（沿假路径向下级联）。再判断 n < 0 ? 是，进入 else if 分支", flow: { node: "c2", edges: [{ from: "init", to: "c1" }, { from: "c1", to: "c2" }], kind: "match" } },
+    { line: 4, info: "先判断 n > 0：-5 > 0 为假，沿假路径向下级联到 else if", flow: { node: "c1", edge: { from: "init", to: "c1" } } },
+    { line: 6, info: "再判断 n < 0：-5 < 0 为真，进入 else if 分支", flow: { node: "c2", edge: { from: "c1", to: "c2" }, kind: "match" } },
     { line: 7, output: "负数", info: "输出 负数", flow: { node: "neg", edge: { from: "c2", to: "neg" } } },
-    { line: 11, info: "if-else 结构结束：执行完一个分支后，沿虚线汇合到末尾，其余分支全部被跳过", flow: { node: "end", edge: { from: "neg", to: "end" } } },
+    { line: 10, info: "if-else 结构结束：执行完一个分支后，沿虚线汇合到末尾，其余分支全部被跳过", flow: { node: "end", edge: { from: "neg", to: "end" } } },
     { line: 11, info: "程序结束", flow: { node: "end" } }
   ]
 });
