@@ -136,6 +136,9 @@ class CDemo {
     this.graphState = null;      // 图/调用树渲染状态：{nodes, edges}
     this.lastHanoi = null;
     this.lastInfo = '点击"运行"、"下一步"或"上一步"开始演示';
+    this.inputCollected = false;   // config.input：是否已收集到用户输入
+    this.inputWaiting = false;     // 是否正停在输入步骤等待用户输入
+    this.resumeAfterInput = false; // 输入完成后是否恢复自动播放
     this.render();
     this.reset();
     this.bindKeys();
@@ -176,6 +179,10 @@ class CDemo {
     </div>`;
     this.renderCode();
     this.renderViz();
+    if (this.config.input) {
+      const inp = document.getElementById(`${this.config.id}-input`);
+      if (inp) inp.addEventListener('keydown', (e) => { if (e.key === 'Enter') this.submitInput(); });
+    }
   }
 
   renderCode() {
@@ -196,7 +203,7 @@ class CDemo {
     if (types.includes('vars')) parts.push(`<div class="viz-box"><h4>变量状态</h4><div class="var-table" id="${id}-vars"></div></div>`);
     if (types.includes('memory')) parts.push(`<div class="viz-box"><h4>内存视图</h4><div class="memory-view" id="${id}-memory"></div></div>`);
     if (types.includes('stack')) parts.push(`<div class="viz-box"><h4>调用栈</h4><div class="stack-frame" id="${id}-stack"></div></div>`);
-    if (types.includes('console')) parts.push(`<div class="viz-box"><h4>输出</h4><div class="console" id="${id}-console"><span class="console-prompt">$ </span></div></div>`);
+    if (types.includes('console')) parts.push(`<div class="viz-box"><h4>输出</h4><div class="console" id="${id}-console"><span class="console-prompt">$ </span></div>${this.config.input ? `<div class="demo-input-row" id="${id}-input-row"><span class="console-prompt">›</span><input class="demo-input" id="${id}-input" type="text" placeholder="${this.config.input.placeholder || ''}" autocomplete="off" spellcheck="false"></div>` : ''}</div>`);
     if (types.includes('array')) parts.push(`<div class="viz-box"><h4>数组</h4><div class="array-panel" id="${id}-array"></div></div>`);
     if (types.includes('matrix')) parts.push(`<div class="viz-box"><h4>二维数组</h4><div class="matrix-panel" id="${id}-matrix"></div></div>`);
     if (types.includes('pointer')) parts.push(`<div class="viz-box"><h4>指针关系</h4><div class="pointer-viz" id="${id}-pointer"></div></div>`);
@@ -297,6 +304,10 @@ class CDemo {
     this.lastHanoi = null;
     this.lastInfo = '点击"运行"、"下一步"或"上一步"开始演示';
     if (this.playTimer) clearInterval(this.playTimer);
+    this.inputCollected = false;
+    this.cancelInputWait();
+    const inpEl = document.getElementById(`${this.config.id}-input`);
+    if (inpEl) inpEl.value = '';
 
     const lines = this.container.querySelectorAll('.code-line');
     lines.forEach(l => { l.classList.remove('active'); });
@@ -384,8 +395,59 @@ class CDemo {
     }, this.playInterval);
   }
 
+  // 到达输入步骤：暂停播放，高亮输入框，等待用户输入
+  beginInputWait() {
+    const id = this.config.id;
+    this.inputWaiting = true;
+    if (this.isPlaying) {
+      this.resumeAfterInput = true;
+      this.isPlaying = false;
+      clearInterval(this.playTimer);
+      document.getElementById(`${id}-btn-play`).textContent = '▶ 运行';
+    }
+    const row = document.getElementById(`${id}-input-row`);
+    if (row) row.classList.add('waiting');
+    const inp = document.getElementById(`${id}-input`);
+    if (inp) inp.focus();
+    document.getElementById(`${id}-info`).textContent =
+      `程序正在等待输入：请在输出窗口中输入后按回车（不输入则使用默认值 ${this.config.input.defaultValue}）`;
+  }
+
+  // 收集输入（空值用默认值），回调页面重建后续步骤，然后继续执行
+  submitInput() {
+    const id = this.config.id;
+    const inpCfg = this.config.input;
+    const inp = document.getElementById(`${id}-input`);
+    const v = (inp && inp.value.trim()) || inpCfg.defaultValue;
+    this.inputCollected = true;
+    this.inputWaiting = false;
+    const row = document.getElementById(`${id}-input-row`);
+    if (row) row.classList.remove('waiting');
+    if (inpCfg.onSubmit) inpCfg.onSubmit(this, v);
+    this.next();
+    if (this.resumeAfterInput) {
+      this.resumeAfterInput = false;
+      if (!this.isPlaying) this.play();
+    }
+  }
+
+  cancelInputWait() {
+    this.inputWaiting = false;
+    this.resumeAfterInput = false;
+    const row = document.getElementById(`${this.config.id}-input-row`);
+    if (row) row.classList.remove('waiting');
+  }
+
   next() {
     if (this.currentStep >= this.config.steps.length - 1) return false;
+
+    // 输入步骤（如 scanf）：第一次到达时暂停并高亮输入框；再次推进时收集输入（空则用默认值）
+    const inpCfg = this.config.input;
+    if (inpCfg && !this.inputCollected && this.currentStep + 1 === inpCfg.step) {
+      if (!this.inputWaiting) this.beginInputWait();
+      else this.submitInput();
+      return true;
+    }
 
     // 先保存当前状态快照，用于后续回退
     this.history[this.currentStep + 1] = this.snapshot();
@@ -496,6 +558,11 @@ class CDemo {
     const state = this.history[this.currentStep];
     if (!state) return false;
     this.restore(state);
+    // 回退到输入步骤之前时，重新等待输入
+    if (this.config.input) {
+      this.cancelInputWait();
+      if (this.currentStep < this.config.input.step) this.inputCollected = false;
+    }
     // restore 会把 currentStep 设置为前一步，并把 history 截断
     this.history.length = this.currentStep + 1;
     document.getElementById(`${this.config.id}-btn-next`).disabled = false;

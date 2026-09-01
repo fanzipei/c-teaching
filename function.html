@@ -6,13 +6,15 @@
 <meta name="description" content="C语言函数交互演示：函数定义、值传递、返回值、作用域、递归，可视化调用栈与递归调用树。">
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
 <title>函数 - C语言教学演示</title>
-<link rel="stylesheet" href="style.css?v=16">
+<link rel="stylesheet" href="style.css?v=20">
 </head>
 <body>
 <nav></nav>
 <div class="container">
 <h1>函数</h1>
 <div class="intro">
+<div class="intro-flex">
+<div class="intro-main">
 <p><strong>函数</strong>是C程序的基本模块，用于封装可复用的代码。核心知识点：</p>
 <ul>
 <li>函数定义：返回类型 函数名(参数列表) { 函数体 }</li>
@@ -23,11 +25,107 @@
 <li>函数必须先声明或定义后，才能被调用</li>
 </ul>
 </div>
+<div class="intro-diagram">
+<svg viewBox="0 0 320 124" width="320" role="img" aria-label="函数调用示意图：main 把参数 3 传给函数 f，f 用 return 带回返回值 9">
+  <defs>
+    <marker id="fn-arg" markerWidth="8" markerHeight="8" refX="7" refY="3" orient="auto"><path d="M0,0 L0,6 L7,3 z" fill="#fab387"/></marker>
+    <marker id="fn-ret" markerWidth="8" markerHeight="8" refX="7" refY="3" orient="auto"><path d="M0,0 L0,6 L7,3 z" fill="#89b4fa"/></marker>
+  </defs>
+  <g font-family="Consolas,monospace" font-size="10" fill="#6c7086" text-anchor="middle">
+    <text x="72" y="40">调用者</text>
+    <text x="247" y="40">被调函数</text>
+  </g>
+  <g fill="#313244" stroke="#45475a" stroke-width="1.5">
+    <rect x="25" y="48" width="95" height="48" rx="6"/>
+    <rect x="200" y="48" width="95" height="48" rx="6"/>
+  </g>
+  <g font-family="Consolas,monospace" font-size="14" fill="#cdd6f4" text-anchor="middle">
+    <text x="72" y="77">main()</text>
+    <text x="247" y="77">f(x)</text>
+  </g>
+  <line x1="120" y1="62" x2="195" y2="62" stroke="#fab387" stroke-width="1.5" marker-end="url(#fn-arg)"/>
+  <line x1="200" y1="86" x2="125" y2="86" stroke="#89b4fa" stroke-width="1.5" marker-end="url(#fn-ret)"/>
+  <g font-family="Consolas,monospace" font-size="10" text-anchor="middle">
+    <text x="160" y="54"><tspan fill="#6c7086">参数 </tspan><tspan fill="#fab387" font-weight="bold">3</tspan></text>
+    <text x="160" y="114"><tspan fill="#6c7086">返回值 </tspan><tspan fill="#a6e3a1" font-weight="bold">9</tspan></text>
+  </g>
+</svg>
+<div class="diagram-caption">一次调用：main 把参数 3 传给 f(x)，f 用 return 带回结果 9</div>
+</div>
+</div>
+</div>
 <div class="demo-grid">
   <div id="demo0"></div>
+  <div class="intro-diagram">
+<svg viewBox="0 0 320 130" width="320" role="img" aria-label="值传递示意图：main 的 x=3 被复制成副本 x'=3 传给 swap，副本被改成 99，main 的 x 仍是 3">
+  <defs>
+    <marker id="fn-copy" markerWidth="8" markerHeight="8" refX="7" refY="3" orient="auto"><path d="M0,0 L0,6 L7,3 z" fill="#89b4fa"/></marker>
+  </defs>
+  <g font-family="Consolas,monospace" font-size="10" fill="#6c7086" text-anchor="middle">
+    <text x="80" y="16">main()</text>
+    <text x="240" y="16">swap()</text>
+  </g>
+  <g fill="#313244" stroke="#45475a" stroke-width="1.5">
+    <rect x="40" y="26" width="80" height="44" rx="6"/>
+    <rect x="200" y="26" width="80" height="44" rx="6"/>
+  </g>
+  <text x="80" y="54" font-family="Consolas,monospace" font-size="14" text-anchor="middle"><tspan fill="#cdd6f4">x = </tspan><tspan fill="#a6e3a1" font-weight="bold">3</tspan></text>
+  <text x="240" y="46" font-family="Consolas,monospace" font-size="12" fill="#a6adc8" text-anchor="middle">x' = 3</text>
+  <line x1="220" y1="42" x2="260" y2="42" stroke="#f38ba8" stroke-width="1.5"/>
+  <text x="240" y="65" font-family="Consolas,monospace" font-size="12" fill="#f38ba8" font-weight="bold" text-anchor="middle">改成 99</text>
+  <line x1="122" y1="48" x2="194" y2="48" stroke="#89b4fa" stroke-width="1.5" stroke-dasharray="5,4" marker-end="url(#fn-copy)"/>
+  <text x="160" y="40" font-family="Consolas,monospace" font-size="10" fill="#89b4fa" text-anchor="middle">复制</text>
+  <text x="80" y="90" font-family="Consolas,monospace" font-size="10" fill="#a6e3a1" text-anchor="middle">✓ 原值仍是 3</text>
+  <text x="240" y="90" font-family="Consolas,monospace" font-size="10" fill="#6c7086" text-anchor="middle">函数结束副本销毁</text>
+  <text x="160" y="116" font-family="Consolas,monospace" font-size="11" text-anchor="middle"><tspan fill="#a6adc8">值传递只改副本，</tspan><tspan fill="#f38ba8">交换失败</tspan></text>
+</svg>
+<div class="diagram-caption">值传递：swap 改的只是 x 的副本，main 的 x 仍是 3——交换失败</div>
+</div>
   <div id="demo1"></div>
   <div id="demo2"></div>
   <div id="demo3"></div>
+  <div class="intro-diagram">
+<svg viewBox="0 0 320 204" width="320" role="img" aria-label="递归调用链：fact(3) 依次向下调用 fact(2)、fact(1)，再沿右侧逐层返回 1、2、6">
+  <defs>
+    <marker id="fn-call" markerWidth="8" markerHeight="8" refX="7" refY="3" orient="auto"><path d="M0,0 L0,6 L7,3 z" fill="#89b4fa"/></marker>
+    <marker id="fn-rback" markerWidth="8" markerHeight="8" refX="7" refY="3" orient="auto"><path d="M0,0 L0,6 L7,3 z" fill="#a6e3a1"/></marker>
+  </defs>
+  <g fill="#313244" stroke="#45475a" stroke-width="1.5">
+    <rect x="95" y="8" width="110" height="26" rx="6"/>
+    <rect x="95" y="56" width="110" height="34" rx="6"/>
+    <rect x="95" y="108" width="110" height="34" rx="6"/>
+    <rect x="95" y="160" width="110" height="34" rx="6"/>
+  </g>
+  <g font-family="Consolas,monospace" text-anchor="middle">
+    <text x="150" y="25" font-size="12" fill="#cdd6f4">main()</text>
+    <text x="150" y="78" font-size="13" fill="#cdd6f4">fact(3)</text>
+    <text x="150" y="130" font-size="13" fill="#cdd6f4">fact(2)</text>
+    <text x="150" y="176" font-size="13" fill="#cdd6f4">fact(1)</text>
+    <text x="150" y="189" font-size="9" fill="#a6e3a1">n&lt;=1, return 1</text>
+  </g>
+  <g stroke="#89b4fa" stroke-width="1.5">
+    <line x1="105" y1="34" x2="105" y2="52" marker-end="url(#fn-call)"/>
+    <line x1="105" y1="90" x2="105" y2="104" marker-end="url(#fn-call)"/>
+    <line x1="105" y1="142" x2="105" y2="156" marker-end="url(#fn-call)"/>
+  </g>
+  <g font-family="Consolas,monospace" font-size="10" fill="#89b4fa" text-anchor="middle">
+    <text x="83" y="48">调用</text>
+    <text x="83" y="100">调用</text>
+    <text x="83" y="152">调用</text>
+  </g>
+  <g stroke="#a6e3a1" stroke-width="1.5">
+    <line x1="195" y1="158" x2="195" y2="146" marker-end="url(#fn-rback)"/>
+    <line x1="195" y1="106" x2="195" y2="94" marker-end="url(#fn-rback)"/>
+    <line x1="195" y1="54" x2="195" y2="38" marker-end="url(#fn-rback)"/>
+  </g>
+  <g font-family="Consolas,monospace" font-size="10">
+    <text x="212" y="154"><tspan fill="#a6e3a1" font-weight="bold">1</tspan><tspan fill="#6c7086"> 返回</tspan></text>
+    <text x="212" y="102"><tspan fill="#a6e3a1" font-weight="bold">2</tspan><tspan fill="#6c7086"> 返回</tspan></text>
+    <text x="212" y="50"><tspan fill="#a6e3a1" font-weight="bold">6</tspan><tspan fill="#6c7086"> 返回</tspan></text>
+  </g>
+</svg>
+<div class="diagram-caption">递归：fact(3) 逐层调用到 fact(1) 触底，再逐层返回 1、2、6</div>
+</div>
   <div id="demo4"></div>
   <div id="demo5"></div>
   <div id="demo6"></div>
@@ -44,7 +142,7 @@
 </div>
 </div>
 
-<script src="demo-engine.js?v=16"></script>
+<script src="demo-engine.js?v=20"></script>
 <script>
 createDemo("demo0", {
   title: "函数的定义与调用",

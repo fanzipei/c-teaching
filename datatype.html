@@ -6,13 +6,15 @@
 <meta name="description" content="C语言数据类型与赋值语句交互演示：基本类型、printf/scanf、类型转换、转义字符、常量与宏、复合赋值、自增自减，逐行执行并可视化变量状态。">
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
 <title>数据类型与赋值语句 - C语言教学演示</title>
-<link rel="stylesheet" href="style.css?v=16">
+<link rel="stylesheet" href="style.css?v=20">
 </head>
 <body>
 <nav></nav>
 <div class="container">
 <h1>数据类型与赋值语句</h1>
 <div class="intro">
+<div class="intro-flex">
+<div class="intro-main">
 <p><strong>数据类型与输入输出</strong>是C语言编程的基石：</p>
 <ul>
 <li>基本类型：<code>int</code>（整数）、<code>float</code>（单精度浮点）、<code>double</code>（双精度浮点）、<code>char</code>（字符）；<code>sizeof</code> 可查看类型占用的字节数</li>
@@ -21,6 +23,27 @@
 <li>转义字符：<code>\n</code>（换行）、<code>\t</code>（制表符）、<code>\\</code>（反斜杠）、<code>\"</code>（双引号）</li>
 <li>常量：<code>#define PI 3.14</code>（宏定义，编译时替换）</li>
 </ul>
+</div>
+<div class="intro-diagram">
+<svg viewBox="0 0 320 82" width="320" role="img" aria-label="int、double、char 占用内存大小对比示意图">
+  <g font-family="Consolas,monospace" font-size="12" fill="#cdd6f4" text-anchor="middle">
+    <text x="54.5" y="16">int</text><text x="192" y="16">double</text><text x="297.5" y="16">char</text>
+  </g>
+  <g fill="#313244" stroke="#45475a" stroke-width="1.5">
+    <rect x="12" y="24" width="85" height="36" rx="6"/><rect x="107" y="24" width="170" height="36" rx="6"/><rect x="287" y="24" width="21" height="36" rx="6"/>
+  </g>
+  <g font-family="Consolas,monospace" fill="#a6e3a1" text-anchor="middle" font-weight="bold">
+    <text x="54.5" y="48" font-size="14">10</text><text x="192" y="48" font-size="14">3.14</text><text x="297.5" y="47" font-size="10">'A'</text>
+  </g>
+  <g font-family="Consolas,monospace" font-size="10" fill="#6c7086" text-anchor="middle">
+    <text x="54.5" y="76">4 字节</text><text x="192" y="76">8 字节</text><text x="297.5" y="76">1 字节</text>
+  </g>
+</svg>
+<div class="diagram-caption">宽度按字节数成比例：double(8) = 2 个 int(4) = 8 个 char(1)</div>
+</div>
+</div>
+<div class="intro-flex">
+<div class="intro-main">
 <p style="margin-top:1rem"><strong>赋值语句</strong>把值存入变量，是最基础的语句：</p>
 <ul>
 <li>C 是<strong>强类型</strong>语言：变量必须先声明类型再使用；基本形式 <code>变量 = 表达式;</code></li>
@@ -29,6 +52,63 @@
 <li><strong>自增/自减</strong>：<code>i++</code>（先用后加）与 <code>++i</code>（先加后用）区别重大</li>
 <li>赋值表达式本身有值，因此 <code>a = b = c = 5;</code> 从右向左执行</li>
 </ul>
+</div>
+<div class="intro-diagram">
+<svg viewBox="0 0 320 92" width="320" role="img" aria-label="赋值语句把值存入变量的示意图">
+  <defs><marker id="dt-arrow" markerWidth="8" markerHeight="8" refX="7" refY="3" orient="auto"><path d="M0,0 L0,6 L7,3 z" fill="#89b4fa"/></marker></defs>
+  <text x="240" y="15" font-family="Consolas,monospace" font-size="10" fill="#6c7086" text-anchor="middle">变量 age 的内存空间</text>
+  <text x="24" y="52" font-family="Consolas,monospace" font-size="13" fill="#cdd6f4">age = 18;</text>
+  <line x1="118" y1="46" x2="162" y2="46" stroke="#89b4fa" stroke-width="1.5" marker-end="url(#dt-arrow)"/>
+  <rect x="172" y="24" width="136" height="44" rx="6" fill="#313244" stroke="#45475a" stroke-width="1.5"/>
+  <text x="240" y="54" font-family="Consolas,monospace" font-size="16" fill="#a6e3a1" font-weight="bold" text-anchor="middle">18</text>
+  <text x="160" y="86" font-family="Consolas,monospace" font-size="10" fill="#6c7086" text-anchor="middle">执行后：值 18 被存入变量 age</text>
+</svg>
+<div class="diagram-caption">赋值 = 把右边的值放进左边变量的「盒子」</div>
+</div>
+</div>
+<div class="intro-diagrams">
+<div class="intro-diagram">
+<svg viewBox="0 0 320 132" width="320" role="img" aria-label="printf 占位符替换示意图">
+  <defs><marker id="dt-fmt-arrow" markerWidth="8" markerHeight="8" refX="7" refY="3" orient="auto"><path d="M0,0 L0,6 L7,3 z" fill="#89b4fa"/></marker></defs>
+  <text x="10" y="13" font-family="Consolas,monospace" font-size="10" fill="#6c7086">格式串</text>
+  <rect x="10" y="19" width="300" height="32" rx="6" fill="#313244" stroke="#45475a" stroke-width="1.5"/>
+  <text x="20" y="40" font-family="Consolas,monospace" font-size="13" fill="#cdd6f4">"年龄:<tspan fill="#fab387" font-weight="bold">%d</tspan> 成绩:<tspan fill="#fab387" font-weight="bold">%.1f</tspan>"</text>
+  <line x1="160" y1="51" x2="160" y2="73" stroke="#89b4fa" stroke-width="1.5" marker-end="url(#dt-fmt-arrow)"/>
+  <text x="170" y="67" font-family="Consolas,monospace" font-size="10" fill="#a6adc8">占位符依次被替换</text>
+  <text x="10" y="91" font-family="Consolas,monospace" font-size="10" fill="#6c7086">输出</text>
+  <rect x="10" y="97" width="300" height="28" rx="6" fill="#313244" stroke="#45475a" stroke-width="1.5"/>
+  <text x="20" y="115" font-family="Consolas,monospace" font-size="13" fill="#a6e3a1">年龄:18 成绩:92.5</text>
+</svg>
+<div class="diagram-caption">printf 把 %d、%.1f 等占位符按顺序替换成变量的值</div>
+</div>
+<div class="intro-diagram">
+<svg viewBox="0 0 320 132" width="320" role="img" aria-label="整数除法与强制转换的对比示意图">
+  <defs>
+    <marker id="dt-div-arrow-b" markerWidth="8" markerHeight="8" refX="7" refY="3" orient="auto"><path d="M0,0 L0,6 L7,3 z" fill="#89b4fa"/></marker>
+    <marker id="dt-div-arrow-g" markerWidth="8" markerHeight="8" refX="7" refY="3" orient="auto"><path d="M0,0 L0,6 L7,3 z" fill="#a6e3a1"/></marker>
+    <marker id="dt-div-arrow-r" markerWidth="8" markerHeight="8" refX="7" refY="3" orient="auto"><path d="M0,0 L0,6 L7,3 z" fill="#f38ba8"/></marker>
+  </defs>
+  <line x1="160" y1="8" x2="160" y2="124" stroke="#45475a" stroke-width="1" stroke-dasharray="3,4"/>
+  <text x="80" y="13" font-family="Consolas,monospace" font-size="10" fill="#6c7086" text-anchor="middle">整数除法 int/int</text>
+  <rect x="15" y="19" width="130" height="30" rx="6" fill="#313244" stroke="#45475a" stroke-width="1.5"/>
+  <text x="80" y="39" font-family="Consolas,monospace" font-size="13" fill="#cdd6f4" text-anchor="middle">10 / 3</text>
+  <line x1="80" y1="49" x2="80" y2="71" stroke="#89b4fa" stroke-width="1.5" marker-end="url(#dt-div-arrow-b)"/>
+  <rect x="15" y="72" width="130" height="30" rx="6" fill="#313244" stroke="#45475a" stroke-width="1.5"/>
+  <text x="72" y="92" font-family="Consolas,monospace" font-size="14" fill="#a6e3a1" font-weight="bold" text-anchor="middle">3</text>
+  <text x="84" y="90" font-family="Consolas,monospace" font-size="11" fill="#f38ba8">.333</text>
+  <line x1="98" y1="94" x2="98" y2="110" stroke="#f38ba8" stroke-width="1.5" stroke-dasharray="3,3" marker-end="url(#dt-div-arrow-r)"/>
+  <text x="80" y="124" font-family="Consolas,monospace" font-size="10" fill="#f38ba8" text-anchor="middle">小数部分被丢弃</text>
+  <text x="240" y="13" font-family="Consolas,monospace" font-size="10" fill="#6c7086" text-anchor="middle">强制转换为 double</text>
+  <rect x="175" y="19" width="130" height="30" rx="6" fill="#313244" stroke="#45475a" stroke-width="1.5"/>
+  <text x="240" y="38" font-family="Consolas,monospace" font-size="12" fill="#cdd6f4" text-anchor="middle">(double)10 / 3</text>
+  <line x1="240" y1="49" x2="240" y2="71" stroke="#a6e3a1" stroke-width="1.5" marker-end="url(#dt-div-arrow-g)"/>
+  <rect x="175" y="72" width="130" height="30" rx="6" fill="#313244" stroke="#45475a" stroke-width="1.5"/>
+  <text x="240" y="92" font-family="Consolas,monospace" font-size="14" fill="#a6e3a1" font-weight="bold" text-anchor="middle">3.33</text>
+  <text x="240" y="124" font-family="Consolas,monospace" font-size="10" fill="#a6e3a1" text-anchor="middle">保留小数部分</text>
+</svg>
+<div class="diagram-caption">10/3 是整数除法得 3；先转 double 再除才得 3.33</div>
+</div>
+</div>
 </div>
 <div class="demo-grid">
   <div id="demo0"></div>
@@ -70,7 +150,7 @@
 </div>
 </div>
 
-<script src="demo-engine.js?v=16"></script>
+<script src="demo-engine.js?v=20"></script>
 <script>
 /* ===== 数据类型与输入输出 ===== */
 createDemo("demo0", {

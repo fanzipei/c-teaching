@@ -3,36 +3,104 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="description" content="认识C程序：从 Hello World 开始，用简单有趣的小例子了解 C 语言编程的核心思想——输出、变量、计算、循环与判断。">
+<meta name="description" content="认识C程序：从 Hello World 开始，用简单有趣的小例子了解 C 语言编程的核心思想——输出、变量、计算、判断与循环。">
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
 <title>认识C程序 - C语言教学演示</title>
-<link rel="stylesheet" href="style.css?v=16">
+<link rel="stylesheet" href="style.css?v=20">
 </head>
 <body>
 <nav></nav>
 <div class="container">
 <h1>认识C程序</h1>
 <div class="intro">
+<div class="intro-flex">
+<div class="intro-main">
 <p><strong>程序</strong>就是写给计算机执行的一系列指令。C 程序从 <code>main()</code> 开始，从上到下一行一行地执行。这一章不讲语法细节，只用几个小例子带你感受编程是怎么回事：</p>
 <ul>
 <li><code>printf</code> 是程序「说话」的方式：双引号里的内容会显示到屏幕上</li>
 <li><strong>变量</strong>像一个贴了标签的盒子，里面装的值可以随时取出、更换</li>
-<li>计算机是一台超级计算器，加减乘除转瞬完成</li>
-<li><strong>循环</strong>让计算机不知疲倦地重复，<strong>判断</strong>让程序根据不同情况走不同的路</li>
+<li>计算机是一台超级计算器：平时、期中、期末成绩一加权，总评立刻算出来</li>
+<li><strong>判断</strong>让程序根据不同情况走不同的路，<strong>循环</strong>让计算机不知疲倦地重复</li>
 <li>每条语句以分号 <code>;</code> 结尾——这是 C 语言的「句号」</li>
 </ul>
+</div>
+<div class="intro-diagram">
+<svg viewBox="0 0 320 206" width="320" role="img" aria-label="程序从上到下逐行执行，printf 把内容输出到终端屏幕的示意图">
+  <defs><marker id="intro-arrow" markerWidth="8" markerHeight="8" refX="7" refY="3" orient="auto"><path d="M0,0 L0,6 L7,3 z" fill="#89b4fa"/></marker></defs>
+  <g font-family="Consolas,monospace" font-size="10" fill="#6c7086" text-anchor="end">
+    <text x="12" y="29">1</text><text x="12" y="61">2</text><text x="12" y="93">3</text>
+  </g>
+  <g fill="#313244" stroke="#45475a" stroke-width="1.5">
+    <rect x="20" y="12" width="172" height="26" rx="6"/><rect x="20" y="44" width="172" height="26" rx="6"/><rect x="20" y="76" width="172" height="26" rx="6"/>
+  </g>
+  <g font-family="Consolas,monospace" font-size="11" fill="#cdd6f4">
+    <text x="30" y="29">printf("Hello,");</text><text x="30" y="61">printf(" World!");</text><text x="30" y="93">printf("\n");</text>
+  </g>
+  <line x1="106" y1="38" x2="106" y2="44" stroke="#89b4fa" stroke-width="1.5" marker-end="url(#intro-arrow)"/>
+  <line x1="106" y1="70" x2="106" y2="76" stroke="#89b4fa" stroke-width="1.5" marker-end="url(#intro-arrow)"/>
+  <line x1="212" y1="16" x2="212" y2="98" stroke="#89b4fa" stroke-width="1.5" marker-end="url(#intro-arrow)"/>
+  <text x="222" y="60" font-family="Consolas,monospace" font-size="10" fill="#6c7086">逐行执行</text>
+  <line x1="106" y1="106" x2="106" y2="128" stroke="#89b4fa" stroke-width="1.5" marker-end="url(#intro-arrow)"/>
+  <rect x="16" y="132" width="288" height="66" rx="6" fill="#1e1e2e" stroke="#45475a" stroke-width="1.5"/>
+  <circle cx="32" cy="146" r="3.5" fill="#f38ba8"/><circle cx="44" cy="146" r="3.5" fill="#f9e2af"/><circle cx="56" cy="146" r="3.5" fill="#a6e3a1"/>
+  <text x="288" y="148" font-family="Consolas,monospace" font-size="10" fill="#6c7086" text-anchor="end">终端</text>
+  <text x="30" y="176" font-family="Consolas,monospace" font-size="14" font-weight="bold" fill="#a6e3a1">Hello, World!</text>
+  <rect x="142" y="164" width="8" height="15" fill="#a6e3a1" opacity="0.75"/>
+</svg>
+<div class="diagram-caption">程序从上到下一行一行执行，printf 把内容显示到屏幕上</div>
+</div>
+</div>
 </div>
 <div class="demo-grid">
   <div id="demo0"></div>
   <div id="demo1"></div>
+  <div class="intro-diagram">
+<svg viewBox="0 0 320 150" width="320" role="img" aria-label="变量 age 的盒子：旧值 18 被划掉换成 19，右侧箭头表示取出旧值加 1 再放回">
+  <defs><marker id="age-arrow" markerWidth="8" markerHeight="8" refX="7" refY="3" orient="auto"><path d="M0,0 L0,6 L7,3 z" fill="#89b4fa"/></marker></defs>
+  <rect x="24" y="24" width="56" height="22" rx="6" fill="#313244" stroke="#45475a" stroke-width="1.5"/>
+  <text x="52" y="40" font-family="Consolas,monospace" font-size="12" fill="#cdd6f4" text-anchor="middle">age</text>
+  <rect x="16" y="46" width="130" height="70" rx="6" fill="#313244" stroke="#45475a" stroke-width="1.5"/>
+  <text x="52" y="90" font-family="Consolas,monospace" font-size="22" fill="#f38ba8" text-anchor="middle">18</text>
+  <line x1="38" y1="84" x2="66" y2="84" stroke="#f38ba8" stroke-width="2"/>
+  <text x="112" y="90" font-family="Consolas,monospace" font-size="22" font-weight="bold" fill="#a6e3a1" text-anchor="middle">19</text>
+  <path d="M 146 66 C 200 30, 272 34, 282 76 C 290 112, 220 134, 150 110" fill="none" stroke="#89b4fa" stroke-width="1.5" marker-end="url(#age-arrow)"/>
+  <text x="213" y="28" font-family="Consolas,monospace" font-size="10" fill="#6c7086" text-anchor="middle">取出旧值 18</text>
+  <text x="297" y="80" font-family="Consolas,monospace" font-size="11" fill="#cdd6f4" text-anchor="middle">+1</text>
+  <text x="213" y="146" font-family="Consolas,monospace" font-size="10" fill="#a6e3a1" text-anchor="middle">放回，变成 19</text>
+</svg>
+<div class="diagram-caption">age = age + 1：把盒子里的旧值取出来加 1 再放回，age 从 18 变成 19</div>
+</div>
   <div id="demo2"></div>
   <div id="demo3"></div>
   <div id="demo4"></div>
+  <div class="intro-diagram">
+<svg viewBox="0 0 320 100" width="320" role="img" aria-label="for 循环倒计时：5、4、3、2、1 五个圆形气泡依次用箭头相连，最后箭头指向星形的发射文字块">
+  <defs><marker id="cd-arrow" markerWidth="8" markerHeight="8" refX="7" refY="3" orient="auto"><path d="M0,0 L0,6 L7,3 z" fill="#89b4fa"/></marker></defs>
+  <text x="122" y="14" font-family="Consolas,monospace" font-size="10" fill="#6c7086" text-anchor="middle">for (i = 5; i &gt;= 1; i--)</text>
+  <g fill="#313244" stroke="#45475a" stroke-width="1.5">
+    <circle cx="30" cy="45" r="15"/><circle cx="76" cy="45" r="15"/><circle cx="122" cy="45" r="15"/><circle cx="168" cy="45" r="15"/><circle cx="214" cy="45" r="15"/>
+  </g>
+  <g font-family="Consolas,monospace" font-size="14" fill="#cdd6f4" text-anchor="middle">
+    <text x="30" y="50">5</text><text x="76" y="50">4</text><text x="122" y="50">3</text><text x="168" y="50">2</text><text x="214" y="50">1</text>
+  </g>
+  <g stroke="#89b4fa" stroke-width="1.5">
+    <line x1="46" y1="45" x2="58" y2="45" marker-end="url(#cd-arrow)"/>
+    <line x1="92" y1="45" x2="104" y2="45" marker-end="url(#cd-arrow)"/>
+    <line x1="138" y1="45" x2="150" y2="45" marker-end="url(#cd-arrow)"/>
+    <line x1="184" y1="45" x2="196" y2="45" marker-end="url(#cd-arrow)"/>
+    <line x1="230" y1="45" x2="252" y2="44" marker-end="url(#cd-arrow)"/>
+  </g>
+  <polygon points="283,17 290.1,35.3 309.6,36.3 294.4,48.7 299.5,67.6 283,57 266.5,67.6 271.6,48.7 256.4,36.3 275.9,35.3" fill="#313244" stroke="#f9e2af" stroke-width="1.5"/>
+  <text x="283" y="50" font-family="Consolas,monospace" font-size="13" font-weight="bold" fill="#f9e2af" text-anchor="middle">发射！</text>
+  <text x="122" y="88" font-family="Consolas,monospace" font-size="10" fill="#6c7086" text-anchor="middle">每数一个数，i 减 1；数到 1 后循环结束</text>
+</svg>
+<div class="diagram-caption">for 循环让 i 从 5 数到 1，条件不成立后执行循环外的「发射！」</div>
+</div>
   <div id="demo5"></div>
 </div>
 </div>
 
-<script src="demo-engine.js?v=16"></script>
+<script src="demo-engine.js?v=20"></script>
 <script>
 createDemo("demo0", {
   title: "Hello, World!",
@@ -93,38 +161,100 @@ int main() {
     { line: 7, info: "程序结束" }
   ]
 });
-createDemo("demo3", {
-  title: "超级计算器",
-  subtitle: "加减乘除，转瞬完成",
-  code: `#include <stdio.h>
+// 成绩计算器：输入平时、期中、期末成绩，输出加权百分成绩
+function makeScoreDemo(usual, midterm, final) {
+  const score = usual * 0.3 + midterm * 0.3 + final * 0.4;
+  const scoreS = score.toFixed(1);
+  const prompt = "请输入平时、期中、期末成绩：";
+  const inputLine = usual + " " + midterm + " " + final;
+  return {
+    title: "成绩计算器",
+    subtitle: "平时 ×30% + 期中 ×30% + 期末 ×40%；运行到 scanf 时可直接输入你的成绩",
+    code: `#include <stdio.h>
 
 int main() {
-    int price = 6;
-    int count = 7;
-    printf("苹果 %d 元一斤，买 %d 斤\\n", price, count);
-    printf("一共 %d 元\\n", price * count);
-    printf("顺便，1+2+...+100 = %d\\n", (1 + 100) * 100 / 2);
+    float usual, midterm, final;
+    float score;
+    printf("请输入平时、期中、期末成绩：");
+    scanf("%f %f %f", &usual, &midterm, &final);
+    score = usual * 0.3 + midterm * 0.3 + final * 0.4;
+    printf("百分成绩 = %.1f\\n", score);
     return 0;
 }`,
-  vizTypes: ["vars","console"],
-  steps: [
-    { line: 2, info: "main() 开始" },
-    { line: 3, vars: {price:{value:6,type:"int"}}, info: "单价 6 元" },
-    { line: 4, vars: {count:{value:7,type:"int"}}, info: "买 7 斤" },
-    { line: 5, output: "苹果 6 元一斤，买 7 斤", info: "一行里可以用多个 %d，按顺序依次替换成 price 和 count" },
-    { line: 6, output: "苹果 6 元一斤，买 7 斤\n一共 42 元", info: "price * count 先做乘法 6×7，再把结果填进 %d" },
-    { line: 7, output: "苹果 6 元一斤，买 7 斤\n一共 42 元\n顺便，1+2+...+100 = 5050", info: "(1+100)×100÷2 = 5050——这就是著名的「高斯求和」，计算机瞬间就算完了" },
-    { line: 8, info: "程序结束" }
-  ]
-});
-createDemo("demo4", {
+    vizTypes: ["vars","console"],
+    input: {
+      step: 4,
+      defaultValue: "90 80 85",
+      placeholder: "平时 期中 期末，例如：90 80 85",
+      onSubmit: function (demo, v) {
+        const parts = v.split(/\s+/);
+        const num = (s, d) => { const x = parseFloat(s); return isNaN(x) ? d : x; };
+        demo.config.steps = makeScoreDemo(num(parts[0], 90), num(parts[1], 80), num(parts[2], 85)).steps;
+      }
+    },
+    steps: [
+      { line: 2, info: "main() 开始" },
+      { line: 3, vars: {usual:{value:"?",type:"float"},midterm:{value:"?",type:"float"},final:{value:"?",type:"float"}}, info: "声明三个 float 变量（float 专门装小数），分别装三种成绩" },
+      { line: 4, vars: {score:{value:"?",type:"float"}}, info: "score 用来装算好的总评" },
+      { line: 5, output: prompt, info: "程序打印提示，然后停下来等待你输入" },
+      { line: 6, output: prompt + inputLine, vars: {usual:{value:usual,type:"float"},midterm:{value:midterm,type:"float"},final:{value:final,type:"float"}}, info: "scanf 按顺序把你输入的三个数分别装进三个盒子" },
+      { line: 7, vars: {score:{value:scoreS,type:"float"}}, info: "加权计算：" + usual + "×0.3 + " + midterm + "×0.3 + " + final + "×0.4 = " + scoreS },
+      { line: 8, output: prompt + inputLine + "\n百分成绩 = " + scoreS, info: "%.1f 表示保留 1 位小数输出" },
+      { line: 9, info: "程序结束" }
+    ]
+  };
+}
+createDemo("demo3", makeScoreDemo(90, 80, 85));
+// 判断：程序会做决定（成绩从标准输入读入）
+function makeJudgeDemo(score) {
+  const pass = score >= 60;
+  const prompt = "请输入你的分数：";
+  return {
+    title: "判断：程序会做决定",
+    subtitle: "执行到 scanf 时输入你的分数，看看程序走哪条路",
+    code: `#include <stdio.h>
+
+int main() {
+    int score;
+    printf("请输入你的分数：");
+    scanf("%d", &score);
+    if (score >= 60) {
+        printf("及格啦，恭喜！\\n");
+    } else {
+        printf("继续努力！\\n");
+    }
+    return 0;
+}`,
+    vizTypes: ["vars","branch","console"],
+    input: {
+      step: 3,
+      defaultValue: "85",
+      placeholder: "你的分数，例如：85",
+      onSubmit: function (demo, v) {
+        const x = parseInt(v, 10);
+        demo.config.steps = makeJudgeDemo(isNaN(x) ? 85 : x).steps;
+      }
+    },
+    steps: [
+      { line: 2, info: "main() 开始" },
+      { line: 3, vars: {score:{value:"?",type:"int"}}, info: "声明整数变量 score，准备装你的分数" },
+      { line: 4, output: prompt, info: "程序打印提示，然后停下来等待你输入" },
+      { line: 5, output: prompt + score, vars: {score:{value:score,type:"int"}}, info: "scanf 把你输入的 " + score + " 存进 score" },
+      { line: 6, branch: [{label:"score >= 60：及格啦",active:pass},{label:"score < 60：继续努力",active:!pass}], info: "if 先做判断：" + score + " >= 60 " + (pass ? "成立（为真），走上面的路" : "不成立（为假），走 else 的路") },
+      { line: pass ? 7 : 9, output: prompt + score + "\n" + (pass ? "及格啦，恭喜！" : "继续努力！"), info: pass ? "执行 if 分支；else 分支被跳过，一行都不会执行" : "执行 else 分支；if 分支被跳过，一行都不会执行" },
+      { line: 11, info: pass ? "程序结束。重置后输入 60 以下的分数，看看另一条路" : "程序结束。重置后输入 60 以上的分数，看看另一条路" }
+    ]
+  };
+}
+createDemo("demo4", makeJudgeDemo(85));
+createDemo("demo5", {
   title: "循环：不知疲倦地重复",
   subtitle: "倒计时这种重复劳动，交给计算机最合适",
   code: `#include <stdio.h>
 
 int main() {
     int i;
-    for (i = 3; i >= 1; i--) {
+    for (i = 5; i >= 1; i--) {
         printf("%d...\\n", i);
     }
     printf("发射！\\n");
@@ -133,38 +263,19 @@ int main() {
   vizTypes: ["vars","loop","console"],
   steps: [
     { line: 2, info: "main() 开始" },
-    { line: 4, vars: {i:{value:3,type:"int"}}, loop: [{label:"i=3",active:true}], info: "for 循环：i 从 3 开始，只要 i >= 1 就重复执行" },
-    { line: 5, output: "3...", info: "打印 3..." },
-    { line: 4, vars: {i:{value:2,type:"int"}}, loop: [{label:"i=3",active:false},{label:"i=2",active:true}], info: "i-- 让 i 减 1，i 变成 2，条件仍然成立，继续" },
-    { line: 5, output: "3...\n2...", info: "打印 2..." },
-    { line: 4, vars: {i:{value:1,type:"int"}}, loop: [{label:"i=3",active:false},{label:"i=2",active:false},{label:"i=1",active:true}], info: "i 变成 1，再来一轮" },
-    { line: 5, output: "3...\n2...\n1...", info: "打印 1..." },
+    { line: 4, vars: {i:{value:5,type:"int"}}, loop: [{label:"i=5",active:true}], info: "for 循环：i 从 5 开始，只要 i >= 1 就重复执行" },
+    { line: 5, output: "5...", info: "打印 5..." },
+    { line: 4, vars: {i:{value:4,type:"int"}}, loop: [{label:"i=5",active:false},{label:"i=4",active:true}], info: "i-- 让 i 减 1，i 变成 4，条件仍然成立，继续" },
+    { line: 5, output: "5...\n4...", info: "打印 4..." },
+    { line: 4, vars: {i:{value:3,type:"int"}}, loop: [{label:"i=5",active:false},{label:"i=4",active:false},{label:"i=3",active:true}], info: "i 变成 3，再来一轮" },
+    { line: 5, output: "5...\n4...\n3...", info: "打印 3..." },
+    { line: 4, vars: {i:{value:2,type:"int"}}, loop: [{label:"i=4",active:false},{label:"i=3",active:false},{label:"i=2",active:true}], info: "i 变成 2" },
+    { line: 5, output: "5...\n4...\n3...\n2...", info: "打印 2..." },
+    { line: 4, vars: {i:{value:1,type:"int"}}, loop: [{label:"i=3",active:false},{label:"i=2",active:false},{label:"i=1",active:true}], info: "i 变成 1，最后一轮" },
+    { line: 5, output: "5...\n4...\n3...\n2...\n1...", info: "打印 1..." },
     { line: 4, loop: [{label:"i=1",active:false}], info: "i 变成 0，条件 i >= 1 不成立了，循环结束" },
-    { line: 7, output: "3...\n2...\n1...\n发射！", info: "循环外面的 printf 接着执行：发射！" },
-    { line: 8, info: "程序结束。注意体会：计算机把「重复 3 次」这件事包办了，一次都不偷懒" }
-  ]
-});
-createDemo("demo5", {
-  title: "判断：程序会做决定",
-  subtitle: "不同的分数，走不同的路",
-  code: `#include <stdio.h>
-
-int main() {
-    int score = 85;
-    if (score >= 60) {
-        printf("及格啦，恭喜！\\n");
-    } else {
-        printf("继续努力！\\n");
-    }
-    return 0;
-}`,
-  vizTypes: ["vars","branch","console"],
-  steps: [
-    { line: 2, info: "main() 开始" },
-    { line: 3, vars: {score:{value:85,type:"int"}}, info: "盒子里装进 85 分" },
-    { line: 4, branch: [{label:"score >= 60：及格啦",active:true},{label:"score < 60：继续努力",active:false}], info: "if 会先做判断：85 >= 60 成立（为真），所以走上面的路" },
-    { line: 5, output: "及格啦，恭喜！", info: "执行 if 分支里的 printf；else 分支被跳过，一行都不会执行" },
-    { line: 9, info: "程序结束。试试把 85 改成 50 再运行，程序会走另一条路——这就是「会做决定」的程序" }
+    { line: 7, output: "5...\n4...\n3...\n2...\n1...\n发射！", info: "循环外面的 printf 接着执行：发射！" },
+    { line: 8, info: "程序结束。注意体会：计算机把「重复 5 次」这件事包办了，一次都不偷懒" }
   ]
 });
 </script>
