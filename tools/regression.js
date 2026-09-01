@@ -82,7 +82,7 @@ const PAGES = ['intro.html', 'datatype.html', 'condition.html', 'loop.html',
   page.on('console', m => { if (m.type() === 'error') errors.push(m.text()); });
   await page.goto('file://' + path.resolve(__dirname, '..', 'index.html'));
   await page.evaluate(() => {
-    for (let i = 0; i < 11; i++) localStorage.setItem('cteaching:done:loop.html:demo' + i, '1');
+    for (let i = 0; i < 10; i++) localStorage.setItem('cteaching:done:loop.html:demo' + i, '1');
     for (let i = 0; i < 6; i++) localStorage.setItem('cteaching:done:loop.html:quiz' + i, '1');
     localStorage.setItem('cteaching:done:struct.html:demo0', '1');
   });

@@ -126,7 +126,6 @@
   <div id="demo7"></div>
   <div id="demo8"></div>
   <div id="demo9"></div>
-  <div id="demo10"></div>
 </div>
 <h2>章节练习</h2>
 <div class="quiz-grid">
@@ -374,77 +373,8 @@ int main() {
     { line: 10, info: "程序结束", flow: { node: "end", edge: { from: "println", to: "end" } } }
   ]
 });
-/* ========== demo4: 嵌套循环 ========== */
+/* ========== demo4: 遍历数组 ========== */
 createDemo("demo4", {
-  title: "嵌套循环",
-  subtitle: "打印九九乘法表的一角（观察内外两层判断框的嵌套关系）",
-  code: `#include <stdio.h>
-
-int main() {
-    int i, j;
-    for (i = 1; i <= 3; i++) {
-        for (j = 1; j <= 3; j++) {
-            printf("%d ", i * j);
-        }
-        printf("\\n");
-    }
-    return 0;
-}`,
-  vizTypes: ["flowchart","vars","loop","console"],
-  flowchart: {
-    nodes: [
-      { id: "start",   type: "start",    label: "开始",          x: 200, y: 8,   w: 90,  h: 34 },
-      { id: "oc",      type: "decision", label: "外层 i <= 3 ?", x: 170, y: 58,  w: 150, h: 60 },
-      { id: "ic",      type: "decision", label: "内层 j <= 3 ?", x: 170, y: 158, w: 150, h: 60 },
-      { id: "print",   type: "process",  label: "printf i*j",    x: 170, y: 248, w: 150, h: 38 },
-      { id: "ju",      type: "process",  label: "j++",           x: 170, y: 316, w: 150, h: 38 },
-      { id: "println", type: "process",  label: "printf 换行",   x: 360, y: 158, w: 130, h: 38 },
-      { id: "iu",      type: "process",  label: "i++",           x: 360, y: 226, w: 130, h: 38 },
-      { id: "end",     type: "end",      label: "结束",          x: 30,  y: 390, w: 90,  h: 34 }
-    ],
-    edges: [
-      { from: "start", to: "oc" },
-      { from: "oc", to: "ic", label: "真", kind: "true" },
-      { from: "ic", to: "print", label: "真", kind: "true" },
-      { from: "print", to: "ju" },
-      { from: "ju", to: "ic", fromSide: "left", toSide: "left", curve: { cx: 90, cy: 250 }, label: "内层循环", kind: "back" },
-      { from: "ic", to: "println", fromSide: "right", toSide: "left", label: "假·内层结束", kind: "false", labelPos: { x: 340, y: 150 } },
-      { from: "println", to: "iu" },
-      { from: "iu", to: "oc", fromSide: "right", toSide: "right", curve: { cx: 560, cy: 90 }, label: "外层循环", kind: "back" },
-      { from: "oc", to: "end", fromSide: "left", toSide: "top", curve: { cx: 10, cy: 240 }, label: "假·全部结束", kind: "exit", labelPos: { x: 92, y: 306 } }
-    ]
-  },
-  steps: [
-    { line: 3, info: "main() 开始", flow: { node: "start" } },
-    { line: 4, vars: {i:{value:1,type:"int"}}, loop: [{label:"i=1",active:true}], info: "外层 i=1；判断 i<=3 为真", flow: { node: "oc", edge: { from: "start", to: "oc" } } },
-    { line: 5, vars: {j:{value:1,type:"int"}}, loop: [{label:"i=1 j=1",active:true}], info: "内层 j=1；判断 j<=3 为真", flow: { node: "ic", edge: { from: "oc", to: "ic" } } },
-    { line: 6, output: "1 ", info: "打印 1*1=1", flow: { node: "print", edge: { from: "ic", to: "print" } } },
-    { line: 5, vars: {j:{value:2,type:"int"}}, loop: [{label:"i=1 j=2",active:true}], info: "j++ 后 j=2；内层条件为真", flow: { node: "ic", edges: [{ from: "print", to: "ju" }, { from: "ju", to: "ic" }] } },
-    { line: 6, output: "1 2 ", info: "打印 1*2=2", flow: { node: "print", edge: { from: "ic", to: "print" } } },
-    { line: 5, vars: {j:{value:3,type:"int"}}, loop: [{label:"i=1 j=3",active:true}], info: "j++ 后 j=3；内层条件为真", flow: { node: "ic", edges: [{ from: "print", to: "ju" }, { from: "ju", to: "ic" }] } },
-    { line: 6, output: "1 2 3 ", info: "打印 1*3=3", flow: { node: "print", edge: { from: "ic", to: "print" } } },
-    { line: 8, output: "1 2 3 \n", info: "j++ 后 j=4，内层条件为假，内层结束，换行", flow: { node: "println", edge: { from: "ic", to: "println" } } },
-    { line: 4, vars: {i:{value:2,type:"int"}}, loop: [{label:"i=1",active:false},{label:"i=2",active:true}], info: "i++ 后 i=2；外层条件为真，内层重新开始", flow: { node: "oc", edges: [{ from: "println", to: "iu" }, { from: "iu", to: "oc" }] } },
-    { line: 5, vars: {j:{value:1,type:"int"}}, loop: [{label:"i=2 j=1",active:true}], info: "内层 j 重新从 1 开始", flow: { node: "ic", edge: { from: "oc", to: "ic" } } },
-    { line: 6, output: "1 2 3 \n2 ", info: "打印 2*1=2", flow: { node: "print", edge: { from: "ic", to: "print" } } },
-    { line: 5, vars: {j:{value:2,type:"int"}}, loop: [{label:"i=2 j=2",active:true}], info: "j=2", flow: { node: "ic", edges: [{ from: "print", to: "ju" }, { from: "ju", to: "ic" }] } },
-    { line: 6, output: "1 2 3 \n2 4 ", info: "打印 2*2=4", flow: { node: "print", edge: { from: "ic", to: "print" } } },
-    { line: 5, vars: {j:{value:3,type:"int"}}, loop: [{label:"i=2 j=3",active:true}], info: "j=3", flow: { node: "ic", edges: [{ from: "print", to: "ju" }, { from: "ju", to: "ic" }] } },
-    { line: 6, output: "1 2 3 \n2 4 6 ", info: "打印 2*3=6", flow: { node: "print", edge: { from: "ic", to: "print" } } },
-    { line: 8, output: "1 2 3 \n2 4 6 \n", info: "内层结束，换行", flow: { node: "println", edge: { from: "ic", to: "println" } } },
-    { line: 4, vars: {i:{value:3,type:"int"}}, loop: [{label:"i=2",active:false},{label:"i=3",active:true}], info: "外层 i=3", flow: { node: "oc", edges: [{ from: "println", to: "iu" }, { from: "iu", to: "oc" }] } },
-    { line: 5, vars: {j:{value:1,type:"int"}}, loop: [{label:"i=3 j=1",active:true}], info: "内层 j=1", flow: { node: "ic", edge: { from: "oc", to: "ic" } } },
-    { line: 6, output: "1 2 3 \n2 4 6 \n3 ", info: "打印 3", flow: { node: "print", edge: { from: "ic", to: "print" } } },
-    { line: 5, vars: {j:{value:2,type:"int"}}, loop: [{label:"i=3 j=2",active:true}], info: "j=2", flow: { node: "ic", edges: [{ from: "print", to: "ju" }, { from: "ju", to: "ic" }] } },
-    { line: 6, output: "1 2 3 \n2 4 6 \n3 6 ", info: "打印 6", flow: { node: "print", edge: { from: "ic", to: "print" } } },
-    { line: 5, vars: {j:{value:3,type:"int"}}, loop: [{label:"i=3 j=3",active:true}], info: "j=3", flow: { node: "ic", edges: [{ from: "print", to: "ju" }, { from: "ju", to: "ic" }] } },
-    { line: 6, output: "1 2 3 \n2 4 6 \n3 6 9 ", info: "打印 9", flow: { node: "print", edge: { from: "ic", to: "print" } } },
-    { line: 8, output: "1 2 3 \n2 4 6 \n3 6 9 \n", info: "内层结束，换行；i++ 后 i=4，外层条件为假", flow: { node: "println", edge: { from: "ic", to: "println" } } },
-    { line: 10, info: "外层循环也结束，程序结束（沿红色路径到达终点）", flow: { node: "end", edges: [{ from: "println", to: "iu" }, { from: "iu", to: "oc" }, { from: "oc", to: "end" }], kind: "exit" } }
-  ]
-});
-/* ========== demo5: 遍历数组 ========== */
-createDemo("demo5", {
   title: "遍历数组",
   subtitle: "用循环处理一组数据",
   code: `#include <stdio.h>
@@ -504,8 +434,8 @@ int main() {
     { line: 10, info: "程序结束", flow: { node: "end", edge: { from: "print", to: "end" } } }
   ]
 });
-/* ========== demo6: 判断质数 ========== */
-createDemo("demo6", {
+/* ========== demo5: 判断质数 ========== */
+createDemo("demo5", {
   title: "判断质数",
   subtitle: "标志变量 + 找到因子立即 break（循环与分支的综合应用）",
   code: `#include <stdio.h>
@@ -571,8 +501,8 @@ int main() {
     { line: 17, info: "程序结束（若改成 n = 7，循环会完整跑完，从「假·检查完毕」路径到达同一判断）", flow: { node: "end", edge: { from: "pno", to: "end" } } }
   ]
 });
-/* ========== demo7: 角谷猜想（3n+1 问题） ========== */
-createDemo("demo7", {
+/* ========== demo6: 角谷猜想（3n+1 问题） ========== */
+createDemo("demo6", {
   title: "角谷猜想（3n+1 问题）",
   subtitle: "while + if-else：循环次数无法预知的循环，奇偶走不同路径",
   code: `#include <stdio.h>
@@ -647,17 +577,17 @@ int main() {
     { line: 16, info: "程序结束。任意正整数最终都会回到 1——这就是著名的、至今未被证明的角谷猜想", flow: { node: "end", edge: { from: "println", to: "end" } } }
   ]
 });
-/* ========== demo8: 多层循环基础：打印坐标 ========== */
-createDemo("demo8", {
-  title: "多层循环基础：打印坐标",
-  subtitle: "外层循环一次，内层完整执行一轮",
+/* ========== demo7: 嵌套循环 ========== */
+createDemo("demo7", {
+  title: "嵌套循环",
+  subtitle: "打印九九乘法表的一角（观察内外两层判断框的嵌套关系）",
   code: `#include <stdio.h>
 
 int main() {
     int i, j;
-    for (i = 1; i <= 2; i++) {
+    for (i = 1; i <= 3; i++) {
         for (j = 1; j <= 3; j++) {
-            printf("(%d,%d) ", i, j);
+            printf("%d ", i * j);
         }
         printf("\\n");
     }
@@ -667,9 +597,9 @@ int main() {
   flowchart: {
     nodes: [
       { id: "start",   type: "start",    label: "开始",          x: 200, y: 8,   w: 90,  h: 34 },
-      { id: "oc",      type: "decision", label: "外层 i <= 2 ?", x: 170, y: 58,  w: 150, h: 60 },
+      { id: "oc",      type: "decision", label: "外层 i <= 3 ?", x: 170, y: 58,  w: 150, h: 60 },
       { id: "ic",      type: "decision", label: "内层 j <= 3 ?", x: 170, y: 158, w: 150, h: 60 },
-      { id: "print",   type: "process",  label: "打印 (i,j)",    x: 170, y: 248, w: 150, h: 38 },
+      { id: "print",   type: "process",  label: "printf i*j",    x: 170, y: 248, w: 150, h: 38 },
       { id: "ju",      type: "process",  label: "j++",           x: 170, y: 316, w: 150, h: 38 },
       { id: "println", type: "process",  label: "printf 换行",   x: 360, y: 158, w: 130, h: 38 },
       { id: "iu",      type: "process",  label: "i++",           x: 360, y: 226, w: 130, h: 38 },
@@ -684,33 +614,40 @@ int main() {
       { from: "ic", to: "println", fromSide: "right", toSide: "left", label: "假·内层结束", kind: "false", labelPos: { x: 340, y: 150 } },
       { from: "println", to: "iu" },
       { from: "iu", to: "oc", fromSide: "right", toSide: "right", curve: { cx: 560, cy: 90 }, label: "外层循环", kind: "back" },
-      { from: "oc", to: "end", fromSide: "left", toSide: "top", curve: { cx: 10, cy: 240 }, label: "假·外层结束", kind: "exit", labelPos: { x: 92, y: 306 } }
+      { from: "oc", to: "end", fromSide: "left", toSide: "top", curve: { cx: 10, cy: 240 }, label: "假·全部结束", kind: "exit", labelPos: { x: 92, y: 306 } }
     ]
   },
   steps: [
-    { line: 2, info: "main() 开始", flow: { node: "start" } },
-    { line: 3, vars: {i:{value:1,type:"int"},j:{value:0,type:"int"}}, info: "声明两个循环变量：外层 i、内层 j", flow: { node: "start", edge: { from: "start", to: "oc" } } },
-    { line: 4, loop: [{label:"i=1",active:true}], info: "外层 i=1；判断 i<=2 为真", flow: { node: "oc", edge: { from: "start", to: "oc" } } },
+    { line: 3, info: "main() 开始", flow: { node: "start" } },
+    { line: 4, vars: {i:{value:1,type:"int"}}, loop: [{label:"i=1",active:true}], info: "外层 i=1；判断 i<=3 为真", flow: { node: "oc", edge: { from: "start", to: "oc" } } },
     { line: 5, vars: {j:{value:1,type:"int"}}, loop: [{label:"i=1 j=1",active:true}], info: "内层 j=1；判断 j<=3 为真", flow: { node: "ic", edge: { from: "oc", to: "ic" } } },
-    { line: 6, output: "(1,1) ", info: "打印 (1,1)", flow: { node: "print", edge: { from: "ic", to: "print" } } },
-    { line: 5, vars: {j:{value:2,type:"int"}}, loop: [{label:"i=1 j=2",active:true}], info: "j++ 后 j=2，内层继续", flow: { node: "ic", edges: [{ from: "print", to: "ju" }, { from: "ju", to: "ic" }] } },
-    { line: 6, output: "(1,1) (1,2) ", info: "打印 (1,2)", flow: { node: "print", edge: { from: "ic", to: "print" } } },
-    { line: 5, vars: {j:{value:3,type:"int"}}, loop: [{label:"i=1 j=3",active:true}], info: "j++ 后 j=3", flow: { node: "ic", edges: [{ from: "print", to: "ju" }, { from: "ju", to: "ic" }] } },
-    { line: 6, output: "(1,1) (1,2) (1,3) ", info: "打印 (1,3)", flow: { node: "print", edge: { from: "ic", to: "print" } } },
-    { line: 8, output: "(1,1) (1,2) (1,3) \n", info: "j++ 后 j=4，内层条件为假：内层结束，打印换行", flow: { node: "println", edge: { from: "ic", to: "println" } } },
-    { line: 4, vars: {i:{value:2,type:"int"}}, loop: [{label:"i=2",active:true}], info: "i++ 后 i=2，外层继续——注意内层 j 将重新从 1 开始", flow: { node: "oc", edges: [{ from: "println", to: "iu" }, { from: "iu", to: "oc" }] } },
+    { line: 6, output: "1 ", info: "打印 1*1=1", flow: { node: "print", edge: { from: "ic", to: "print" } } },
+    { line: 5, vars: {j:{value:2,type:"int"}}, loop: [{label:"i=1 j=2",active:true}], info: "j++ 后 j=2；内层条件为真", flow: { node: "ic", edges: [{ from: "print", to: "ju" }, { from: "ju", to: "ic" }] } },
+    { line: 6, output: "1 2 ", info: "打印 1*2=2", flow: { node: "print", edge: { from: "ic", to: "print" } } },
+    { line: 5, vars: {j:{value:3,type:"int"}}, loop: [{label:"i=1 j=3",active:true}], info: "j++ 后 j=3；内层条件为真", flow: { node: "ic", edges: [{ from: "print", to: "ju" }, { from: "ju", to: "ic" }] } },
+    { line: 6, output: "1 2 3 ", info: "打印 1*3=3", flow: { node: "print", edge: { from: "ic", to: "print" } } },
+    { line: 8, output: "1 2 3 \n", info: "j++ 后 j=4，内层条件为假，内层结束，换行", flow: { node: "println", edge: { from: "ic", to: "println" } } },
+    { line: 4, vars: {i:{value:2,type:"int"}}, loop: [{label:"i=1",active:false},{label:"i=2",active:true}], info: "i++ 后 i=2；外层条件为真，内层重新开始", flow: { node: "oc", edges: [{ from: "println", to: "iu" }, { from: "iu", to: "oc" }] } },
     { line: 5, vars: {j:{value:1,type:"int"}}, loop: [{label:"i=2 j=1",active:true}], info: "内层 j 重新从 1 开始", flow: { node: "ic", edge: { from: "oc", to: "ic" } } },
-    { line: 6, output: "(1,1) (1,2) (1,3) \n(2,1) ", info: "打印 (2,1)", flow: { node: "print", edge: { from: "ic", to: "print" } } },
-    { line: 5, vars: {j:{value:2,type:"int"}}, loop: [{label:"i=2 j=2",active:true}], info: "j++ 后 j=2", flow: { node: "ic", edges: [{ from: "print", to: "ju" }, { from: "ju", to: "ic" }] } },
-    { line: 6, output: "(1,1) (1,2) (1,3) \n(2,1) (2,2) ", info: "打印 (2,2)", flow: { node: "print", edge: { from: "ic", to: "print" } } },
-    { line: 5, vars: {j:{value:3,type:"int"}}, loop: [{label:"i=2 j=3",active:true}], info: "j++ 后 j=3", flow: { node: "ic", edges: [{ from: "print", to: "ju" }, { from: "ju", to: "ic" }] } },
-    { line: 6, output: "(1,1) (1,2) (1,3) \n(2,1) (2,2) (2,3) ", info: "打印 (2,3)", flow: { node: "print", edge: { from: "ic", to: "print" } } },
-    { line: 8, output: "(1,1) (1,2) (1,3) \n(2,1) (2,2) (2,3) \n", info: "内层再次结束，换行", flow: { node: "println", edge: { from: "ic", to: "println" } } },
-    { line: 10, info: "i++ 后 i=3，外层条件为假，外层也结束。程序结束", flow: { node: "end", edges: [{ from: "println", to: "iu" }, { from: "iu", to: "oc" }, { from: "oc", to: "end" }], kind: "exit" } }
+    { line: 6, output: "1 2 3 \n2 ", info: "打印 2*1=2", flow: { node: "print", edge: { from: "ic", to: "print" } } },
+    { line: 5, vars: {j:{value:2,type:"int"}}, loop: [{label:"i=2 j=2",active:true}], info: "j=2", flow: { node: "ic", edges: [{ from: "print", to: "ju" }, { from: "ju", to: "ic" }] } },
+    { line: 6, output: "1 2 3 \n2 4 ", info: "打印 2*2=4", flow: { node: "print", edge: { from: "ic", to: "print" } } },
+    { line: 5, vars: {j:{value:3,type:"int"}}, loop: [{label:"i=2 j=3",active:true}], info: "j=3", flow: { node: "ic", edges: [{ from: "print", to: "ju" }, { from: "ju", to: "ic" }] } },
+    { line: 6, output: "1 2 3 \n2 4 6 ", info: "打印 2*3=6", flow: { node: "print", edge: { from: "ic", to: "print" } } },
+    { line: 8, output: "1 2 3 \n2 4 6 \n", info: "内层结束，换行", flow: { node: "println", edge: { from: "ic", to: "println" } } },
+    { line: 4, vars: {i:{value:3,type:"int"}}, loop: [{label:"i=2",active:false},{label:"i=3",active:true}], info: "外层 i=3", flow: { node: "oc", edges: [{ from: "println", to: "iu" }, { from: "iu", to: "oc" }] } },
+    { line: 5, vars: {j:{value:1,type:"int"}}, loop: [{label:"i=3 j=1",active:true}], info: "内层 j=1", flow: { node: "ic", edge: { from: "oc", to: "ic" } } },
+    { line: 6, output: "1 2 3 \n2 4 6 \n3 ", info: "打印 3", flow: { node: "print", edge: { from: "ic", to: "print" } } },
+    { line: 5, vars: {j:{value:2,type:"int"}}, loop: [{label:"i=3 j=2",active:true}], info: "j=2", flow: { node: "ic", edges: [{ from: "print", to: "ju" }, { from: "ju", to: "ic" }] } },
+    { line: 6, output: "1 2 3 \n2 4 6 \n3 6 ", info: "打印 6", flow: { node: "print", edge: { from: "ic", to: "print" } } },
+    { line: 5, vars: {j:{value:3,type:"int"}}, loop: [{label:"i=3 j=3",active:true}], info: "j=3", flow: { node: "ic", edges: [{ from: "print", to: "ju" }, { from: "ju", to: "ic" }] } },
+    { line: 6, output: "1 2 3 \n2 4 6 \n3 6 9 ", info: "打印 9", flow: { node: "print", edge: { from: "ic", to: "print" } } },
+    { line: 8, output: "1 2 3 \n2 4 6 \n3 6 9 \n", info: "内层结束，换行；i++ 后 i=4，外层条件为假", flow: { node: "println", edge: { from: "ic", to: "println" } } },
+    { line: 10, info: "外层循环也结束，程序结束（沿红色路径到达终点）", flow: { node: "end", edges: [{ from: "println", to: "iu" }, { from: "iu", to: "oc" }, { from: "oc", to: "end" }], kind: "exit" } }
   ]
 });
-/* ========== demo9: 多层循环中的 break 与 continue ========== */
-createDemo("demo9", {
+/* ========== demo8: 多层循环中的 break 与 continue ========== */
+createDemo("demo8", {
   title: "多层循环中的 break 与 continue",
   subtitle: "它们只作用于当前所在层，不会影响外层循环",
   code: `#include <stdio.h>
@@ -786,8 +723,8 @@ int main() {
     { line: 12, info: "i++ 后 i=4，外层条件为假——程序结束。体会：每一圈的 break/continue 都只影响内层，外层始终按部就班", flow: { node: "end", edges: [{ from: "println", to: "iu" }, { from: "iu", to: "oc" }, { from: "oc", to: "end" }], kind: "exit" } }
   ]
 });
-/* ========== demo10: 用 flag 变量跳出多层循环 ========== */
-createDemo("demo10", {
+/* ========== demo9: 用 flag 变量跳出多层循环 ========== */
+createDemo("demo9", {
   title: "用 flag 变量跳出多层循环",
   subtitle: "break 只能跳一层；旗帜变量让每层条件都知道「该停了」",
   code: `#include <stdio.h>
