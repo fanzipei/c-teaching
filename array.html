@@ -133,11 +133,11 @@ int main() {
 }`,
   vizTypes: ["vars","array","console"],
   steps: [
-    { line: 3, info: "main() 开始" },
-    { line: 4, vars: {a:{value:"int[5]",type:"array"}}, array: {name:"a", cells:[{val:10},{val:20},{val:30},{val:40},{val:50}]}, info: "完全初始化：a = {10,20,30,40,50}" },
-    { line: 5, vars: {b:{value:"int[5]",type:"array"}}, array: {name:"b", cells:[{val:1},{val:2},{val:0},{val:0},{val:0}]}, info: "部分初始化：b = {1,2}，其余自动补 0" },
-    { line: 6, vars: {c:{value:"int[3]",type:"array"}}, array: {name:"c", cells:[{val:5},{val:6},{val:7}]}, info: "省略长度，编译器自动推算 c 长度为 3" },
-    { line: 7, output: "a[0]=10, b[4]=0, c[2]=7", info: "输出：b[4] 被自动初始化为 0" },
+    { line: 2, info: "main() 开始" },
+    { line: 3, vars: {a:{value:"int[5]",type:"array"}}, array: {name:"a", cells:[{val:10},{val:20},{val:30},{val:40},{val:50}]}, info: "完全初始化：a = {10,20,30,40,50}" },
+    { line: 4, vars: {b:{value:"int[5]",type:"array"}}, array: {name:"b", cells:[{val:1},{val:2},{val:0},{val:0},{val:0}]}, info: "部分初始化：b = {1,2}，其余自动补 0" },
+    { line: 5, vars: {c:{value:"int[3]",type:"array"}}, array: {name:"c", cells:[{val:5},{val:6},{val:7}]}, info: "省略长度，编译器自动推算 c 长度为 3" },
+    { line: 6, output: "a[0]=10, b[4]=0, c[2]=7", info: "输出：b[4] 被自动初始化为 0" },
     { line: 8, info: "程序结束" }
   ]
 });
@@ -156,8 +156,8 @@ int main() {
 }`,
   vizTypes: ["vars","array","loop","console"],
   steps: [
-    { line: 3, info: "main() 开始" },
-    { line: 4, vars: {arr:{value:"int[5]",type:"array"}}, array: {name:"arr", cells:[{val:10},{val:20},{val:30},{val:40},{val:50}]}, info: "定义数组 arr = {10,20,30,40,50}" },
+    { line: 2, info: "main() 开始" },
+    { line: 3, vars: {arr:{value:"int[5]",type:"array"}}, array: {name:"arr", cells:[{val:10},{val:20},{val:30},{val:40},{val:50}]}, info: "定义数组 arr = {10,20,30,40,50}" },
     { line: 5, vars: {i:{value:0,type:"int"}}, loop: [{label:"i=0",active:true}], info: "i=0，开始遍历" },
     { line: 6, output: "arr[0] = 10", info: "访问 arr[0]" },
     { line: 5, vars: {i:{value:1,type:"int"}}, loop: [{label:"i=1",active:true}], array: {name:"arr", cells:[{val:10,highlight:true},{val:20},{val:30},{val:40},{val:50}]}, info: "i=1" },
@@ -187,12 +187,12 @@ int main() {
 }`,
   vizTypes: ["vars","array","console"],
   steps: [
-    { line: 3, info: "main() 开始" },
-    { line: 4, vars: {arr:{value:"int[5]",type:"array"}}, array: {name:"arr", cells:[{val:1},{val:2},{val:3},{val:4},{val:5}]}, info: "初始数组 {1,2,3,4,5}" },
-    { line: 5, vars: {arr:{value:"int[5]",type:"array"}}, array: {name:"arr", cells:[{val:100},{val:2},{val:3},{val:4},{val:5}]}, info: "arr[0] = 100" },
-    { line: 6, vars: {arr:{value:"int[5]",type:"array"}}, array: {name:"arr", cells:[{val:100},{val:2},{val:102},{val:4},{val:5}]}, info: "arr[2] = arr[0] + arr[1] = 100 + 2 = 102" },
-    { line: 7, vars: {arr:{value:"int[5]",type:"array"}}, array: {name:"arr", cells:[{val:100},{val:2},{val:102},{val:4},{val:50}]}, info: "arr[4] *= 10，即 arr[4] = 5 * 10 = 50" },
-    { line: 8, output: "100 2 102 4 50", info: "输出修改后的数组" },
+    { line: 2, info: "main() 开始" },
+    { line: 3, vars: {arr:{value:"int[5]",type:"array"}}, array: {name:"arr", cells:[{val:1},{val:2},{val:3},{val:4},{val:5}]}, info: "初始数组 {1,2,3,4,5}" },
+    { line: 4, vars: {arr:{value:"int[5]",type:"array"}}, array: {name:"arr", cells:[{val:100},{val:2},{val:3},{val:4},{val:5}]}, info: "arr[0] = 100" },
+    { line: 5, vars: {arr:{value:"int[5]",type:"array"}}, array: {name:"arr", cells:[{val:100},{val:2},{val:102},{val:4},{val:5}]}, info: "arr[2] = arr[0] + arr[1] = 100 + 2 = 102" },
+    { line: 6, vars: {arr:{value:"int[5]",type:"array"}}, array: {name:"arr", cells:[{val:100},{val:2},{val:102},{val:4},{val:50}]}, info: "arr[4] *= 10，即 arr[4] = 5 * 10 = 50" },
+    { line: 7, output: "100 2 102 4 50", info: "输出修改后的数组" },
     { line: 9, info: "程序结束" }
   ]
 });
@@ -217,19 +217,19 @@ int main() {
 }`,
   vizTypes: ["vars","array","console"],
   steps: [
-    { line: 3, info: "main() 开始" },
-    { line: 4, vars: {arr:{value:"int[6]",type:"array"}}, array: {name:"arr", cells:[{val:3},{val:7},{val:2},{val:9},{val:1},{val:5}]}, info: "数组 {3,7,2,9,1,5}" },
-    { line: 5, vars: {sum:{value:0,type:"int"}}, info: "sum = 0" },
-    { line: 6, vars: {max:{value:3,type:"int"}}, info: "max 初始化为 arr[0] = 3" },
-    { line: 7, vars: {min:{value:3,type:"int"}}, info: "min 初始化为 arr[0] = 3" },
+    { line: 2, info: "main() 开始" },
+    { line: 3, vars: {arr:{value:"int[6]",type:"array"}}, array: {name:"arr", cells:[{val:3},{val:7},{val:2},{val:9},{val:1},{val:5}]}, info: "数组 {3,7,2,9,1,5}" },
+    { line: 4, vars: {sum:{value:0,type:"int"}}, info: "sum = 0" },
+    { line: 5, vars: {max:{value:3,type:"int"}}, info: "max 初始化为 arr[0] = 3" },
+    { line: 6, vars: {min:{value:3,type:"int"}}, info: "min 初始化为 arr[0] = 3" },
     { line: 8, vars: {i:{value:0,type:"int"}}, loop: [{label:"i=0",active:true}], array: {name:"arr", cells:[{val:3,highlight:true},{val:7},{val:2},{val:9},{val:1},{val:5}]}, info: "i=0：arr[0]=3，sum=3，max=3，min=3" },
     { line: 8, vars: {i:{value:1,type:"int"},sum:{value:10,type:"int"},max:{value:7,type:"int"}}, loop: [{label:"i=1",active:true}], array: {name:"arr", cells:[{val:3},{val:7,highlight:true},{val:2},{val:9},{val:1},{val:5}]}, info: "i=1：arr[1]=7，sum=10，max=7" },
     { line: 8, vars: {i:{value:2,type:"int"},sum:{value:12,type:"int"},min:{value:2,type:"int"}}, loop: [{label:"i=2",active:true}], array: {name:"arr", cells:[{val:3},{val:7},{val:2,highlight:true},{val:9},{val:1},{val:5}]}, info: "i=2：arr[2]=2，sum=12，min=2" },
     { line: 8, vars: {i:{value:3,type:"int"},sum:{value:21,type:"int"},max:{value:9,type:"int"}}, loop: [{label:"i=3",active:true}], array: {name:"arr", cells:[{val:3},{val:7},{val:2},{val:9,highlight:true},{val:1},{val:5}]}, info: "i=3：arr[3]=9，sum=21，max=9" },
     { line: 8, vars: {i:{value:4,type:"int"},sum:{value:22,type:"int"},min:{value:1,type:"int"}}, loop: [{label:"i=4",active:true}], array: {name:"arr", cells:[{val:3},{val:7},{val:2},{val:9},{val:1,highlight:true},{val:5}]}, info: "i=4：arr[4]=1，sum=22，min=1" },
     { line: 8, vars: {i:{value:5,type:"int"},sum:{value:27,type:"int"}}, loop: [{label:"i=5",active:true}], array: {name:"arr", cells:[{val:3},{val:7},{val:2},{val:9},{val:1},{val:5,highlight:true}]}, info: "i=5：arr[5]=5，sum=27" },
-    { line: 12, output: "sum=27 max=9 min=1", info: "最终结果" },
-    { line: 13, info: "程序结束" }
+    { line: 13, output: "sum=27 max=9 min=1", info: "最终结果" },
+    { line: 14, info: "程序结束" }
   ]
 });
 createDemo("demo4", {
@@ -279,8 +279,8 @@ int main() {
 }`,
   vizTypes: ["vars","array","console"],
   steps: [
-    { line: 3, info: "main() 开始" },
-    { line: 4, vars: {arr:{value:"int[5]",type:"array"}}, array: {name:"arr", cells:[{val:5},{val:3},{val:4},{val:1},{val:2}]}, info: "初始数组 {5,3,4,1,2}" },
+    { line: 2, info: "main() 开始" },
+    { line: 3, vars: {arr:{value:"int[5]",type:"array"}}, array: {name:"arr", cells:[{val:5},{val:3},{val:4},{val:1},{val:2}]}, info: "初始数组 {5,3,4,1,2}" },
     { line: 5, vars: {i:{value:0,type:"int"}}, loop: [{label:"i=0",active:true}], info: "外层 i=0，把最大元素冒泡到末尾" },
     { line: 6, vars: {j:{value:0,type:"int"}}, loop: [{label:"j=0",active:true}], info: "内层 j=0：arr[0]=5 > arr[1]=3，交换" },
     { line: 7, vars: {arr:{value:"int[5]",type:"array"}}, array: {name:"arr", cells:[{val:3},{val:5},{val:4},{val:1},{val:2}]}, info: "交换后 {3,5,4,1,2}" },
@@ -318,17 +318,17 @@ int main() {
 }`,
   vizTypes: ["vars","array","stack","console"],
   steps: [
-    { line: 10, info: "main() 开始" },
-    { line: 11, vars: {a:{value:"int[4]",type:"array"}}, array: {name:"a", cells:[{val:1},{val:2},{val:3},{val:4}]}, info: "定义数组 a = {1,2,3,4}" },
-    { line: 12, info: "调用 double_arr(a, 4)，传递数组首地址" },
-    { line: 3, stack: [{name:"main",value:"a[4]"},{name:"double_arr",value:"arr=a,n=4",highlight:true}], vars: {n:{value:4,type:"int"}}, info: "进入 double_arr，arr 获得 a 的首地址" },
+    { line: 9, info: "main() 开始" },
+    { line: 10, vars: {a:{value:"int[4]",type:"array"}}, array: {name:"a", cells:[{val:1},{val:2},{val:3},{val:4}]}, info: "定义数组 a = {1,2,3,4}" },
+    { line: 11, info: "调用 double_arr(a, 4)，传递数组首地址" },
+    { line: 2, stack: [{name:"main",value:"a[4]"},{name:"double_arr",value:"arr=a,n=4",highlight:true}], vars: {n:{value:4,type:"int"}}, info: "进入 double_arr，arr 获得 a 的首地址" },
     { line: 4, vars: {i:{value:0,type:"int"}}, loop: [{label:"i=0",active:true}], array: {name:"a", cells:[{val:2,highlight:true},{val:2},{val:3},{val:4}]}, info: "i=0：arr[0]*=2 => 2" },
     { line: 4, vars: {i:{value:1,type:"int"}}, loop: [{label:"i=1",active:true}], array: {name:"a", cells:[{val:2},{val:4,highlight:true},{val:3},{val:4}]}, info: "i=1：arr[1]*=2 => 4" },
     { line: 4, vars: {i:{value:2,type:"int"}}, loop: [{label:"i=2",active:true}], array: {name:"a", cells:[{val:2},{val:4},{val:6,highlight:true},{val:4}]}, info: "i=2：arr[2]*=2 => 6" },
     { line: 4, vars: {i:{value:3,type:"int"}}, loop: [{label:"i=3",active:true}], array: {name:"a", cells:[{val:2},{val:4},{val:6},{val:8,highlight:true}]}, info: "i=3：arr[3]*=2 => 8" },
     { line: 6, stack: [{name:"main",value:"a[4]",highlight:true}], info: "double_arr 结束，返回 main" },
     { line: 12, vars: {a:{value:"int[4]",type:"array"}}, array: {name:"a", cells:[{val:2},{val:4},{val:6},{val:8}]}, info: "main 中的 a 已经被修改" },
-    { line: 13, output: "2 4 6 8", info: "输出修改后的数组" },
+    { line: 12, output: "2 4 6 8", info: "输出修改后的数组" },
     { line: 14, info: "程序结束" }
   ]
 });
@@ -510,10 +510,10 @@ int main() {
 }`,
   vizTypes: ["vars","matrix","console"],
   steps: [
-    { line: 3, info: "main() 开始" },
-    { line: 4, vars: {a:{value:"int[2][3]",type:"array"}}, matrix: {name:"a", rows:2, cols:3, cells:[[{val:1},{val:2},{val:3}],[{val:4},{val:5},{val:6}]]}, info: "完全初始化 2x3 矩阵 a = {{1,2,3},{4,5,6}}" },
-    { line: 5, vars: {b:{value:"int[3][3]",type:"array"}}, matrix: {name:"b", rows:3, cols:3, cells:[[{val:1},{val:2},{val:0,hl:true}],[{val:3},{val:0,hl:true},{val:0,hl:true}],[{val:0,hl:true},{val:0,hl:true},{val:0,hl:true}]]}, info: "部分初始化 3x3 矩阵 b，未指定的元素自动为 0" },
-    { line: 6, output: "a[1][2]=6, b[2][0]=0", info: "b[2][0] 被自动初始化为 0" },
+    { line: 2, info: "main() 开始" },
+    { line: 3, vars: {a:{value:"int[2][3]",type:"array"}}, matrix: {name:"a", rows:2, cols:3, cells:[[{val:1},{val:2},{val:3}],[{val:4},{val:5},{val:6}]]}, info: "完全初始化 2x3 矩阵 a = {{1,2,3},{4,5,6}}" },
+    { line: 4, vars: {b:{value:"int[3][3]",type:"array"}}, matrix: {name:"b", rows:3, cols:3, cells:[[{val:1},{val:2},{val:0,hl:true}],[{val:3},{val:0,hl:true},{val:0,hl:true}],[{val:0,hl:true},{val:0,hl:true},{val:0,hl:true}]]}, info: "部分初始化 3x3 矩阵 b，未指定的元素自动为 0" },
+    { line: 5, output: "a[1][2]=6, b[2][0]=0", info: "b[2][0] 被自动初始化为 0" },
     { line: 7, info: "程序结束" }
   ]
 });
@@ -535,8 +535,8 @@ int main() {
 }`,
   vizTypes: ["vars","matrix","loop","console"],
   steps: [
-    { line: 3, info: "main() 开始" },
-    { line: 4, vars: {a:{value:"int[2][3]",type:"array"}}, matrix: {name:"a", rows:2, cols:3, cells:[[{val:1},{val:2},{val:3}],[{val:4},{val:5},{val:6}]]}, info: "定义 2x3 矩阵" },
+    { line: 2, info: "main() 开始" },
+    { line: 3, vars: {a:{value:"int[2][3]",type:"array"}}, matrix: {name:"a", rows:2, cols:3, cells:[[{val:1},{val:2},{val:3}],[{val:4},{val:5},{val:6}]]}, info: "定义 2x3 矩阵" },
     { line: 5, vars: {i:{value:0,type:"int"}}, loop: [{label:"i=0",active:true}], info: "外层 i=0（第 0 行）" },
     { line: 6, vars: {j:{value:0,type:"int"}}, loop: [{label:"i=0 j=0",active:true}], matrix: {name:"a", rows:2, cols:3, cells:[[{val:1,highlight:true},{val:2},{val:3}],[{val:4},{val:5},{val:6}]]}, info: "内层 j=0，访问 a[0][0]=1" },
     { line: 7, output: "1 ", info: "打印 1" },
@@ -575,9 +575,9 @@ int main() {
 }`,
   vizTypes: ["vars","matrix","loop","console"],
   steps: [
-    { line: 3, info: "main() 开始" },
-    { line: 4, vars: {a:{value:"int[2][3]",type:"array"}}, matrix: {name:"a", rows:2, cols:3, cells:[[{val:1},{val:2},{val:3}],[{val:4},{val:5},{val:6}]]}, info: "原矩阵 a（2行3列）" },
-    { line: 5, vars: {b:{value:"int[3][2]",type:"array"}}, matrix: {name:"b", rows:3, cols:2, cells:[[{val:null,empty:true},{val:null,empty:true}],[{val:null,empty:true},{val:null,empty:true}],[{val:null,empty:true},{val:null,empty:true}]]}, info: "转置矩阵 b（3行2列）" },
+    { line: 2, info: "main() 开始" },
+    { line: 3, vars: {a:{value:"int[2][3]",type:"array"}}, matrix: {name:"a", rows:2, cols:3, cells:[[{val:1},{val:2},{val:3}],[{val:4},{val:5},{val:6}]]}, info: "原矩阵 a（2行3列）" },
+    { line: 4, vars: {b:{value:"int[3][2]",type:"array"}}, matrix: {name:"b", rows:3, cols:2, cells:[[{val:null,empty:true},{val:null,empty:true}],[{val:null,empty:true},{val:null,empty:true}],[{val:null,empty:true},{val:null,empty:true}]]}, info: "转置矩阵 b（3行2列）" },
     { line: 6, vars: {i:{value:0,type:"int"}}, loop: [{label:"i=0",active:true}], info: "外层 i=0" },
     { line: 7, vars: {j:{value:0,type:"int"}}, loop: [{label:"i=0 j=0",active:true}], matrix: [{name:"a", rows:2, cols:3, cells:[[{val:1,hl:true},{val:2},{val:3}],[{val:4},{val:5},{val:6}]]}, {name:"b", rows:3, cols:2, cells:[[{val:1,highlight:true},{val:null,empty:true}],[{val:null,empty:true},{val:null,empty:true}],[{val:null,empty:true},{val:null,empty:true}]]}], info: "b[0][0] = a[0][0] = 1" },
     { line: 7, vars: {j:{value:1,type:"int"}}, loop: [{label:"i=0 j=1",active:true}], matrix: [{name:"a", rows:2, cols:3, cells:[[{val:1},{val:2,hl:true},{val:3}],[{val:4},{val:5},{val:6}]]}, {name:"b", rows:3, cols:2, cells:[[{val:1},{val:null,empty:true}],[{val:2,highlight:true},{val:null,empty:true}],[{val:null,empty:true},{val:null,empty:true}]]}], info: "b[1][0] = a[0][1] = 2" },
@@ -586,8 +586,8 @@ int main() {
     { line: 7, vars: {j:{value:0,type:"int"}}, loop: [{label:"i=1 j=0",active:true}], matrix: [{name:"a", rows:2, cols:3, cells:[[{val:1},{val:2},{val:3}],[{val:4,hl:true},{val:5},{val:6}]]}, {name:"b", rows:3, cols:2, cells:[[{val:1},{val:4,highlight:true}],[{val:2},{val:null,empty:true}],[{val:3},{val:null,empty:true}]]}], info: "b[0][1] = a[1][0] = 4" },
     { line: 7, vars: {j:{value:1,type:"int"}}, loop: [{label:"i=1 j=1",active:true}], matrix: [{name:"a", rows:2, cols:3, cells:[[{val:1},{val:2},{val:3}],[{val:4},{val:5,hl:true},{val:6}]]}, {name:"b", rows:3, cols:2, cells:[[{val:1},{val:4}],[{val:2},{val:5,highlight:true}],[{val:3},{val:null,empty:true}]]}], info: "b[1][1] = a[1][1] = 5" },
     { line: 7, vars: {j:{value:2,type:"int"}}, loop: [{label:"i=1 j=2",active:true}], matrix: [{name:"a", rows:2, cols:3, cells:[[{val:1},{val:2},{val:3}],[{val:4},{val:5},{val:6,hl:true}]]}, {name:"b", rows:3, cols:2, cells:[[{val:1},{val:4}],[{val:2},{val:5}],[{val:3},{val:6,highlight:true}]]}], info: "b[2][1] = a[1][2] = 6" },
-    { line: 10, output: "1 4\n2 5\n3 6", info: "输出转置后的矩阵" },
-    { line: 11, info: "程序结束" }
+    { line: 11, output: "1 4\n2 5\n3 6", info: "输出转置后的矩阵" },
+    { line: 12, info: "程序结束" }
   ]
 });
 createDemo("demo11", {
@@ -612,10 +612,10 @@ int main() {
 }`,
   vizTypes: ["vars","matrix","array","loop","console"],
   steps: [
-    { line: 3, info: "main() 开始" },
-    { line: 4, vars: {a:{value:"int[3][3]",type:"array"}}, matrix: {name:"a", rows:3, cols:3, cells:[[{val:1},{val:2},{val:3}],[{val:4},{val:5},{val:6}],[{val:7},{val:8},{val:9}]]}, info: "3x3 矩阵" },
-    { line: 5, vars: {row_sum:{value:"int[3]",type:"array"}}, array: {name:"row_sum", cells:[{val:0},{val:0},{val:0}]}, info: "row_sum 初始化为 {0,0,0}" },
-    { line: 6, vars: {col_sum:{value:"int[3]",type:"array"}}, array: {name:"col_sum", cells:[{val:0},{val:0},{val:0}]}, info: "col_sum 初始化为 {0,0,0}" },
+    { line: 2, info: "main() 开始" },
+    { line: 3, vars: {a:{value:"int[3][3]",type:"array"}}, matrix: {name:"a", rows:3, cols:3, cells:[[{val:1},{val:2},{val:3}],[{val:4},{val:5},{val:6}],[{val:7},{val:8},{val:9}]]}, info: "3x3 矩阵" },
+    { line: 4, vars: {row_sum:{value:"int[3]",type:"array"}}, array: {name:"row_sum", cells:[{val:0},{val:0},{val:0}]}, info: "row_sum 初始化为 {0,0,0}" },
+    { line: 5, vars: {col_sum:{value:"int[3]",type:"array"}}, array: {name:"col_sum", cells:[{val:0},{val:0},{val:0}]}, info: "col_sum 初始化为 {0,0,0}" },
     { line: 7, vars: {i:{value:0,type:"int"}}, loop: [{label:"i=0",active:true}], info: "外层 i=0" },
     { line: 8, vars: {j:{value:0,type:"int"}}, loop: [{label:"i=0 j=0",active:true}], matrix: {name:"a", rows:3, cols:3, cells:[[{val:1,highlight:true},{val:2},{val:3}],[{val:4},{val:5},{val:6}],[{val:7},{val:8},{val:9}]]}, array: [{name:"row_sum", cells:[{val:1,highlight:true},{val:0},{val:0}]}, {name:"col_sum", cells:[{val:1,highlight:true},{val:0},{val:0}]}], info: "a[0][0]=1：row_sum[0]=1, col_sum[0]=1" },
     { line: 8, vars: {j:{value:1,type:"int"}}, loop: [{label:"i=0 j=1",active:true}], matrix: {name:"a", rows:3, cols:3, cells:[[{val:1},{val:2,highlight:true},{val:3}],[{val:4},{val:5},{val:6}],[{val:7},{val:8},{val:9}]]}, array: [{name:"row_sum", cells:[{val:3,highlight:true},{val:0},{val:0}]}, {name:"col_sum", cells:[{val:1},{val:2,highlight:true},{val:0}]}], info: "a[0][1]=2：row_sum[0]=3, col_sum[1]=2" },
@@ -628,9 +628,9 @@ int main() {
     { line: 8, vars: {j:{value:0,type:"int"}}, loop: [{label:"i=2 j=0",active:true}], matrix: {name:"a", rows:3, cols:3, cells:[[{val:1},{val:2},{val:3}],[{val:4},{val:5},{val:6}],[{val:7,highlight:true},{val:8},{val:9}]]}, array: [{name:"row_sum", cells:[{val:6},{val:15},{val:7,highlight:true}]}, {name:"col_sum", cells:[{val:12,highlight:true},{val:7},{val:9}]}], info: "a[2][0]=7：row_sum[2]=7, col_sum[0]=12" },
     { line: 8, vars: {j:{value:1,type:"int"}}, loop: [{label:"i=2 j=1",active:true}], matrix: {name:"a", rows:3, cols:3, cells:[[{val:1},{val:2},{val:3}],[{val:4},{val:5},{val:6}],[{val:7},{val:8,highlight:true},{val:9}]]}, array: [{name:"row_sum", cells:[{val:6},{val:15},{val:15,highlight:true}]}, {name:"col_sum", cells:[{val:12},{val:15,highlight:true},{val:9}]}], info: "a[2][1]=8：row_sum[2]=15, col_sum[1]=15" },
     { line: 8, vars: {j:{value:2,type:"int"}}, loop: [{label:"i=2 j=2",active:true}], matrix: {name:"a", rows:3, cols:3, cells:[[{val:1},{val:2},{val:3}],[{val:4},{val:5},{val:6}],[{val:7},{val:8},{val:9,highlight:true}]]}, array: [{name:"row_sum", cells:[{val:6},{val:15},{val:24,highlight:true}]}, {name:"col_sum", cells:[{val:12},{val:15},{val:18,highlight:true}]}], info: "a[2][2]=9：row_sum[2]=24, col_sum[2]=18" },
-    { line: 11, output: "row: 6 15 24", info: "每行之和" },
-    { line: 12, output: "row: 6 15 24\ncol: 12 15 18", info: "每列之和" },
-    { line: 13, info: "程序结束" }
+    { line: 13, output: "row: 6 15 24", info: "每行之和" },
+    { line: 14, output: "row: 6 15 24\ncol: 12 15 18", info: "每列之和" },
+    { line: 15, info: "程序结束" }
   ]
 });
 createDemo("demo12", {
@@ -647,11 +647,11 @@ int main() {
 }`,
   vizTypes: ["vars","matrix","pointer","console"],
   steps: [
-    { line: 3, info: "main() 开始" },
-    { line: 4, vars: {a:{value:"int[2][3]",type:"array"}}, matrix: {name:"a", rows:2, cols:3, cells:[[{val:1},{val:2},{val:3}],[{val:4},{val:5},{val:6}]]}, info: "定义 2x3 矩阵" },
-    { line: 5, vars: {p:{value:"0x1000",type:"int*"}}, info: "p = a[0]，指向第 0 行首元素" },
-    { line: 6, output: "a[0][0]=1, *p=1", matrix: {name:"a", rows:2, cols:3, cells:[[{val:1,highlight:true},{val:2},{val:3}],[{val:4},{val:5},{val:6}]]}, pointer: [{name:"p", type:"int*", addr:"0x2000", value:"0x1000", targetName:"a[0][0]", targetType:"int", targetAddr:"0x1000", targetValue:1}], info: "*p 即 a[0][0]" },
-    { line: 7, output: "a[0][0]=1, *p=1\na[1][1]=5, *(p+4)=5", matrix: {name:"a", rows:2, cols:3, cells:[[{val:1},{val:2},{val:3}],[{val:4},{val:5,highlight:true},{val:6}]]}, pointer: [{name:"p", type:"int*", addr:"0x2000", value:"0x1000+16", targetName:"a[1][1]", targetType:"int", targetAddr:"0x1010", targetValue:5}], info: "p+4 跳过 4 个 int，到达 a[1][1]（行优先存储）" },
+    { line: 2, info: "main() 开始" },
+    { line: 3, vars: {a:{value:"int[2][3]",type:"array"}}, matrix: {name:"a", rows:2, cols:3, cells:[[{val:1},{val:2},{val:3}],[{val:4},{val:5},{val:6}]]}, info: "定义 2x3 矩阵" },
+    { line: 4, vars: {p:{value:"0x1000",type:"int*"}}, info: "p = a[0]，指向第 0 行首元素" },
+    { line: 5, output: "a[0][0]=1, *p=1", matrix: {name:"a", rows:2, cols:3, cells:[[{val:1,highlight:true},{val:2},{val:3}],[{val:4},{val:5},{val:6}]]}, pointer: [{name:"p", type:"int*", addr:"0x2000", value:"0x1000", targetName:"a[0][0]", targetType:"int", targetAddr:"0x1000", targetValue:1}], info: "*p 即 a[0][0]" },
+    { line: 6, output: "a[0][0]=1, *p=1\na[1][1]=5, *(p+4)=5", matrix: {name:"a", rows:2, cols:3, cells:[[{val:1},{val:2},{val:3}],[{val:4},{val:5,highlight:true},{val:6}]]}, pointer: [{name:"p", type:"int*", addr:"0x2000", value:"0x1000+16", targetName:"a[1][1]", targetType:"int", targetAddr:"0x1010", targetValue:5}], info: "p+4 跳过 4 个 int，到达 a[1][1]（行优先存储）" },
     { line: 8, info: "程序结束" }
   ]
 });
@@ -680,7 +680,7 @@ int main() {
     { line: 12, info: "main() 开始" },
     { line: 13, vars: {a:{value:"int[2][3]",type:"array"}}, matrix: {name:"a", rows:2, cols:3, cells:[[{val:1},{val:2},{val:3}],[{val:4},{val:5},{val:6}]]}, info: "定义矩阵 a" },
     { line: 14, info: "调用 print_matrix(a, 2)" },
-    { line: 3, stack: [{name:"main",value:"a[2][3]"},{name:"print_matrix",value:"m=a,rows=2",highlight:true}], info: "进入函数，m 获得 a 的首地址，必须知道列数 3 才能正确计算偏移" },
+    { line: 2, stack: [{name:"main",value:"a[2][3]"},{name:"print_matrix",value:"m=a,rows=2",highlight:true}], info: "进入函数，m 获得 a 的首地址，必须知道列数 3 才能正确计算偏移" },
     { line: 4, vars: {i:{value:0,type:"int"}}, loop: [{label:"i=0",active:true}], info: "外层 i=0" },
     { line: 5, vars: {j:{value:0,type:"int"}}, loop: [{label:"j=0",active:true}], matrix: {name:"a", rows:2, cols:3, cells:[[{val:1,highlight:true},{val:2},{val:3}],[{val:4},{val:5},{val:6}]]}, info: "内层 j=0，m[0][0]=1" },
     { line: 6, output: "1 ", info: "打印 1" },
@@ -698,7 +698,7 @@ int main() {
     { line: 6, output: "1 2 3 \n4 5 6 ", info: "打印 6" },
     { line: 8, output: "1 2 3 \n4 5 6 \n", info: "换行" },
     { line: 9, stack: [{name:"main",value:"a[2][3]",highlight:true}], info: "函数结束" },
-    { line: 14, info: "程序结束" }
+    { line: 15, info: "程序结束" }
   ]
 });
 createDemo("demo14", {
@@ -724,20 +724,20 @@ int main() {
 }`,
   vizTypes: ["vars","matrix","graph","loop","console"],
   steps: [
-    { line: 3, info: "main() 开始：用邻接矩阵表示一张 4 个顶点的无向图（0=A, 1=B, 2=C, 3=D）" },
-    { line: 4, vars: {g:{value:"int[4][4]",type:"array"}}, matrix: {name:"g", rows:4, cols:4, cells:[[{val:0},{val:0},{val:0},{val:0}],[{val:0},{val:0},{val:0},{val:0}],[{val:0},{val:0},{val:0},{val:0}],[{val:0},{val:0},{val:0},{val:0}]]}, graph: {nodes:[{id:"A",label:"A",x:30,y:20},{id:"B",label:"B",x:170,y:20},{id:"C",label:"C",x:30,y:140},{id:"D",label:"D",x:170,y:140}], edges:[]}, info: "g[4][4] 全部初始化为 0：任意两点之间暂时没有边" },
-    { line: 5, vars: {i:{value:0,type:"int"},j:{value:0,type:"int"}}, info: "声明循环变量 i, j" },
-    { line: 6, matrix: {name:"g", rows:4, cols:4, cells:[[{val:0},{val:1,highlight:true},{val:0},{val:0}],[{val:1,highlight:true},{val:0},{val:0},{val:0}],[{val:0},{val:0},{val:0},{val:0}],[{val:0},{val:0},{val:0},{val:0}]]}, graph: {nodes:[{id:"A",label:"A",x:30,y:20},{id:"B",label:"B",x:170,y:20},{id:"C",label:"C",x:30,y:140},{id:"D",label:"D",x:170,y:140}], edges:[{from:"A",to:"B",highlight:true}]}, info: "g[0][1]=g[1][0]=1：A 与 B 之间出现一条边（无向图矩阵对称）" },
-    { line: 7, matrix: {name:"g", rows:4, cols:4, cells:[[{val:0},{val:1},{val:1,highlight:true},{val:0}],[{val:1},{val:0},{val:0},{val:0}],[{val:1,highlight:true},{val:0},{val:0},{val:0}],[{val:0},{val:0},{val:0},{val:0}]]}, graph: {nodes:[{id:"A",label:"A",x:30,y:20},{id:"B",label:"B",x:170,y:20},{id:"C",label:"C",x:30,y:140},{id:"D",label:"D",x:170,y:140}], edges:[{from:"A",to:"B"},{from:"A",to:"C",highlight:true}]}, info: "g[0][2]=g[2][0]=1：A 与 C 之间连边" },
-    { line: 8, matrix: {name:"g", rows:4, cols:4, cells:[[{val:0},{val:1},{val:1},{val:0}],[{val:1},{val:0},{val:0},{val:1,highlight:true}],[{val:1},{val:0},{val:0},{val:0}],[{val:0},{val:1,highlight:true},{val:0},{val:0}]]}, graph: {nodes:[{id:"A",label:"A",x:30,y:20},{id:"B",label:"B",x:170,y:20},{id:"C",label:"C",x:30,y:140},{id:"D",label:"D",x:170,y:140}], edges:[{from:"A",to:"B"},{from:"A",to:"C"},{from:"B",to:"D",highlight:true}]}, info: "g[1][3]=g[3][1]=1：B 与 D 之间连边" },
-    { line: 9, matrix: {name:"g", rows:4, cols:4, cells:[[{val:0},{val:1},{val:1},{val:0}],[{val:1},{val:0},{val:0},{val:1}],[{val:1},{val:0},{val:0},{val:1,highlight:true}],[{val:0},{val:1},{val:1,highlight:true},{val:0}]]}, graph: {nodes:[{id:"A",label:"A",x:30,y:20},{id:"B",label:"B",x:170,y:20},{id:"C",label:"C",x:30,y:140},{id:"D",label:"D",x:170,y:140}], edges:[{from:"A",to:"B"},{from:"A",to:"C"},{from:"B",to:"D"},{from:"C",to:"D",highlight:true}]}, info: "g[2][3]=g[3][2]=1：C 与 D 之间连边，图构建完成（一个四边形）" },
-    { line: 10, vars: {i:{value:0,type:"int"}}, loop: [{label:"i=0",active:true}], matrix: {name:"g", rows:4, cols:4, cells:[[{val:0,hl:true},{val:1,hl:true},{val:1,hl:true},{val:0,hl:true}],[{val:1},{val:0},{val:0},{val:1}],[{val:1},{val:0},{val:0},{val:1}],[{val:0},{val:1},{val:1},{val:0}]]}, graph: {nodes:[{id:"A",label:"A",x:30,y:20,highlight:true},{id:"B",label:"B",x:170,y:20},{id:"C",label:"C",x:30,y:140},{id:"D",label:"D",x:170,y:140}], edges:[{from:"A",to:"B"},{from:"A",to:"C"},{from:"B",to:"D"},{from:"C",to:"D"}]}, info: "i=0：把第 0 行全部加起来，0+1+1+0=2" },
+    { line: 2, info: "main() 开始：用邻接矩阵表示一张 4 个顶点的无向图（0=A, 1=B, 2=C, 3=D）" },
+    { line: 3, vars: {g:{value:"int[4][4]",type:"array"}}, matrix: {name:"g", rows:4, cols:4, cells:[[{val:0},{val:0},{val:0},{val:0}],[{val:0},{val:0},{val:0},{val:0}],[{val:0},{val:0},{val:0},{val:0}],[{val:0},{val:0},{val:0},{val:0}]]}, graph: {nodes:[{id:"A",label:"A",x:30,y:20},{id:"B",label:"B",x:170,y:20},{id:"C",label:"C",x:30,y:140},{id:"D",label:"D",x:170,y:140}], edges:[]}, info: "g[4][4] 全部初始化为 0：任意两点之间暂时没有边" },
+    { line: 4, vars: {i:{value:0,type:"int"},j:{value:0,type:"int"}}, info: "声明循环变量 i, j" },
+    { line: 5, matrix: {name:"g", rows:4, cols:4, cells:[[{val:0},{val:1,highlight:true},{val:0},{val:0}],[{val:1,highlight:true},{val:0},{val:0},{val:0}],[{val:0},{val:0},{val:0},{val:0}],[{val:0},{val:0},{val:0},{val:0}]]}, graph: {nodes:[{id:"A",label:"A",x:30,y:20},{id:"B",label:"B",x:170,y:20},{id:"C",label:"C",x:30,y:140},{id:"D",label:"D",x:170,y:140}], edges:[{from:"A",to:"B",highlight:true}]}, info: "g[0][1]=g[1][0]=1：A 与 B 之间出现一条边（无向图矩阵对称）" },
+    { line: 6, matrix: {name:"g", rows:4, cols:4, cells:[[{val:0},{val:1},{val:1,highlight:true},{val:0}],[{val:1},{val:0},{val:0},{val:0}],[{val:1,highlight:true},{val:0},{val:0},{val:0}],[{val:0},{val:0},{val:0},{val:0}]]}, graph: {nodes:[{id:"A",label:"A",x:30,y:20},{id:"B",label:"B",x:170,y:20},{id:"C",label:"C",x:30,y:140},{id:"D",label:"D",x:170,y:140}], edges:[{from:"A",to:"B"},{from:"A",to:"C",highlight:true}]}, info: "g[0][2]=g[2][0]=1：A 与 C 之间连边" },
+    { line: 7, matrix: {name:"g", rows:4, cols:4, cells:[[{val:0},{val:1},{val:1},{val:0}],[{val:1},{val:0},{val:0},{val:1,highlight:true}],[{val:1},{val:0},{val:0},{val:0}],[{val:0},{val:1,highlight:true},{val:0},{val:0}]]}, graph: {nodes:[{id:"A",label:"A",x:30,y:20},{id:"B",label:"B",x:170,y:20},{id:"C",label:"C",x:30,y:140},{id:"D",label:"D",x:170,y:140}], edges:[{from:"A",to:"B"},{from:"A",to:"C"},{from:"B",to:"D",highlight:true}]}, info: "g[1][3]=g[3][1]=1：B 与 D 之间连边" },
+    { line: 8, matrix: {name:"g", rows:4, cols:4, cells:[[{val:0},{val:1},{val:1},{val:0}],[{val:1},{val:0},{val:0},{val:1}],[{val:1},{val:0},{val:0},{val:1,highlight:true}],[{val:0},{val:1},{val:1,highlight:true},{val:0}]]}, graph: {nodes:[{id:"A",label:"A",x:30,y:20},{id:"B",label:"B",x:170,y:20},{id:"C",label:"C",x:30,y:140},{id:"D",label:"D",x:170,y:140}], edges:[{from:"A",to:"B"},{from:"A",to:"C"},{from:"B",to:"D"},{from:"C",to:"D",highlight:true}]}, info: "g[2][3]=g[3][2]=1：C 与 D 之间连边，图构建完成（一个四边形）" },
+    { line: 9, vars: {i:{value:0,type:"int"}}, loop: [{label:"i=0",active:true}], matrix: {name:"g", rows:4, cols:4, cells:[[{val:0,hl:true},{val:1,hl:true},{val:1,hl:true},{val:0,hl:true}],[{val:1},{val:0},{val:0},{val:1}],[{val:1},{val:0},{val:0},{val:1}],[{val:0},{val:1},{val:1},{val:0}]]}, graph: {nodes:[{id:"A",label:"A",x:30,y:20,highlight:true},{id:"B",label:"B",x:170,y:20},{id:"C",label:"C",x:30,y:140},{id:"D",label:"D",x:170,y:140}], edges:[{from:"A",to:"B"},{from:"A",to:"C"},{from:"B",to:"D"},{from:"C",to:"D"}]}, info: "i=0：把第 0 行全部加起来，0+1+1+0=2" },
     { line: 14, vars: {deg:{value:2,type:"int"}}, output: "A 的度 = 2", info: "顶点 A 的度为 2（连着 B 和 C）" },
-    { line: 10, vars: {i:{value:1,type:"int"}}, loop: [{label:"i=1",active:true}], matrix: {name:"g", rows:4, cols:4, cells:[[{val:0},{val:1},{val:1},{val:0}],[{val:1,hl:true},{val:0,hl:true},{val:0,hl:true},{val:1,hl:true}],[{val:1},{val:0},{val:0},{val:1}],[{val:0},{val:1},{val:1},{val:0}]]}, graph: {nodes:[{id:"A",label:"A",x:30,y:20},{id:"B",label:"B",x:170,y:20,highlight:true},{id:"C",label:"C",x:30,y:140},{id:"D",label:"D",x:170,y:140}], edges:[{from:"A",to:"B"},{from:"A",to:"C"},{from:"B",to:"D"},{from:"C",to:"D"}]}, info: "i=1：第 1 行求和，1+0+0+1=2" },
+    { line: 9, vars: {i:{value:1,type:"int"}}, loop: [{label:"i=1",active:true}], matrix: {name:"g", rows:4, cols:4, cells:[[{val:0},{val:1},{val:1},{val:0}],[{val:1,hl:true},{val:0,hl:true},{val:0,hl:true},{val:1,hl:true}],[{val:1},{val:0},{val:0},{val:1}],[{val:0},{val:1},{val:1},{val:0}]]}, graph: {nodes:[{id:"A",label:"A",x:30,y:20},{id:"B",label:"B",x:170,y:20,highlight:true},{id:"C",label:"C",x:30,y:140},{id:"D",label:"D",x:170,y:140}], edges:[{from:"A",to:"B"},{from:"A",to:"C"},{from:"B",to:"D"},{from:"C",to:"D"}]}, info: "i=1：第 1 行求和，1+0+0+1=2" },
     { line: 14, output: "A 的度 = 2\nB 的度 = 2", info: "顶点 B 的度为 2（连着 A 和 D）" },
-    { line: 10, vars: {i:{value:2,type:"int"}}, loop: [{label:"i=2",active:true}], matrix: {name:"g", rows:4, cols:4, cells:[[{val:0},{val:1},{val:1},{val:0}],[{val:1},{val:0},{val:0},{val:1}],[{val:1,hl:true},{val:0,hl:true},{val:0,hl:true},{val:1,hl:true}],[{val:0},{val:1},{val:1},{val:0}]]}, graph: {nodes:[{id:"A",label:"A",x:30,y:20},{id:"B",label:"B",x:170,y:20},{id:"C",label:"C",x:30,y:140,highlight:true},{id:"D",label:"D",x:170,y:140}], edges:[{from:"A",to:"B"},{from:"A",to:"C"},{from:"B",to:"D"},{from:"C",to:"D"}]}, info: "i=2：第 2 行求和，1+0+0+1=2" },
+    { line: 9, vars: {i:{value:2,type:"int"}}, loop: [{label:"i=2",active:true}], matrix: {name:"g", rows:4, cols:4, cells:[[{val:0},{val:1},{val:1},{val:0}],[{val:1},{val:0},{val:0},{val:1}],[{val:1,hl:true},{val:0,hl:true},{val:0,hl:true},{val:1,hl:true}],[{val:0},{val:1},{val:1},{val:0}]]}, graph: {nodes:[{id:"A",label:"A",x:30,y:20},{id:"B",label:"B",x:170,y:20},{id:"C",label:"C",x:30,y:140,highlight:true},{id:"D",label:"D",x:170,y:140}], edges:[{from:"A",to:"B"},{from:"A",to:"C"},{from:"B",to:"D"},{from:"C",to:"D"}]}, info: "i=2：第 2 行求和，1+0+0+1=2" },
     { line: 14, output: "A 的度 = 2\nB 的度 = 2\nC 的度 = 2", info: "顶点 C 的度为 2（连着 A 和 D）" },
-    { line: 10, vars: {i:{value:3,type:"int"}}, loop: [{label:"i=3",active:true}], matrix: {name:"g", rows:4, cols:4, cells:[[{val:0},{val:1},{val:1},{val:0}],[{val:1},{val:0},{val:0},{val:1}],[{val:1},{val:0},{val:0},{val:1}],[{val:0,hl:true},{val:1,hl:true},{val:1,hl:true},{val:0,hl:true}]]}, graph: {nodes:[{id:"A",label:"A",x:30,y:20},{id:"B",label:"B",x:170,y:20},{id:"C",label:"C",x:30,y:140},{id:"D",label:"D",x:170,y:140,highlight:true}], edges:[{from:"A",to:"B"},{from:"A",to:"C"},{from:"B",to:"D"},{from:"C",to:"D"}]}, info: "i=3：第 3 行求和，0+1+1+0=2" },
+    { line: 9, vars: {i:{value:3,type:"int"}}, loop: [{label:"i=3",active:true}], matrix: {name:"g", rows:4, cols:4, cells:[[{val:0},{val:1},{val:1},{val:0}],[{val:1},{val:0},{val:0},{val:1}],[{val:1},{val:0},{val:0},{val:1}],[{val:0,hl:true},{val:1,hl:true},{val:1,hl:true},{val:0,hl:true}]]}, graph: {nodes:[{id:"A",label:"A",x:30,y:20},{id:"B",label:"B",x:170,y:20},{id:"C",label:"C",x:30,y:140},{id:"D",label:"D",x:170,y:140,highlight:true}], edges:[{from:"A",to:"B"},{from:"A",to:"C"},{from:"B",to:"D"},{from:"C",to:"D"}]}, info: "i=3：第 3 行求和，0+1+1+0=2" },
     { line: 14, output: "A 的度 = 2\nB 的度 = 2\nC 的度 = 2\nD 的度 = 2", info: "顶点 D 的度为 2。每个顶点的度就是邻接矩阵对应行的和" },
     { line: 17, info: "程序结束" }
   ]

@@ -140,8 +140,8 @@ int main() {
 }`,
   vizTypes: ["vars","struct","loop","console"],
   steps: [
-    { line: 5, info: "main() 开始" },
-    { line: 6, vars: {pts:{value:"struct Point[3]",type:"array"}}, struct: [{name:"pts[0]",addr:"0x1000",fields:[{name:"x",value:0},{name:"y",value:0}]},{name:"pts[1]",addr:"0x1008",fields:[{name:"x",value:1},{name:"y",value:2}]},{name:"pts[2]",addr:"0x1010",fields:[{name:"x",value:3},{name:"y",value:4}]}], info: "定义结构体数组并初始化 3 个点" },
+    { line: 4, info: "main() 开始" },
+    { line: 5, vars: {pts:{value:"struct Point[3]",type:"array"}}, struct: [{name:"pts[0]",addr:"0x1000",fields:[{name:"x",value:0},{name:"y",value:0}]},{name:"pts[1]",addr:"0x1008",fields:[{name:"x",value:1},{name:"y",value:2}]},{name:"pts[2]",addr:"0x1010",fields:[{name:"x",value:3},{name:"y",value:4}]}], info: "定义结构体数组并初始化 3 个点" },
     { line: 7, vars: {i:{value:0,type:"int"}}, loop: [{label:"i=0",active:true}], info: "循环开始，i=0" },
     { line: 8, output: "(0,0) ", info: "访问 pts[0].x 和 pts[0].y" },
     { line: 7, vars: {i:{value:1,type:"int"}}, loop: [{label:"i=1",active:true}], info: "i=1" },
@@ -168,11 +168,11 @@ int main() {
 }`,
   vizTypes: ["vars","pointer","struct","console"],
   steps: [
-    { line: 6, info: "main() 开始" },
-    { line: 7, vars: {s:{value:"struct Student",type:"struct"}}, struct: [{name:"s",addr:"0x1000",fields:[{name:"name",value:"Bob"},{name:"age",value:19}]}], info: "定义 s 并初始化" },
-    { line: 8, vars: {p:{value:"0x1000",type:"struct Student*"}}, pointer: [{name:"p",type:"struct Student*",addr:"0x2000",value:"0x1000",targetName:"s",targetType:"struct Student",targetAddr:"0x1000",targetValue:"{Bob, 19}"}], info: "p 指向 s 的地址" },
-    { line: 9, vars: {s:{value:"struct Student",type:"struct"}}, struct: [{name:"s",addr:"0x1000",fields:[{name:"name",value:"Bob"},{name:"age",value:20}]}], pointer: [{name:"p",type:"struct Student*",addr:"0x2000",value:"0x1000",targetName:"s",targetType:"struct Student",targetAddr:"0x1000",targetValue:"{Bob, 20}"}], info: "p->age = 20：通过指针修改 s 的 age 字段" },
-    { line: 10, output: "Bob 20", info: "通过指针访问成员并输出" },
+    { line: 4, info: "main() 开始" },
+    { line: 5, vars: {s:{value:"struct Student",type:"struct"}}, struct: [{name:"s",addr:"0x1000",fields:[{name:"name",value:"Bob"},{name:"age",value:19}]}], info: "定义 s 并初始化" },
+    { line: 6, vars: {p:{value:"0x1000",type:"struct Student*"}}, pointer: [{name:"p",type:"struct Student*",addr:"0x2000",value:"0x1000",targetName:"s",targetType:"struct Student",targetAddr:"0x1000",targetValue:"{Bob, 19}"}], info: "p 指向 s 的地址" },
+    { line: 7, vars: {s:{value:"struct Student",type:"struct"}}, struct: [{name:"s",addr:"0x1000",fields:[{name:"name",value:"Bob"},{name:"age",value:20}]}], pointer: [{name:"p",type:"struct Student*",addr:"0x2000",value:"0x1000",targetName:"s",targetType:"struct Student",targetAddr:"0x1000",targetValue:"{Bob, 20}"}], info: "p->age = 20：通过指针修改 s 的 age 字段" },
+    { line: 8, output: "Bob 20", info: "通过指针访问成员并输出" },
     { line: 10, info: "程序结束" }
   ]
 });
@@ -225,9 +225,9 @@ int main() {
 }`,
   vizTypes: ["vars","struct","console"],
   steps: [
-    { line: 10, info: "main() 开始" },
-    { line: 11, vars: {p:{value:"struct Person",type:"struct"}}, struct: [{name:"p",addr:"0x1000",fields:[{name:"name",value:"Alice"},{name:"birthday",value:"{2000,5,15}"}]}], info: "定义嵌套结构体并初始化" },
-    { line: 12, output: "Alice born on 2000/5/15", info: "通过 p.birthday.year 访问嵌套成员" },
+    { line: 9, info: "main() 开始" },
+    { line: 10, vars: {p:{value:"struct Person",type:"struct"}}, struct: [{name:"p",addr:"0x1000",fields:[{name:"name",value:"Alice"},{name:"birthday",value:"{2000,5,15}"}]}], info: "定义嵌套结构体并初始化" },
+    { line: 11, output: "Alice born on 2000/5/15", info: "通过 p.birthday.year 访问嵌套成员" },
     { line: 15, info: "程序结束" }
   ]
 });
@@ -251,15 +251,15 @@ int main() {
 }`,
   vizTypes: ["vars","struct","pointer","stack","console"],
   steps: [
-    { line: 10, info: "main() 开始" },
-    { line: 11, vars: {a:{value:"struct Point",type:"struct"}}, struct: [{name:"a",addr:"0x1000",fields:[{name:"x",value:1},{name:"y",value:2}]}], info: "a = (1, 2)" },
-    { line: 12, info: "调用 move(&a)：传递地址，避免整个结构体拷贝" },
-    { line: 5, stack: [{name:"main",value:"a=(1,2)"},{name:"move",value:"p=&a",highlight:true}], vars: {p:{value:"0x1000",type:"struct Point*"}}, pointer: [{name:"p",type:"struct Point*",addr:"0x2000",value:"0x1000",targetName:"a",targetType:"struct Point",targetAddr:"0x1000",targetValue:"(1, 2)"}], info: "p 指向 a" },
-    { line: 6, vars: {a:{value:"struct Point",type:"struct"}}, struct: [{name:"a",addr:"0x1000",fields:[{name:"x",value:11},{name:"y",value:2}]}], pointer: [{name:"p",type:"struct Point*",addr:"0x2000",value:"0x1000",targetName:"a",targetType:"struct Point",targetAddr:"0x1000",targetValue:"(11, 2)"}], info: "p->x += 10：修改 x 为 11" },
-    { line: 7, vars: {a:{value:"struct Point",type:"struct"}}, struct: [{name:"a",addr:"0x1000",fields:[{name:"x",value:11},{name:"y",value:12}]}], pointer: [{name:"p",type:"struct Point*",addr:"0x2000",value:"0x1000",targetName:"a",targetType:"struct Point",targetAddr:"0x1000",targetValue:"(11, 12)"}], info: "p->y += 10：修改 y 为 12" },
-    { line: 9, stack: [{name:"main",value:"a=(11,12)",highlight:true}], info: "move 结束" },
-    { line: 13, vars: {a:{value:"struct Point",type:"struct"}}, struct: [{name:"a",addr:"0x1000",fields:[{name:"x",value:11},{name:"y",value:12}]}], info: "a 被成功修改为 (11, 12)" },
-    { line: 13, output: "(11,12)", info: "输出结果" },
+    { line: 9, info: "main() 开始" },
+    { line: 10, vars: {a:{value:"struct Point",type:"struct"}}, struct: [{name:"a",addr:"0x1000",fields:[{name:"x",value:1},{name:"y",value:2}]}], info: "a = (1, 2)" },
+    { line: 11, info: "调用 move(&a)：传递地址，避免整个结构体拷贝" },
+    { line: 4, stack: [{name:"main",value:"a=(1,2)"},{name:"move",value:"p=&a",highlight:true}], vars: {p:{value:"0x1000",type:"struct Point*"}}, pointer: [{name:"p",type:"struct Point*",addr:"0x2000",value:"0x1000",targetName:"a",targetType:"struct Point",targetAddr:"0x1000",targetValue:"(1, 2)"}], info: "p 指向 a" },
+    { line: 5, vars: {a:{value:"struct Point",type:"struct"}}, struct: [{name:"a",addr:"0x1000",fields:[{name:"x",value:11},{name:"y",value:2}]}], pointer: [{name:"p",type:"struct Point*",addr:"0x2000",value:"0x1000",targetName:"a",targetType:"struct Point",targetAddr:"0x1000",targetValue:"(11, 2)"}], info: "p->x += 10：修改 x 为 11" },
+    { line: 6, vars: {a:{value:"struct Point",type:"struct"}}, struct: [{name:"a",addr:"0x1000",fields:[{name:"x",value:11},{name:"y",value:12}]}], pointer: [{name:"p",type:"struct Point*",addr:"0x2000",value:"0x1000",targetName:"a",targetType:"struct Point",targetAddr:"0x1000",targetValue:"(11, 12)"}], info: "p->y += 10：修改 y 为 12" },
+    { line: 7, stack: [{name:"main",value:"a=(11,12)",highlight:true}], info: "move 结束" },
+    { line: 12, vars: {a:{value:"struct Point",type:"struct"}}, struct: [{name:"a",addr:"0x1000",fields:[{name:"x",value:11},{name:"y",value:12}]}], info: "a 被成功修改为 (11, 12)" },
+    { line: 12, output: "(11,12)", info: "输出结果" },
     { line: 14, info: "程序结束" }
   ]
 });
@@ -283,11 +283,11 @@ int main() {
 }`,
   vizTypes: ["vars","struct","console"],
   steps: [
-    { line: 8, info: "main() 开始" },
-    { line: 9, vars: {p1:{value:"Point",type:"struct"}}, struct: [{name:"p1",addr:"0x1000",fields:[{name:"x",value:3},{name:"y",value:4}]}], info: "用别名 Point 定义变量 p1，无需写 struct" },
-    { line: 10, vars: {p2:{value:"Point",type:"struct"}}, struct: [{name:"p1",addr:"0x1000",fields:[{name:"x",value:3},{name:"y",value:4}]},{name:"p2",addr:"0x1008",fields:[{name:"x",value:3},{name:"y",value:4}]}], info: "p2 = p1：结构体整体拷贝，p2 得到一份独立副本" },
-    { line: 11, vars: {p2:{value:"Point",type:"struct"}}, struct: [{name:"p1",addr:"0x1000",fields:[{name:"x",value:3},{name:"y",value:4}]},{name:"p2",addr:"0x1008",fields:[{name:"x",value:10},{name:"y",value:4}]}], info: "修改 p2.x 为 10，不影响 p1" },
-    { line: 12, output: "p1=(3,4) p2=(10,4)", info: "p1 和 p2 是独立的两个结构体" },
+    { line: 7, info: "main() 开始" },
+    { line: 8, vars: {p1:{value:"Point",type:"struct"}}, struct: [{name:"p1",addr:"0x1000",fields:[{name:"x",value:3},{name:"y",value:4}]}], info: "用别名 Point 定义变量 p1，无需写 struct" },
+    { line: 9, vars: {p2:{value:"Point",type:"struct"}}, struct: [{name:"p1",addr:"0x1000",fields:[{name:"x",value:3},{name:"y",value:4}]},{name:"p2",addr:"0x1008",fields:[{name:"x",value:3},{name:"y",value:4}]}], info: "p2 = p1：结构体整体拷贝，p2 得到一份独立副本" },
+    { line: 10, vars: {p2:{value:"Point",type:"struct"}}, struct: [{name:"p1",addr:"0x1000",fields:[{name:"x",value:3},{name:"y",value:4}]},{name:"p2",addr:"0x1008",fields:[{name:"x",value:10},{name:"y",value:4}]}], info: "修改 p2.x 为 10，不影响 p1" },
+    { line: 11, output: "p1=(3,4) p2=(10,4)", info: "p1 和 p2 是独立的两个结构体" },
     { line: 14, info: "程序结束" }
   ]
 });
@@ -469,19 +469,19 @@ int main() {
 }`,
   vizTypes: ["vars","stack","pointer","console"],
   steps: [
-    { line: 18, info: "main() 开始" },
-    { line: 19, info: "先调用 create_wrong()：它返回局部变量的地址" },
-    { line: 7, stack: [{name:"main",value:"a=?, b=?"},{name:"create_wrong",value:"p=(1,2) @0x3000",highlight:true}], vars: {p:{value:"(1,2)",type:"struct Point",addr:"0x3000"}}, info: "create_wrong 里的 p 是【局部变量】，住在栈上（假设地址 0x3000）" },
-    { line: 8, info: "return &p：把 p 的地址 0x3000 返回给 main" },
-    { line: 10, stack: [{name:"main",value:"a=0x3000, b=?",highlight:true}], vars: {a:{value:"0x3000",type:"struct Point*"}}, pointer: [{name:"a",type:"struct Point*",addr:"0x2000",value:"0x3000",targetName:"p（栈上）",targetType:"struct Point",targetAddr:"0x3000",targetValue:"(1, 2)",targetInvalid:true}], info: "⚠ create_wrong 结束，栈帧销毁，p 的内存随即被回收——a 成了「悬垂指针」：地址还在，但家没了。再使用 a 是未定义行为！" },
-    { line: 20, info: "再调用 create_right()：它返回 malloc 申请的堆内存" },
-    { line: 12, stack: [{name:"main",value:"a=0x3000, b=?"},{name:"create_right",value:"p=0xB000",highlight:true}], vars: {p:{value:"0xB000",type:"struct Point*"}}, pointer: [{name:"p",type:"struct Point*",addr:"0x2004",value:"0xB000",targetName:"堆内存",targetType:"struct Point",targetAddr:"0xB000",targetValue:"?"}], info: "malloc(sizeof(struct Point))：在【堆】上申请内存 0xB000——堆内存不随函数返回释放" },
-    { line: 13, pointer: [{name:"p",type:"struct Point*",addr:"0x2004",value:"0xB000",targetName:"堆内存",targetType:"struct Point",targetAddr:"0xB000",targetValue:"(3, ?)"}], info: "p->x = 3：往堆内存写数据" },
-    { line: 14, pointer: [{name:"p",type:"struct Point*",addr:"0x2004",value:"0xB000",targetName:"堆内存",targetType:"struct Point",targetAddr:"0xB000",targetValue:"(3, 4)"}], info: "p->y = 4" },
-    { line: 15, info: "return p：把堆内存地址 0xB000 返回" },
-    { line: 17, stack: [{name:"main",value:"a=0x3000, b=0xB000",highlight:true}], vars: {b:{value:"0xB000",type:"struct Point*"}}, pointer: [{name:"b",type:"struct Point*",addr:"0x2004",value:"0xB000",targetName:"堆内存",targetType:"struct Point",targetAddr:"0xB000",targetValue:"(3, 4)"}], info: "create_right 结束：局部指针 p 销毁了，但【堆内存还在】——b 是合法有效的！" },
-    { line: 21, output: "b=(3,4)", info: "b 可以安全使用。对比 a：同样是函数返回的地址，栈上的家被收了，堆上的家还在" },
-    { line: 22, pointer: [{name:"b",type:"struct Point*",addr:"0x2004",value:"0xB000",targetName:"堆内存",targetType:"struct Point",targetAddr:"0xB000",targetValue:"(3, 4)",targetInvalid:true}], info: "free(b)：堆内存的生命周期由你掌控——不用了就手动归还（a 指向的栈内存不需要也不能 free）" },
+    { line: 17, info: "main() 开始" },
+    { line: 18, info: "先调用 create_wrong()：它返回局部变量的地址" },
+    { line: 6, stack: [{name:"main",value:"a=?, b=?"},{name:"create_wrong",value:"p=(1,2) @0x3000",highlight:true}], vars: {p:{value:"(1,2)",type:"struct Point",addr:"0x3000"}}, info: "create_wrong 里的 p 是【局部变量】，住在栈上（假设地址 0x3000）" },
+    { line: 7, info: "return &p：把 p 的地址 0x3000 返回给 main" },
+    { line: 18, stack: [{name:"main",value:"a=0x3000, b=?",highlight:true}], vars: {a:{value:"0x3000",type:"struct Point*"}}, pointer: [{name:"a",type:"struct Point*",addr:"0x2000",value:"0x3000",targetName:"p（栈上）",targetType:"struct Point",targetAddr:"0x3000",targetValue:"(1, 2)",targetInvalid:true}], info: "⚠ create_wrong 结束，栈帧销毁，p 的内存随即被回收——a 成了「悬垂指针」：地址还在，但家没了。再使用 a 是未定义行为！" },
+    { line: 19, info: "再调用 create_right()：它返回 malloc 申请的堆内存" },
+    { line: 11, stack: [{name:"main",value:"a=0x3000, b=?"},{name:"create_right",value:"p=0xB000",highlight:true}], vars: {p:{value:"0xB000",type:"struct Point*"}}, pointer: [{name:"p",type:"struct Point*",addr:"0x2004",value:"0xB000",targetName:"堆内存",targetType:"struct Point",targetAddr:"0xB000",targetValue:"?"}], info: "malloc(sizeof(struct Point))：在【堆】上申请内存 0xB000——堆内存不随函数返回释放" },
+    { line: 12, pointer: [{name:"p",type:"struct Point*",addr:"0x2004",value:"0xB000",targetName:"堆内存",targetType:"struct Point",targetAddr:"0xB000",targetValue:"(3, ?)"}], info: "p->x = 3：往堆内存写数据" },
+    { line: 13, pointer: [{name:"p",type:"struct Point*",addr:"0x2004",value:"0xB000",targetName:"堆内存",targetType:"struct Point",targetAddr:"0xB000",targetValue:"(3, 4)"}], info: "p->y = 4" },
+    { line: 14, info: "return p：把堆内存地址 0xB000 返回" },
+    { line: 19, stack: [{name:"main",value:"a=0x3000, b=0xB000",highlight:true}], vars: {b:{value:"0xB000",type:"struct Point*"}}, pointer: [{name:"b",type:"struct Point*",addr:"0x2004",value:"0xB000",targetName:"堆内存",targetType:"struct Point",targetAddr:"0xB000",targetValue:"(3, 4)"}], info: "create_right 结束：局部指针 p 销毁了，但【堆内存还在】——b 是合法有效的！" },
+    { line: 20, output: "b=(3,4)", info: "b 可以安全使用。对比 a：同样是函数返回的地址，栈上的家被收了，堆上的家还在" },
+    { line: 21, pointer: [{name:"b",type:"struct Point*",addr:"0x2004",value:"0xB000",targetName:"堆内存",targetType:"struct Point",targetAddr:"0xB000",targetValue:"(3, 4)",targetInvalid:true}], info: "free(b)：堆内存的生命周期由你掌控——不用了就手动归还（a 指向的栈内存不需要也不能 free）" },
     { line: 23, info: "程序结束。记住：需要跨函数存活的结构体，就用 malloc 在堆上创建" }
   ]
 });

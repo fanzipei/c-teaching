@@ -172,15 +172,15 @@ int main() {
 }`,
   vizTypes: ["vars","console"],
   steps: [
-    { line: 3, info: "main() 开始" },
-    { line: 4, vars: {a:{value:10,type:"int"}}, info: "声明 int 变量 a = 10，通常占 4 字节" },
-    { line: 5, vars: {f:{value:3.14,type:"float"}}, info: "声明 float 变量 f = 3.14，通常占 4 字节" },
-    { line: 6, vars: {d:{value:3.1415926535,type:"double"}}, info: "声明 double 变量 d，通常占 8 字节，精度更高" },
-    { line: 7, vars: {c:{value:"'A'",type:"char"}}, info: "声明 char 变量 c = 'A'，占 1 字节" },
-    { line: 8, output: "int=4 bytes, float=4 bytes", info: "sizeof 返回各类型占用的字节数" },
-    { line: 9, output: "int=4 bytes, float=4 bytes\ndouble=8 bytes, char=1 bytes", info: "double 占 8 字节，char 占 1 字节" },
-    { line: 10, output: "int=4 bytes, float=4 bytes\ndouble=8 bytes, char=1 bytes\na=10, f=3.14, d=3.1415926535, c=A", info: "输出各变量的值" },
-    { line: 11, info: "程序结束" }
+    { line: 2, info: "main() 开始" },
+    { line: 3, vars: {a:{value:10,type:"int"}}, info: "声明 int 变量 a = 10，通常占 4 字节" },
+    { line: 4, vars: {f:{value:3.14,type:"float"}}, info: "声明 float 变量 f = 3.14，通常占 4 字节" },
+    { line: 5, vars: {d:{value:3.1415926535,type:"double"}}, info: "声明 double 变量 d，通常占 8 字节，精度更高" },
+    { line: 6, vars: {c:{value:"'A'",type:"char"}}, info: "声明 char 变量 c = 'A'，占 1 字节" },
+    { line: 7, output: "int=4 bytes, float=4 bytes", info: "sizeof 返回各类型占用的字节数" },
+    { line: 8, output: "int=4 bytes, float=4 bytes\ndouble=8 bytes, char=1 bytes", info: "double 占 8 字节，char 占 1 字节" },
+    { line: 9, output: "int=4 bytes, float=4 bytes\ndouble=8 bytes, char=1 bytes\na=10, f=3.14, d=3.1415926535, c=A", info: "输出各变量的值" },
+    { line: 10, info: "程序结束" }
   ]
 });
 createDemo("demo1", {
@@ -200,15 +200,15 @@ int main() {
 }`,
   vizTypes: ["vars","console"],
   steps: [
-    { line: 3, info: "程序从 main() 开始执行" },
-    { line: 4, vars: {age:{value:20,type:"int"}}, info: "声明 int 变量 age 并初始化为 20" },
-    { line: 5, vars: {age:{value:20,type:"int"}, pi:{value:3.14,type:"float"}}, info: "声明 float 变量 pi = 3.14" },
-    { line: 6, vars: {age:{value:20,type:"int"}, pi:{value:3.14,type:"float"}, grade:{value:"'A'",type:"char"}}, info: "声明 char 变量 grade = 'A'" },
-    { line: 7, vars: {age:{value:21,type:"int"}, pi:{value:3.14,type:"float"}, grade:{value:"'A'",type:"char"}}, info: "age 被覆盖为 21" },
-    { line: 8, vars: {age:{value:21,type:"int"}, pi:{value:3.14159,type:"float"}, grade:{value:"'A'",type:"char"}}, info: "pi 更新为 3.14159" },
-    { line: 9, vars: {age:{value:21,type:"int"}, pi:{value:3.14159,type:"float"}, grade:{value:"'B'",type:"char"}}, info: "grade 更新为 'B'" },
-    { line: 10, output: "age=21, pi=3.141590, grade=B", info: "printf 输出当前所有变量的值" },
-    { line: 11, info: "main 返回 0，程序结束" }
+    { line: 2, info: "程序从 main() 开始执行" },
+    { line: 3, vars: {age:{value:20,type:"int"}}, info: "声明 int 变量 age 并初始化为 20" },
+    { line: 4, vars: {age:{value:20,type:"int"}, pi:{value:3.14,type:"float"}}, info: "声明 float 变量 pi = 3.14" },
+    { line: 5, vars: {age:{value:20,type:"int"}, pi:{value:3.14,type:"float"}, grade:{value:"'A'",type:"char"}}, info: "声明 char 变量 grade = 'A'" },
+    { line: 6, vars: {age:{value:21,type:"int"}, pi:{value:3.14,type:"float"}, grade:{value:"'A'",type:"char"}}, info: "age 被覆盖为 21" },
+    { line: 7, vars: {age:{value:21,type:"int"}, pi:{value:3.14159,type:"float"}, grade:{value:"'A'",type:"char"}}, info: "pi 更新为 3.14159" },
+    { line: 8, vars: {age:{value:21,type:"int"}, pi:{value:3.14159,type:"float"}, grade:{value:"'B'",type:"char"}}, info: "grade 更新为 'B'" },
+    { line: 9, output: "age=21, pi=3.141590, grade=B", info: "printf 输出当前所有变量的值" },
+    { line: 10, info: "main 返回 0，程序结束" }
   ]
 });
 createDemo("demo2", {
@@ -230,16 +230,16 @@ int main() {
 }`,
   vizTypes: ["vars","console"],
   steps: [
-    { line: 3, info: "main() 开始" },
-    { line: 4, vars: {a:{value:17,type:"int"}}, info: "a = 17" },
-    { line: 5, vars: {a:{value:17,type:"int"},b:{value:5,type:"int"}}, info: "b = 5" },
-    { line: 6, vars: {a:{value:17,type:"int"},b:{value:5,type:"int"},sum:{value:22,type:"int"}}, info: "sum = a + b = 22" },
-    { line: 7, vars: {a:{value:17,type:"int"},b:{value:5,type:"int"},sum:{value:22,type:"int"},diff:{value:12,type:"int"}}, info: "diff = a - b = 12" },
-    { line: 8, vars: {prod:{value:85,type:"int"}}, info: "prod = a * b = 85" },
-    { line: 9, vars: {quot:{value:3,type:"int"}}, info: "quot = a / b = 3（整数除法截断小数）" },
-    { line: 10, vars: {rem:{value:2,type:"int"}}, info: "rem = a % b = 2（取模运算）" },
-    { line: 11, output: "sum=22, diff=12, prod=85, quot=3, rem=2", info: "输出所有运算结果" },
-    { line: 13, info: "程序结束" }
+    { line: 2, info: "main() 开始" },
+    { line: 3, vars: {a:{value:17,type:"int"}}, info: "a = 17" },
+    { line: 4, vars: {a:{value:17,type:"int"},b:{value:5,type:"int"}}, info: "b = 5" },
+    { line: 5, vars: {a:{value:17,type:"int"},b:{value:5,type:"int"},sum:{value:22,type:"int"}}, info: "sum = a + b = 22" },
+    { line: 6, vars: {a:{value:17,type:"int"},b:{value:5,type:"int"},sum:{value:22,type:"int"},diff:{value:12,type:"int"}}, info: "diff = a - b = 12" },
+    { line: 7, vars: {prod:{value:85,type:"int"}}, info: "prod = a * b = 85" },
+    { line: 8, vars: {quot:{value:3,type:"int"}}, info: "quot = a / b = 3（整数除法截断小数）" },
+    { line: 9, vars: {rem:{value:2,type:"int"}}, info: "rem = a % b = 2（取模运算）" },
+    { line: 10, output: "sum=22, diff=12, prod=85, quot=3, rem=2", info: "输出所有运算结果" },
+    { line: 12, info: "程序结束" }
   ]
 });
 createDemo("demo3", {
@@ -258,14 +258,14 @@ int main() {
 }`,
   vizTypes: ["vars","console"],
   steps: [
-    { line: 3, info: "main() 开始" },
-    { line: 4, vars: {age:{value:20,type:"int"}}, info: "age = 20" },
-    { line: 5, vars: {pi:{value:3.14159,type:"float"}}, info: "pi = 3.14159" },
-    { line: 6, vars: {grade:{value:"'A'",type:"char"}}, info: "grade = 'A'" },
-    { line: 7, output: "age = 20", info: "%d 输出整数" },
-    { line: 8, output: "age = 20\npi = 3.14", info: "%.2f 保留两位小数输出浮点数" },
-    { line: 9, output: "age = 20\npi = 3.14\ngrade = A, ASCII = 65", info: "%c 输出字符，%d 输出其 ASCII 码 65" },
-    { line: 10, info: "程序结束" }
+    { line: 2, info: "main() 开始" },
+    { line: 3, vars: {age:{value:20,type:"int"}}, info: "age = 20" },
+    { line: 4, vars: {pi:{value:3.14159,type:"float"}}, info: "pi = 3.14159" },
+    { line: 5, vars: {grade:{value:"'A'",type:"char"}}, info: "grade = 'A'" },
+    { line: 6, output: "age = 20", info: "%d 输出整数" },
+    { line: 7, output: "age = 20\npi = 3.14", info: "%.2f 保留两位小数输出浮点数" },
+    { line: 8, output: "age = 20\npi = 3.14\ngrade = A, ASCII = 65", info: "%c 输出字符，%d 输出其 ASCII 码 65" },
+    { line: 9, info: "程序结束" }
   ]
 });
 // 模拟 scanf("%d %f %c", ...) 对一行输入的逐项解析（含分段可视化数据）
@@ -364,15 +364,15 @@ int main() {
 }`,
     vizTypes: ["vars","console"],
     steps: [
-      { line: 3, info: "main() 开始" },
-      { line: 4, vars: {age:{value:"?",type:"int"}}, info: "声明未初始化的 int 变量 age（里面是随机垃圾值）" },
-      { line: 5, vars: {score:{value:"?",type:"float"}}, info: "声明未初始化的 float 变量 score" },
-      { line: 6, vars: {grade:{value:"?",type:"char"}}, info: "声明未初始化的 char 变量 grade" },
-      { line: 7, vars: {ret:{value:"?",type:"int"}}, info: "ret 用来接收 scanf 的返回值（成功赋值的项数）" },
-      { line: 8, output: "请输入年龄、成绩、等级：" + input, info: "提示用户输入，程序在此阻塞等待；你输入了一整行数据" },
-      { line: 9, vars: {age:{value:ageS,type:"int"},score:{value:scoreS,type:"float"},grade:{value:gradeS === '?' ? '?' : "'" + gradeS + "'",type:"char"},ret:{value:p.ret,type:"int"}}, info: parseInfo },
-      { line: 10, output: "ret=" + p.ret + ", age=" + ageS + ", score=" + scoreS + ", grade=" + gradeS, info: ok ? "输出读取到的值" : "⚠ 注意：未匹配成功的变量仍是随机垃圾值——真实程序中打印它们是未定义行为，所以必须检查 ret" },
-      { line: 11, info: ok ? "程序结束" : "程序结束。教训：scanf 的返回值告诉你成功读取了几项，用它判断输入是否合法" }
+      { line: 2, info: "main() 开始" },
+      { line: 3, vars: {age:{value:"?",type:"int"}}, info: "声明未初始化的 int 变量 age（里面是随机垃圾值）" },
+      { line: 4, vars: {score:{value:"?",type:"float"}}, info: "声明未初始化的 float 变量 score" },
+      { line: 5, vars: {grade:{value:"?",type:"char"}}, info: "声明未初始化的 char 变量 grade" },
+      { line: 6, vars: {ret:{value:"?",type:"int"}}, info: "ret 用来接收 scanf 的返回值（成功赋值的项数）" },
+      { line: 7, output: "请输入年龄、成绩、等级：" + input, info: "提示用户输入，程序在此阻塞等待；你输入了一整行数据" },
+      { line: 8, vars: {age:{value:ageS,type:"int"},score:{value:scoreS,type:"float"},grade:{value:gradeS === '?' ? '?' : "'" + gradeS + "'",type:"char"},ret:{value:p.ret,type:"int"}}, info: parseInfo },
+      { line: 9, output: "ret=" + p.ret + ", age=" + ageS + ", score=" + scoreS + ", grade=" + gradeS, info: ok ? "输出读取到的值" : "⚠ 注意：未匹配成功的变量仍是随机垃圾值——真实程序中打印它们是未定义行为，所以必须检查 ret" },
+      { line: 10, info: ok ? "程序结束" : "程序结束。教训：scanf 的返回值告诉你成功读取了几项，用它判断输入是否合法" }
     ]
   };
 }
@@ -404,14 +404,14 @@ int main() {
 }`,
   vizTypes: ["vars","console"],
   steps: [
-    { line: 3, info: "main() 开始" },
-    { line: 4, vars: {a:{value:5,type:"int"}}, info: "a = 5" },
-    { line: 5, vars: {b:{value:2,type:"int"}}, info: "b = 2" },
-    { line: 6, vars: {f1:{value:2.0,type:"float"}}, info: "a/b 先按 int 计算得 2，再隐式转为 float，f1 = 2.0" },
-    { line: 7, vars: {f2:{value:2.5,type:"float"}}, info: "(float)a 先强制转换，再除以 b 得 2.5" },
-    { line: 8, vars: {c:{value:3,type:"int"}}, info: "(int)3.99 强制截断小数部分，c = 3" },
-    { line: 9, output: "f1=2.00, f2=2.50, c=3", info: "输出结果，注意 f1 和 f2 的区别" },
-    { line: 10, info: "程序结束" }
+    { line: 2, info: "main() 开始" },
+    { line: 3, vars: {a:{value:5,type:"int"}}, info: "a = 5" },
+    { line: 4, vars: {b:{value:2,type:"int"}}, info: "b = 2" },
+    { line: 5, vars: {f1:{value:2.0,type:"float"}}, info: "a/b 先按 int 计算得 2，再隐式转为 float，f1 = 2.0" },
+    { line: 6, vars: {f2:{value:2.5,type:"float"}}, info: "(float)a 先强制转换，再除以 b 得 2.5" },
+    { line: 7, vars: {c:{value:3,type:"int"}}, info: "(int)3.99 强制截断小数部分，c = 3" },
+    { line: 8, output: "f1=2.00, f2=2.50, c=3", info: "输出结果，注意 f1 和 f2 的区别" },
+    { line: 9, info: "程序结束" }
   ]
 });
 createDemo("demo6", {
@@ -428,12 +428,12 @@ int main() {
 }`,
   vizTypes: ["console"],
   steps: [
-    { line: 3, info: "main() 开始" },
-    { line: 4, output: "Hello\nWorld\n", info: "\\n 换行：输出分两行显示" },
-    { line: 5, output: "Hello\nWorld\n\nName\tAge\tScore\n", info: "\\t 制表符：对齐列" },
-    { line: 6, output: "Hello\nWorld\n\nName\tAge\tScore\n\nHe said \"OK\"\n", info: "\\\" 输出双引号" },
-    { line: 7, output: "Hello\nWorld\n\nName\tAge\tScore\n\nHe said \"OK\"\n\nPath: C:\\Windows\n", info: "\\\\ 输出单个反斜杠" },
-    { line: 8, info: "程序结束" }
+    { line: 2, info: "main() 开始" },
+    { line: 3, output: "Hello\nWorld\n", info: "\\n 换行：输出分两行显示" },
+    { line: 4, output: "Hello\nWorld\n\nName\tAge\tScore\n", info: "\\t 制表符：对齐列" },
+    { line: 5, output: "Hello\nWorld\n\nName\tAge\tScore\n\nHe said \"OK\"\n", info: "\\\" 输出双引号" },
+    { line: 6, output: "Hello\nWorld\n\nName\tAge\tScore\n\nHe said \"OK\"\n\nPath: C:\\Windows\n", info: "\\\\ 输出单个反斜杠" },
+    { line: 7, info: "程序结束" }
   ]
 });
 createDemo("demo7", {
@@ -452,14 +452,14 @@ int main() {
 }`,
   vizTypes: ["vars","console"],
   steps: [
-    { line: 3, info: "预处理：#define PI 3.14159，编译时所有 PI 会被替换" },
-    { line: 4, info: "预处理：#define MAX 100" },
-    { line: 5, info: "预处理：#define MIN 1" },
-    { line: 6, info: "main() 开始" },
-    { line: 7, vars: {r:{value:5.0,type:"double"}}, info: "r = 5.0" },
-    { line: 8, vars: {area:{value:78.53975,type:"double"}}, info: "area = PI * r * r ≈ 78.54" },
-    { line: 9, output: "MAX=100, MIN=1, area=78.54", info: "MAX 和 MIN 都是宏替换，没有 const 关键字" },
-    { line: 10, info: "程序结束" }
+    { line: 2, info: "预处理：#define PI 3.14159，编译时所有 PI 会被替换" },
+    { line: 3, info: "预处理：#define MAX 100" },
+    { line: 4, info: "预处理：#define MIN 1" },
+    { line: 5, info: "main() 开始" },
+    { line: 6, vars: {r:{value:5.0,type:"double"}}, info: "r = 5.0" },
+    { line: 7, vars: {area:{value:78.53975,type:"double"}}, info: "area = PI * r * r ≈ 78.54" },
+    { line: 8, output: "MAX=100, MIN=1, area=78.54", info: "MAX 和 MIN 都是宏替换，没有 const 关键字" },
+    { line: 9, info: "程序结束" }
   ]
 });
 /* ===== 赋值运算符 ===== */
@@ -480,15 +480,15 @@ int main() {
 }`,
   vizTypes: ["vars","console"],
   steps: [
-    { line: 3, info: "main() 开始" },
-    { line: 4, vars: {score:{value:100,type:"int"}}, info: "score 初始化为 100" },
-    { line: 5, vars: {score:{value:110,type:"int"}}, info: "score += 10  => score = 110" },
-    { line: 6, vars: {score:{value:90,type:"int"}}, info: "score -= 20  => score = 90" },
-    { line: 7, vars: {score:{value:180,type:"int"}}, info: "score *= 2   => score = 180" },
-    { line: 8, vars: {score:{value:60,type:"int"}}, info: "score /= 3   => score = 60（整数除法）" },
-    { line: 9, vars: {score:{value:4,type:"int"}}, info: "score %= 7   => score = 4（60 % 7 = 4）" },
-    { line: 10, output: "score = 4", info: "最终输出 score = 4" },
-    { line: 11, info: "程序结束" }
+    { line: 2, info: "main() 开始" },
+    { line: 3, vars: {score:{value:100,type:"int"}}, info: "score 初始化为 100" },
+    { line: 4, vars: {score:{value:110,type:"int"}}, info: "score += 10  => score = 110" },
+    { line: 5, vars: {score:{value:90,type:"int"}}, info: "score -= 20  => score = 90" },
+    { line: 6, vars: {score:{value:180,type:"int"}}, info: "score *= 2   => score = 180" },
+    { line: 7, vars: {score:{value:60,type:"int"}}, info: "score /= 3   => score = 60（整数除法）" },
+    { line: 8, vars: {score:{value:4,type:"int"}}, info: "score %= 7   => score = 4（60 % 7 = 4）" },
+    { line: 9, output: "score = 4", info: "最终输出 score = 4" },
+    { line: 10, info: "程序结束" }
   ]
 });
 createDemo("demo9", {
@@ -507,14 +507,14 @@ int main() {
 }`,
   vizTypes: ["vars","console"],
   steps: [
-    { line: 3, info: "main() 开始" },
-    { line: 4, vars: {i:{value:5,type:"int"}}, info: "i 初始化为 5" },
-    { line: 5, vars: {i:{value:6,type:"int"},a:{value:5,type:"int"}}, info: "a = i++：先把 i 的旧值 5 赋给 a，然后 i 自增为 6" },
-    { line: 6, vars: {i:{value:7,type:"int"},a:{value:5,type:"int"},b:{value:7,type:"int"}}, info: "b = ++i：先把 i 自增为 7，再把新值 7 赋给 b" },
-    { line: 7, vars: {i:{value:6,type:"int"},a:{value:5,type:"int"},b:{value:7,type:"int"},c:{value:7,type:"int"}}, info: "c = i--：先把 i 的旧值 7 赋给 c，然后 i 自减为 6" },
-    { line: 8, vars: {i:{value:5,type:"int"},a:{value:5,type:"int"},b:{value:7,type:"int"},c:{value:7,type:"int"},d:{value:5,type:"int"}}, info: "d = --i：先把 i 自减为 5，再把新值 5 赋给 d" },
-    { line: 9, output: "a=5, b=7, c=7, d=5, i=5", info: "最终 i 回到了 5，但 a/b/c/d 记录了中间状态" },
-    { line: 10, info: "程序结束" }
+    { line: 2, info: "main() 开始" },
+    { line: 3, vars: {i:{value:5,type:"int"}}, info: "i 初始化为 5" },
+    { line: 4, vars: {i:{value:6,type:"int"},a:{value:5,type:"int"}}, info: "a = i++：先把 i 的旧值 5 赋给 a，然后 i 自增为 6" },
+    { line: 5, vars: {i:{value:7,type:"int"},a:{value:5,type:"int"},b:{value:7,type:"int"}}, info: "b = ++i：先把 i 自增为 7，再把新值 7 赋给 b" },
+    { line: 6, vars: {i:{value:6,type:"int"},a:{value:5,type:"int"},b:{value:7,type:"int"},c:{value:7,type:"int"}}, info: "c = i--：先把 i 的旧值 7 赋给 c，然后 i 自减为 6" },
+    { line: 7, vars: {i:{value:5,type:"int"},a:{value:5,type:"int"},b:{value:7,type:"int"},c:{value:7,type:"int"},d:{value:5,type:"int"}}, info: "d = --i：先把 i 自减为 5，再把新值 5 赋给 d" },
+    { line: 8, output: "a=5, b=7, c=7, d=5, i=5", info: "最终 i 回到了 5，但 a/b/c/d 记录了中间状态" },
+    { line: 9, info: "程序结束" }
   ]
 });
 createDemo("demo10", {
@@ -534,15 +534,15 @@ int main() {
 }`,
   vizTypes: ["vars","console"],
   steps: [
-    { line: 3, info: "main() 开始" },
-    { line: 4, vars: {a:{value:"?",type:"int"},b:{value:"?",type:"int"},c:{value:"?",type:"int"}}, info: "声明三个未初始化的 int 变量（值不确定）" },
-    { line: 5, vars: {a:{value:10,type:"int"},b:{value:10,type:"int"},c:{value:10,type:"int"}}, info: "从右向左执行：c=10, b=c=10, a=b=10" },
-    { line: 6, vars: {x:{value:3,type:"int"},y:{value:7,type:"int"}}, info: "声明 x=3, y=7" },
-    { line: 7, vars: {x:{value:10,type:"int"},y:{value:7,type:"int"}}, info: "x = x + y = 3 + 7 = 10" },
-    { line: 8, vars: {x:{value:10,type:"int"},y:{value:3,type:"int"}}, info: "y = x - y = 10 - 7 = 3（原来的 x）" },
-    { line: 9, vars: {x:{value:7,type:"int"},y:{value:3,type:"int"}}, info: "x = x - y = 10 - 3 = 7（原来的 y），完成交换" },
-    { line: 10, output: "a=10, b=10, c=10, x=7, y=3", info: "连续赋值让 a/b/c 同为 10；加减法完成 x 与 y 的交换" },
-    { line: 11, info: "程序结束" }
+    { line: 2, info: "main() 开始" },
+    { line: 3, vars: {a:{value:"?",type:"int"},b:{value:"?",type:"int"},c:{value:"?",type:"int"}}, info: "声明三个未初始化的 int 变量（值不确定）" },
+    { line: 4, vars: {a:{value:10,type:"int"},b:{value:10,type:"int"},c:{value:10,type:"int"}}, info: "从右向左执行：c=10, b=c=10, a=b=10" },
+    { line: 5, vars: {x:{value:3,type:"int"},y:{value:7,type:"int"}}, info: "声明 x=3, y=7" },
+    { line: 6, vars: {x:{value:10,type:"int"},y:{value:7,type:"int"}}, info: "x = x + y = 3 + 7 = 10" },
+    { line: 7, vars: {x:{value:10,type:"int"},y:{value:3,type:"int"}}, info: "y = x - y = 10 - 7 = 3（原来的 x）" },
+    { line: 8, vars: {x:{value:7,type:"int"},y:{value:3,type:"int"}}, info: "x = x - y = 10 - 3 = 7（原来的 y），完成交换" },
+    { line: 9, output: "a=10, b=10, c=10, x=7, y=3", info: "连续赋值让 a/b/c 同为 10；加减法完成 x 与 y 的交换" },
+    { line: 10, info: "程序结束" }
   ]
 });
 /* ========== 章节练习：3 道预测输出 + 3 道改错 ========== */

@@ -171,13 +171,13 @@ int main() {
     ]
   },
   steps: [
-    { line: 3, info: "main() 开始", flow: { node: "start" } },
-    { line: 4, vars: {score:{value:75,type:"int"}}, info: "score = 75", flow: { node: "init", edge: { from: "start", to: "init" } } },
-    { line: 5, info: "判断 score >= 60：75 >= 60 为真，进入 if 分支", flow: { node: "cond", edge: { from: "init", to: "cond" }, kind: "match" } },
-    { line: 6, output: "及格", info: "执行 printf，输出 及格", flow: { node: "pass", edge: { from: "cond", to: "pass" } } },
-    { line: 8, info: "if 语句结束，汇合到后续代码", flow: { node: "println", edge: { from: "pass", to: "println" } } },
-    { line: 8, output: "结束", info: "输出 结束（注意：条件为假时会沿右侧路径直接到这里）", flow: { node: "println" } },
-    { line: 9, info: "程序结束", flow: { node: "end", edge: { from: "println", to: "end" } } }
+    { line: 2, info: "main() 开始", flow: { node: "start" } },
+    { line: 3, vars: {score:{value:75,type:"int"}}, info: "score = 75", flow: { node: "init", edge: { from: "start", to: "init" } } },
+    { line: 4, info: "判断 score >= 60：75 >= 60 为真，进入 if 分支", flow: { node: "cond", edge: { from: "init", to: "cond" }, kind: "match" } },
+    { line: 5, output: "及格", info: "执行 printf，输出 及格", flow: { node: "pass", edge: { from: "cond", to: "pass" } } },
+    { line: 7, info: "if 语句结束，汇合到后续代码", flow: { node: "println", edge: { from: "pass", to: "println" } } },
+    { line: 7, output: "结束", info: "输出 结束（注意：条件为假时会沿右侧路径直接到这里）", flow: { node: "println" } },
+    { line: 8, info: "程序结束", flow: { node: "end", edge: { from: "println", to: "end" } } }
   ]
 });
 /* ========== demo1: if-else if-else 多分支 ========== */
@@ -222,9 +222,9 @@ int main() {
     ]
   },
   steps: [
-    { line: 3, info: "main() 开始", flow: { node: "start" } },
-    { line: 4, vars: {n:{value:-5,type:"int"}}, info: "n = -5", flow: { node: "init", edge: { from: "start", to: "init" } } },
-    { line: 5, info: "n > 0 ? 否（沿假路径向下级联）。再判断 n < 0 ? 是，进入 else if 分支", flow: { node: "c2", edges: [{ from: "init", to: "c1" }, { from: "c1", to: "c2" }], kind: "match" } },
+    { line: 2, info: "main() 开始", flow: { node: "start" } },
+    { line: 3, vars: {n:{value:-5,type:"int"}}, info: "n = -5", flow: { node: "init", edge: { from: "start", to: "init" } } },
+    { line: 6, info: "n > 0 ? 否（沿假路径向下级联）。再判断 n < 0 ? 是，进入 else if 分支", flow: { node: "c2", edges: [{ from: "init", to: "c1" }, { from: "c1", to: "c2" }], kind: "match" } },
     { line: 7, output: "负数", info: "输出 负数", flow: { node: "neg", edge: { from: "c2", to: "neg" } } },
     { line: 11, info: "if-else 结构结束：执行完一个分支后，沿虚线汇合到末尾，其余分支全部被跳过", flow: { node: "end", edge: { from: "neg", to: "end" } } },
     { line: 11, info: "程序结束", flow: { node: "end" } }
@@ -265,12 +265,12 @@ int main() {
     ]
   },
   steps: [
-    { line: 3, info: "main() 开始", flow: { node: "start" } },
-    { line: 4, vars: {year:{value:2024,type:"int"}}, info: "year = 2024", flow: { node: "init", edge: { from: "start", to: "init" } } },
-    { line: 5, info: "2024%4=0 且 2024%100=24≠0，&& 左侧为真，整个条件为真，是闰年", flow: { node: "cond", edge: { from: "init", to: "cond" }, kind: "match" } },
-    { line: 6, output: "闰年", info: "输出 闰年", flow: { node: "leap", edge: { from: "cond", to: "leap" } } },
-    { line: 8, info: "else 分支被跳过，两个分支在末尾汇合", flow: { node: "end", edge: { from: "leap", to: "end" } } },
-    { line: 10, info: "程序结束", flow: { node: "end" } }
+    { line: 2, info: "main() 开始", flow: { node: "start" } },
+    { line: 3, vars: {year:{value:2024,type:"int"}}, info: "year = 2024", flow: { node: "init", edge: { from: "start", to: "init" } } },
+    { line: 4, info: "2024%4=0 且 2024%100=24≠0，&& 左侧为真，整个条件为真，是闰年", flow: { node: "cond", edge: { from: "init", to: "cond" }, kind: "match" } },
+    { line: 5, output: "闰年", info: "输出 闰年", flow: { node: "leap", edge: { from: "cond", to: "leap" } } },
+    { line: 9, info: "else 分支被跳过，两个分支在末尾汇合", flow: { node: "end", edge: { from: "leap", to: "end" } } },
+    { line: 9, info: "程序结束", flow: { node: "end" } }
   ]
 });
 /* ========== demo3: switch 多分支 ========== */
@@ -319,16 +319,16 @@ int main() {
     ]
   },
   steps: [
-    { line: 3, info: "main() 开始", flow: { node: "start" } },
-    { line: 4, vars: {day:{value:3,type:"int"}}, info: "day = 3", flow: { node: "init", edge: { from: "start", to: "init" } } },
-    { line: 5, info: "进入 switch，用 day 的值逐个与 case 比较", flow: { node: "sw", edge: { from: "init", to: "sw" } } },
-    { line: 6, info: "case 1：3 ≠ 1，不匹配", flow: { node: "c1", edge: { from: "sw", to: "c1" } } },
-    { line: 7, info: "case 2：3 ≠ 2，不匹配", flow: { node: "c2", edge: { from: "sw", to: "c2" } } },
-    { line: 8, info: "case 3：3 == 3，匹配！执行该分支", flow: { node: "c3", edge: { from: "sw", to: "c3" }, kind: "match" } },
-    { line: 8, output: "周三", info: "输出 周三", flow: { node: "c3" } },
-    { line: 8, info: "遇到 break：沿曲线跳出 switch（没有 break 会继续落入 case 4！）", flow: { node: "c3", edge: { from: "c3", to: "end" }, kind: "break" } },
-    { line: 12, info: "switch 结束，继续执行后续代码", flow: { node: "end" } },
-    { line: 12, info: "程序结束", flow: { node: "end" } }
+    { line: 2, info: "main() 开始", flow: { node: "start" } },
+    { line: 3, vars: {day:{value:3,type:"int"}}, info: "day = 3", flow: { node: "init", edge: { from: "start", to: "init" } } },
+    { line: 4, info: "进入 switch，用 day 的值逐个与 case 比较", flow: { node: "sw", edge: { from: "init", to: "sw" } } },
+    { line: 5, info: "case 1：3 ≠ 1，不匹配", flow: { node: "c1", edge: { from: "sw", to: "c1" } } },
+    { line: 6, info: "case 2：3 ≠ 2，不匹配", flow: { node: "c2", edge: { from: "sw", to: "c2" } } },
+    { line: 7, info: "case 3：3 == 3，匹配！执行该分支", flow: { node: "c3", edge: { from: "sw", to: "c3" }, kind: "match" } },
+    { line: 7, output: "周三", info: "输出 周三", flow: { node: "c3" } },
+    { line: 7, info: "遇到 break：沿曲线跳出 switch（没有 break 会继续落入 case 4！）", flow: { node: "c3", edge: { from: "c3", to: "end" }, kind: "break" } },
+    { line: 11, info: "switch 结束，继续执行后续代码", flow: { node: "end" } },
+    { line: 11, info: "程序结束", flow: { node: "end" } }
   ]
 });
 /* ========== demo4: 三目运算符 ========== */
@@ -373,12 +373,12 @@ int main() {
     ]
   },
   steps: [
-    { line: 3, info: "main() 开始", flow: { node: "start" } },
-    { line: 4, vars: {a:{value:5,type:"int"},b:{value:8,type:"int"}}, info: "a = 5, b = 8", flow: { node: "init", edge: { from: "start", to: "init" } } },
-    { line: 5, vars: {max:{value:8,type:"int"}}, info: "a > b ? 否，取 : 后面的值 b=8，max = 8", flow: { node: "maxb", edges: [{ from: "init", to: "c1" }, { from: "c1", to: "maxb" }] } },
-    { line: 6, vars: {sign:{value:1,type:"int"}}, info: "a > 0 ? 是，取 ? 后面的值 1，sign = 1", flow: { node: "sg1", edges: [{ from: "maxb", to: "c2" }, { from: "c2", to: "sg1" }], kind: "match" } },
-    { line: 7, output: "max=8, sign=1", info: "输出结果", flow: { node: "print", edge: { from: "sg1", to: "print" } } },
-    { line: 8, info: "程序结束", flow: { node: "end", edge: { from: "print", to: "end" } } }
+    { line: 2, info: "main() 开始", flow: { node: "start" } },
+    { line: 3, vars: {a:{value:5,type:"int"},b:{value:8,type:"int"}}, info: "a = 5, b = 8", flow: { node: "init", edge: { from: "start", to: "init" } } },
+    { line: 4, vars: {max:{value:8,type:"int"}}, info: "a > b ? 否，取 : 后面的值 b=8，max = 8", flow: { node: "maxb", edges: [{ from: "init", to: "c1" }, { from: "c1", to: "maxb" }] } },
+    { line: 5, vars: {sign:{value:1,type:"int"}}, info: "a > 0 ? 是，取 ? 后面的值 1，sign = 1", flow: { node: "sg1", edges: [{ from: "maxb", to: "c2" }, { from: "c2", to: "sg1" }], kind: "match" } },
+    { line: 6, output: "max=8, sign=1", info: "输出结果", flow: { node: "print", edge: { from: "sg1", to: "print" } } },
+    { line: 7, info: "程序结束", flow: { node: "end", edge: { from: "print", to: "end" } } }
   ]
 });
 /* ========== demo5: 短路求值 ========== */
@@ -426,13 +426,13 @@ int main() {
     ]
   },
   steps: [
-    { line: 3, info: "main() 开始", flow: { node: "start" } },
-    { line: 4, vars: {a:{value:0,type:"int"},b:{value:5,type:"int"}}, info: "a = 0, b = 5", flow: { node: "init", edge: { from: "start", to: "init" } } },
-    { line: 5, info: "a != 0 为假，&& 右侧 b/a 直接被跳过（避免了除零错误！）", flow: { node: "c1", edge: { from: "init", to: "c1" }, kind: "skip" } },
-    { line: 6, info: "整个条件为假，跳过 if 块，沿路径来到第二个 if", flow: { node: "c2", edge: { from: "c1", to: "c2" } } },
-    { line: 8, info: "a == 0 为真，|| 右侧 b==5 不再计算，条件直接为真", flow: { node: "c2", edge: { from: "c2", to: "p2" }, kind: "skip" } },
-    { line: 9, output: "条件2成立", info: "进入 if 块，输出", flow: { node: "p2" } },
-    { line: 11, info: "程序结束", flow: { node: "end", edge: { from: "p2", to: "end" } } }
+    { line: 2, info: "main() 开始", flow: { node: "start" } },
+    { line: 3, vars: {a:{value:0,type:"int"},b:{value:5,type:"int"}}, info: "a = 0, b = 5", flow: { node: "init", edge: { from: "start", to: "init" } } },
+    { line: 4, info: "a != 0 为假，&& 右侧 b/a 直接被跳过（避免了除零错误！）", flow: { node: "c1", edge: { from: "init", to: "c1" }, kind: "skip" } },
+    { line: 7, info: "整个条件为假，跳过 if 块，沿路径来到第二个 if", flow: { node: "c2", edge: { from: "c1", to: "c2" } } },
+    { line: 7, info: "a == 0 为真，|| 右侧 b==5 不再计算，条件直接为真", flow: { node: "c2", edge: { from: "c2", to: "p2" }, kind: "skip" } },
+    { line: 8, output: "条件2成立", info: "进入 if 块，输出", flow: { node: "p2" } },
+    { line: 10, info: "程序结束", flow: { node: "end", edge: { from: "p2", to: "end" } } }
   ]
 });
 /* ========== 章节练习：3 道预测输出 + 3 道改错 ========== */

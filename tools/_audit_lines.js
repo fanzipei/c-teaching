@@ -25,7 +25,7 @@ const PAGES = ['intro.html','datatype.html','condition.html','loop.html','functi
           if (s.vars) {
             for (const name of Object.keys(s.vars)) {
               if (name === 'ret' && /scanf/.test(text)) continue;
-              if (!new RegExp('\b' + name + '\b').test(text)) { flags.push(`变量${name}不在该行`); break; }
+              if (!new RegExp('\\b' + name + '\\b').test(text)) { flags.push(`变量${name}不在该行`); break; }
             }
           }
           if (s.line >= total) flags.push('行号越界');
