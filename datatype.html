@@ -594,7 +594,8 @@ int main() {
 });
 createQuiz("quiz3", {
   type: "fix",
-  title: "把赋值 == 误写成了比较 ==",
+  title: "给变量重新赋值",
+  hint: "把赋值 == 误写成了比较 ==",
   code: `#include <stdio.h>
 
 int main() {
@@ -615,7 +616,8 @@ int main() {
 });
 createQuiz("quiz4", {
   type: "fix",
-  title: "复合赋值 += 写反成了 =+",
+  title: "给分数加上 10 分",
+  hint: "复合赋值 += 写反成了 =+",
   code: `#include <stdio.h>
 
 int main() {
@@ -643,7 +645,8 @@ int main() {
 });
 createQuiz("quiz5", {
   type: "fix",
-  title: "#define 末尾多了一个分号",
+  title: "用宏计算圆的面积",
+  hint: "#define 末尾多了一个分号",
   code: `#include <stdio.h>
 
 #define PI 3.14159;
