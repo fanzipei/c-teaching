@@ -1,3 +1,11 @@
+.flow-current {
+  color: var(--accent);
+  font-size: 0.85rem;
+  padding-bottom: 0.6rem;
+  overflow-wrap: anywhere;
+}
+.flow-current:empty { display: none; }
+
 /* ===== 全局样式 ===== */
 * {
   margin: 0;

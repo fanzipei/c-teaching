@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="C语言文件操作交互演示：文件打开与关闭、文本写入、逐字符读取、追加、格式化读写及基础练习。">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<title>文件操作 - C语言教学演示</title>
+<link rel="stylesheet" href="style.css?v=31">
+</head>
+<body>
+<nav></nav>
+<main class="container" id="main-content">
+<h1>文件操作</h1>
+<div class="intro">
+<div class="intro-flex">
+<div class="intro-main">
+<p><strong>文件操作</strong>让程序把数据保存到文件，也能从文件读回数据。核心知识点：</p>
+<ul>
+<li>包含 <code>&lt;stdio.h&gt;</code>，用 <code>FILE *fp</code> 保存文件流指针。</li>
+<li><code>fopen("文件名", "模式")</code> 打开文件，失败时返回 <code>NULL</code>，使用前先检查。</li>
+<li><code>r</code> 只读，要求文件已存在；<code>w</code> 写入，创建或清空文件；<code>a</code> 追加，创建或保留原内容并在末尾写入。</li>
+<li><code>fputs</code> 写字符串，<code>fgetc</code> 读字符；用 <code>int</code> 接收 <code>fgetc</code> 的返回值，读取结束或出错时返回 <code>EOF</code>。</li>
+<li><code>fprintf</code> / <code>fscanf</code> 格式化读写；<code>fscanf</code> 返回成功赋值的项数，读取整数时需要传入变量地址。</li>
+<li>使用完调用 <code>fclose(fp)</code> 关闭文件。相对文件名位于程序的当前工作目录。</li>
+</ul>
+</div>
+<div class="intro-diagram">
+<svg viewBox="0 0 320 150" width="320" role="img" aria-label="文件操作流程：打开文件，检查是否成功，读写，关闭">
+<g fill="#313244" stroke="#45475a" stroke-width="1.5">
+<rect x="10" y="15" width="135" height="45" rx="6"/><rect x="175" y="15" width="135" height="45" rx="6"/>
+<rect x="175" y="95" width="135" height="40" rx="6"/><rect x="10" y="95" width="135" height="40" rx="6"/>
+</g>
+<g text-anchor="middle" fill="#cdd6f4" font-family="Microsoft YaHei,sans-serif" font-size="13">
+<text x="77" y="43">fopen 打开</text><text x="242" y="43">检查 fp != NULL</text>
+<text x="242" y="120">读写文件</text><text x="77" y="120">fclose 关闭</text>
+</g>
+<g fill="#89b4fa" font-size="24" text-anchor="middle"><text x="160" y="45">→</text><text x="242" y="85">↓</text><text x="160" y="122">←</text></g>
+</svg>
+<div class="diagram-caption">打开成功后再读写，使用完及时关闭</div>
+</div>
+</div>
+<p>演示中的“文件内容”展示写入的数据，“终端输出”展示 printf / putchar 的输出。每个示例都会先准备所需文件；正常路径假定读写成功。实际程序还应检查写入和关闭操作的返回值。</p>
+</div>
+<div class="demo-grid">
+  <div id="demo0"></div>
+  <div id="demo1"></div>
+  <div id="demo2"></div>
+  <div id="demo3"></div>
+</div>
+<h2>章节练习</h2>
+<div class="quiz-grid">
+  <div id="quiz0"></div>
+  <div id="quiz1"></div>
+  <div id="quiz2"></div>
+  <div id="quiz3"></div>
+</div>
+</main>
+<script src="site-config.js?v=31"></script>
+<script src="demo-engine.js?v=31"></script>
+<script src="demo-traces.js?v=31"></script>
+<script>
+createDemo("demo0", {
+  title: "打开、写入与关闭文件",
+  subtitle: "fopen → 检查是否成功 → fputs → fclose",
+  code: `#include <stdio.h>
+
+int main() {
+    FILE *fp = fopen("hello.txt", "w");
+    if (fp == NULL) return 1;
+    fputs("Hello, file!\\n", fp);
+    fclose(fp);
+    printf("saved\\n");
+    return 0;
+}`,
+  vizTypes: ["vars", "console"],
+  steps: CTeachingTraces["file.html:demo0"]
+});
+createDemo("demo1", {
+  title: "逐字符读取文件",
+  subtitle: "fgetc 每次读取一个字符，用 int 接收返回值并与 EOF 比较",
+  code: `#include <stdio.h>
+
+int main() {
+    FILE *fp;
+    int ch;
+    fp = fopen("letters.txt", "w");
+    if (fp == NULL) return 1;
+    fputs("ABC", fp);
+    fclose(fp);
+    fp = fopen("letters.txt", "r");
+    if (fp == NULL) { return 1; }
+    while ((ch = fgetc(fp)) != EOF) {
+        putchar(ch);
+    }
+    fclose(fp);
+    printf("\\n");
+    return 0;
+}`,
+  vizTypes: ["vars", "console"],
+  steps: CTeachingTraces["file.html:demo1"]
+});
+createDemo("demo2", {
+  title: "追加内容：a 与 w 的区别",
+  subtitle: "a 保留已有内容，在文件末尾写入；w 会清空已有内容",
+  code: `#include <stdio.h>
+
+int main() {
+    FILE *fp = fopen("log.txt", "w");
+    if (fp == NULL) return 1;
+    fputs("first\\n", fp);
+    fclose(fp);
+    fp = fopen("log.txt", "a");
+    if (fp == NULL) { return 1; }
+    fputs("second\\n", fp);
+    fclose(fp);
+    printf("appended\\n");
+    return 0;
+}`,
+  vizTypes: ["vars", "console"],
+  steps: CTeachingTraces["file.html:demo2"]
+});
+createDemo("demo3", {
+  title: "格式化读写整数",
+  subtitle: "fprintf 写入文本数字；fscanf 用地址接收数据，并检查成功读取的个数",
+  code: `#include <stdio.h>
+
+int main() {
+    FILE *fp = fopen("numbers.txt", "w");
+    int a, b, count;
+    if (fp == NULL) return 1;
+    fprintf(fp, "%d %d\\n", 12, 30);
+    fclose(fp);
+    fp = fopen("numbers.txt", "r");
+    if (fp == NULL) { return 1; }
+    count = fscanf(fp, "%d %d", &a, &b);
+    if (count == 2) {
+        printf("sum = %d\\n", a + b);
+    }
+    fclose(fp);
+    return 0;
+}`,
+  vizTypes: ["vars", "console"],
+  steps: CTeachingTraces["file.html:demo3"]
+});
+createQuiz("quiz0", {
+  type: "predict",
+  title: "连续读取两个字符",
+  code: `#include <stdio.h>
+
+int main() {
+    FILE *fp = fopen("quiz_letters.txt", "w");
+    int ch;
+    if (fp == NULL) return 1;
+    fputs("CAT", fp);
+    fclose(fp);
+    fp = fopen("quiz_letters.txt", "r");
+    if (fp == NULL) return 1;
+    ch = fgetc(fp);
+    putchar(ch);
+    ch = fgetc(fp);
+    putchar(ch);
+    fclose(fp);
+    printf("\\n");
+    return 0;
+}`,
+  answer: "CA",
+  explain: "每次 fgetc 都从当前位置读取一个字符，并向后移动。两次依次读到 C、A；T 尚未读取。"
+});
+createQuiz("quiz1", {
+  type: "predict",
+  title: "从文件读取两个整数",
+  code: `#include <stdio.h>
+
+int main() {
+    FILE *fp = fopen("quiz_numbers.txt", "w");
+    int a, b, count;
+    if (fp == NULL) return 1;
+    fprintf(fp, "%d %d\\n", 4, 6);
+    fclose(fp);
+    fp = fopen("quiz_numbers.txt", "r");
+    if (fp == NULL) { return 1; }
+    count = fscanf(fp, "%d %d", &a, &b);
+    if (count == 2) {
+        printf("sum = %d\\n", a + b);
+    }
+    fclose(fp);
+    return 0;
+}`,
+  answer: "sum = 10",
+  explain: "fprintf 写入文本 4 6；fscanf 成功读取两个整数后，a=4、b=6，输出 sum = 10。"
+});
+createQuiz("quiz2", {
+  type: "fix",
+  title: "保留已有内容再写入",
+  code: `#include <stdio.h>
+
+int main() {
+    FILE *fp = fopen("quiz_log.txt", "w");
+    if (fp == NULL) return 1;
+    fputs("first\\n", fp);
+    fclose(fp);
+    fp = fopen("quiz_log.txt", "w");
+    if (fp == NULL) { return 1; }
+    fputs("second\\n", fp);
+    fclose(fp);
+    printf("appended\\n");
+    return 0;
+}`,
+  accept: ["#include <stdio.h>\n\nint main() {\n    FILE *fp = fopen(\"quiz_log.txt\", \"w\");\n    if (fp == NULL) return 1;\n    fputs(\"first\\n\", fp);\n    fclose(fp);\n    fp = fopen(\"quiz_log.txt\", \"a\");\n    if (fp == NULL) { return 1; }\n    fputs(\"second\\n\", fp);\n    fclose(fp);\n    printf(\"appended\\n\");\n    return 0;\n}"],
+  hint: "目标是让文件同时保留 first 和 second 两行；检查第二次打开的模式。",
+  explain: "第二次打开必须使用 a 模式。w 会清空 first；a 保留已有内容并将 second 写到末尾。"
+});
+createQuiz("quiz3", {
+  type: "fix",
+  title: "把读到的整数存入变量",
+  code: `#include <stdio.h>
+
+int main() {
+    FILE *fp = fopen("quiz_scan.txt", "w");
+    int a, b, count;
+    if (fp == NULL) return 1;
+    fprintf(fp, "%d %d\\n", 12, 30);
+    fclose(fp);
+    fp = fopen("quiz_scan.txt", "r");
+    if (fp == NULL) { return 1; }
+    count = fscanf(fp, "%d %d", a, b);
+    if (count == 2) {
+        printf("sum = %d\\n", a + b);
+    }
+    fclose(fp);
+    return 0;
+}`,
+  accept: ["#include <stdio.h>\n\nint main() {\n    FILE *fp = fopen(\"quiz_scan.txt\", \"w\");\n    int a, b, count;\n    if (fp == NULL) return 1;\n    fprintf(fp, \"%d %d\\n\", 12, 30);\n    fclose(fp);\n    fp = fopen(\"quiz_scan.txt\", \"r\");\n    if (fp == NULL) { return 1; }\n    count = fscanf(fp, \"%d %d\", &a, &b);\n    if (count == 2) {\n        printf(\"sum = %d\\n\", a + b);\n    }\n    fclose(fp);\n    return 0;\n}"],
+  hint: "fscanf 与 scanf 一样，需要知道整数变量的存储地址。",
+  explain: "把 a、b 改为 &a、&b，将地址传给 fscanf；成功读取后输出 sum = 42。"
+});
+</script>
+</body>
+</html>

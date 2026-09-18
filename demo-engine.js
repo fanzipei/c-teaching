@@ -234,7 +234,7 @@ class CDemo {
     const parts = [];
     const types = this.config.vizTypes;
     const id = this.config.id;
-    if (types.includes('flowchart')) parts.push(`<div class="viz-box"><h4>程序流程图</h4><div class="flowchart-viz" id="${id}-flowchart"></div></div>`);
+    if (types.includes('flowchart')) parts.push(`<div class="viz-box"><h4>程序流程图</h4><div class="flow-current" id="${id}-flow-current"></div><div class="flowchart-viz" id="${id}-flowchart"></div></div>`);
     if (types.includes('vars')) parts.push(`<div class="viz-box"><h4>变量状态</h4><div class="var-table" id="${id}-vars"></div></div>`);
     if (types.includes('memory')) parts.push(`<div class="viz-box"><h4>内存视图</h4><div class="memory-view" id="${id}-memory"></div></div>`);
     if (types.includes('stack')) parts.push(`<div class="viz-box"><h4>调用栈</h4><div class="stack-frame" id="${id}-stack"></div></div>`);
@@ -518,7 +518,12 @@ class CDemo {
         const oldVal = old ? (typeof old === 'object' ? old.value : old) : undefined;
         if (JSON.stringify(oldVal) !== JSON.stringify(newVal)) changedVars.add(name);
       }
+      if (step.stateComplete) this.variables = {};
       Object.assign(this.variables, step.vars);
+    }
+    if (step.stateComplete) {
+      this.arrays = {};
+      this.matrices = {};
     }
 
     // output 自动区分两种写法：
@@ -527,7 +532,7 @@ class CDemo {
     if (step.output !== undefined) {
       const prev = this.output.join('\n');
       const next = String(step.output);
-      if (prev && next.startsWith(prev)) {
+      if (step.outputMode === 'replace' || (prev && next.startsWith(prev))) {
         this.output = next.split('\n');
       } else if (next) {
         this.output.push(...next.split('\n'));
@@ -564,7 +569,7 @@ class CDemo {
         }
       });
       this.flowVisited = visited;
-      this.lastFlowchart = { node: f.node || null, edge: f.edge || null, edges: f.edges || null, kind: f.kind || null, visited };
+      this.lastFlowchart = { node: f.node || null, edge: f.edge || null, edges: f.edges || null, kind: f.kind || null, detail: f.detail || '', visited };
     }
     if (step.info !== undefined) this.lastInfo = step.info;
 
@@ -1110,6 +1115,8 @@ class CDemo {
   }
 
   updateFlowchart(flow) {
+    const detail = document.getElementById(`${this.config.id}-flow-current`);
+    if (detail) detail.textContent = flow && flow.detail ? flow.detail : '';
     const el = document.getElementById(`${this.config.id}-flowchart`);
     if (!el) return;
     if (!el.querySelector('svg')) this.renderFlowchart();

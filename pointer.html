@@ -6,7 +6,7 @@
 <meta name="description" content="C语言指针交互演示：取地址与解引用、指针运算、指针参数、多级指针、字符串、malloc/free，直观展示指针与内存数据的关系。">
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
 <title>指针 - C语言教学演示</title>
-<link rel="stylesheet" href="style.css?v=28">
+<link rel="stylesheet" href="style.css?v=31">
 </head>
 <body>
 <nav></nav>
@@ -68,8 +68,9 @@
 </div>
 </main>
 
-<script src="site-config.js?v=28"></script>
-<script src="demo-engine.js?v=28"></script>
+<script src="site-config.js?v=31"></script>
+<script src="demo-engine.js?v=31"></script>
+<script src="demo-traces.js?v=31"></script>
 <script>
 createDemo("demo0", {
   title: "指针基础：& 与 *",
@@ -84,14 +85,7 @@ int main() {
     return 0;
 }`,
   vizTypes: ["vars","pointer","console"],
-  steps: [
-    { line: 2, info: "main() 开始" },
-    { line: 3, vars: {a:{value:10,type:"int",addr:"0x1000"}}, info: "a = 10，假设存放在地址 0x1000" },
-    { line: 4, vars: {p:{value:"0x1000",type:"int*",addr:"0x2000"}}, pointer: [{name:"p",type:"int*",addr:"0x2000",value:"0x1000",targetName:"a",targetType:"int",targetAddr:"0x1000",targetValue:10}], info: "p 存储 a 的地址 0x1000" },
-    { line: 5, vars: {a:{value:20,type:"int",addr:"0x1000"}}, pointer: [{name:"p",type:"int*",addr:"0x2000",value:"0x1000",targetName:"a",targetType:"int",targetAddr:"0x1000",targetValue:20}], info: "*p = 20：通过指针修改 a 的值" },
-    { line: 6, output: "a = 20", info: "a 已经被改为 20" },
-    { line: 8, info: "程序结束" }
-  ]
+  steps: CTeachingTraces["pointer.html:demo0"]
 });
 createDemo("demo1", {
   title: "指针与数组",
@@ -108,16 +102,7 @@ int main() {
     return 0;
 }`,
   vizTypes: ["vars","array","pointer","console"],
-  steps: [
-    { line: 2, info: "main() 开始" },
-    { line: 3, vars: {arr:{value:"int[3]",type:"array"}}, array: {name:"arr",cells:[{val:10,highlight:false},{val:20},{val:30}]}, info: "arr = {10,20,30}，假设首地址 0x1000" },
-    { line: 4, vars: {p:{value:"0x1000",type:"int*"}}, pointer: [{name:"p",type:"int*",addr:"0x2000",value:"0x1000",targetName:"arr[0]",targetType:"int",targetAddr:"0x1000",targetValue:10}], info: "p = arr，p 指向 arr[0]" },
-    { line: 5, output: "*p = 10", info: "*p 即 arr[0]，输出 10" },
-    { line: 6, output: "*p = 10\n*(p+1) = 20", info: "*(p+1) 移动到 arr[1]，输出 20" },
-    { line: 7, vars: {p:{value:"0x1004",type:"int*"}}, pointer: [{name:"p",type:"int*",addr:"0x2000",value:"0x1004",targetName:"arr[1]",targetType:"int",targetAddr:"0x1004",targetValue:20}], info: "p++：指针向后移动一个 int 的大小（4字节），指向 arr[1]" },
-    { line: 8, output: "*p = 10\n*(p+1) = 20\n*p = 20", info: "*p 现在指向 arr[1]，输出 20" },
-    { line: 10, info: "程序结束" }
-  ]
+  steps: CTeachingTraces["pointer.html:demo1"]
 });
 createDemo("demo2", {
   title: "指针作为函数参数",
@@ -145,25 +130,7 @@ int main() {
     return 0;
 }`,
   vizTypes: ["vars","pointer","stack","console"],
-  steps: [
-    { line: 14, info: "main() 开始" },
-    { line: 15, vars: {x:{value:3,type:"int",addr:"0x1000"},y:{value:7,type:"int",addr:"0x1004"}}, info: "main 中 x=3, y=7，假设 x 住在 0x1000，y 住在 0x1004" },
-    { line: 16, info: "先调用 swap_wrong(x, y)：只传【值】" },
-    { line: 2, stack: [{name:"main",value:"x=3, y=7"},{name:"swap_wrong",value:"a=3, b=7",highlight:true}], vars: {a:{value:3,type:"int"},b:{value:7,type:"int"}}, info: "形参 a、b 是 x、y 的【副本】——函数拿到的是复印件，不是原件" },
-    { line: 3, vars: {tmp:{value:3,type:"int"},a:{value:3,type:"int"},b:{value:7,type:"int"}}, info: "tmp = a = 3" },
-    { line: 4, vars: {a:{value:7,type:"int"},b:{value:7,type:"int"},tmp:{value:3,type:"int"}}, info: "a = b = 7（改的只是副本 a）" },
-    { line: 5, vars: {b:{value:3,type:"int"},a:{value:7,type:"int"},tmp:{value:3,type:"int"}}, info: "b = tmp = 3（副本 a、b 交换“成功”了，但和 x、y 毫无关系）" },
-    { line: 6, stack: [{name:"main",value:"x=3, y=7",highlight:true}], info: "swap_wrong 结束，副本 a、b、tmp 随栈帧一起销毁" },
-    { line: 17, output: "wrong: x=3, y=7", info: "x、y 根本没变——值传递改不到 main 里的变量" },
-    { line: 18, info: "再调用 swap(&x, &y)：这次把 x、y 的【地址】交给函数" },
-    { line: 8, stack: [{name:"main",value:"x=3, y=7"},{name:"swap",value:"pa=0x1000, pb=0x1004",highlight:true}], vars: {pa:{value:"0x1000",type:"int*"},pb:{value:"0x1004",type:"int*"}}, pointer: [{name:"pa",type:"int*",addr:"0x2000",value:"0x1000",targetName:"x",targetType:"int",targetAddr:"0x1000",targetValue:3},{name:"pb",type:"int*",addr:"0x2004",value:"0x1004",targetName:"y",targetType:"int",targetAddr:"0x1004",targetValue:7}], info: "形参 pa、pb 存的是 x、y 的地址——相当于函数拿到了「通往 x 和 y 的钥匙」，看右侧指针关系图" },
-    { line: 9, vars: {tmp:{value:3,type:"int"}}, info: "tmp = *pa：顺着地址读出 x 的值 3" },
-    { line: 10, vars: {x:{value:7,type:"int",addr:"0x1000"}}, pointer: [{name:"pa",type:"int*",addr:"0x2000",value:"0x1000",targetName:"x",targetType:"int",targetAddr:"0x1000",targetValue:7},{name:"pb",type:"int*",addr:"0x2004",value:"0x1004",targetName:"y",targetType:"int",targetAddr:"0x1004",targetValue:7}], info: "*pa = *pb：顺着地址把 7 写进 x 的“家门”——改的就是 main 里的 x 本身！" },
-    { line: 11, vars: {y:{value:3,type:"int",addr:"0x1004"}}, pointer: [{name:"pa",type:"int*",addr:"0x2000",value:"0x1000",targetName:"x",targetType:"int",targetAddr:"0x1000",targetValue:7},{name:"pb",type:"int*",addr:"0x2004",value:"0x1004",targetName:"y",targetType:"int",targetAddr:"0x1004",targetValue:3}], info: "*pb = tmp：同样顺着地址把 3 写进 y" },
-    { line: 12, stack: [{name:"main",value:"x=7, y=3",highlight:true}], info: "swap 结束，指针 pa、pb 销毁，但 x、y 已经被真正交换" },
-    { line: 19, output: "right: x=7, y=3", info: "对比两次输出：有没有指针，结果完全不同——指针让函数拥有了修改外部变量的能力" },
-    { line: 21, info: "程序结束" }
-  ]
+  steps: CTeachingTraces["pointer.html:demo2"]
 });
 createDemo("demo3", {
   title: "指针运算",
@@ -206,15 +173,7 @@ int main() {
     return 0;
 }`,
   vizTypes: ["vars","array","pointer","console"],
-  steps: [
-    { line: 2, info: "main() 开始" },
-    { line: 3, vars: {arr:{value:"int[5]",type:"array"}}, array: {name:"arr",cells:[{val:10},{val:20},{val:30},{val:40},{val:50}]}, info: "arr = {10,20,30,40,50}" },
-    { line: 4, vars: {p:{value:"0x1004",type:"int*"}}, pointer: [{name:"p",type:"int*",addr:"0x2000",value:"0x1004",targetName:"arr[1]",targetType:"int",targetAddr:"0x1004",targetValue:20}], info: "p 指向 arr[1]" },
-    { line: 5, vars: {q:{value:"0x1010",type:"int*"}}, pointer: [{name:"p",type:"int*",addr:"0x2000",value:"0x1004",targetName:"arr[1]",targetType:"int",targetAddr:"0x1004",targetValue:20},{name:"q",type:"int*",addr:"0x2004",value:"0x1010",targetName:"arr[4]",targetType:"int",targetAddr:"0x1010",targetValue:50}], info: "q 指向 arr[4]" },
-    { line: 6, output: "q - p = 3", info: "q-p = 3（表示两者相隔 3 个 int 元素，不是 12 字节）" },
-    { line: 7, output: "q - p = 3\n*(p + 2) = 40", info: "p+2 指向 arr[3]，解引用得到 40" },
-    { line: 9, info: "程序结束" }
-  ]
+  steps: CTeachingTraces["pointer.html:demo3"]
 });
 createDemo("demo4", {
   title: "二维数组与指针",
@@ -223,20 +182,13 @@ createDemo("demo4", {
 
 int main() {
     int a[2][3] = {{1, 2, 3}, {4, 5, 6}};
-    int *p = a[0];
-    printf("a[0][0]=%d, *p=%d\\n", a[0][0], *p);
-    printf("a[1][1]=%d, *(p+4)=%d\\n", a[1][1], *(p+4));
+    int (*p)[3] = a;
+    printf("a[0][0]=%d, p[0][0]=%d\\n", a[0][0], p[0][0]);
+    printf("a[1][1]=%d, p[1][1]=%d\\n", a[1][1], p[1][1]);
     return 0;
 }`,
   vizTypes: ["vars","matrix","pointer","console"],
-  steps: [
-    { line: 2, info: "main() 开始" },
-    { line: 3, vars: {a:{value:"int[2][3]",type:"array"}}, matrix: {name:"a", rows:2, cols:3, cells:[[{val:1},{val:2},{val:3}],[{val:4},{val:5},{val:6}]]}, info: "定义 2x3 矩阵" },
-    { line: 4, vars: {p:{value:"0x1000",type:"int*"}}, info: "p = a[0]，指向第 0 行首元素" },
-    { line: 5, output: "a[0][0]=1, *p=1", matrix: {name:"a", rows:2, cols:3, cells:[[{val:1,highlight:true},{val:2},{val:3}],[{val:4},{val:5},{val:6}]]}, pointer: [{name:"p", type:"int*", addr:"0x2000", value:"0x1000", targetName:"a[0][0]", targetType:"int", targetAddr:"0x1000", targetValue:1}], info: "*p 即 a[0][0]" },
-    { line: 6, output: "a[0][0]=1, *p=1\na[1][1]=5, *(p+4)=5", matrix: {name:"a", rows:2, cols:3, cells:[[{val:1},{val:2},{val:3}],[{val:4},{val:5,highlight:true},{val:6}]]}, pointer: [{name:"p", type:"int*", addr:"0x2000", value:"0x1000+16", targetName:"a[1][1]", targetType:"int", targetAddr:"0x1010", targetValue:5}], info: "p+4 跳过 4 个 int，到达 a[1][1]（行优先存储）" },
-    { line: 8, info: "程序结束" }
-  ]
+  steps: CTeachingTraces["pointer.html:demo4"]
 });
 createDemo("demo5", {
   title: "多级指针",
@@ -273,15 +225,7 @@ int main() {
     return 0;
 }`,
   vizTypes: ["vars","pointer","console"],
-  steps: [
-    { line: 2, info: "main() 开始" },
-    { line: 3, vars: {a:{value:10,type:"int",addr:"0x1000"}}, info: "a = 10" },
-    { line: 4, vars: {p:{value:"0x1000",type:"int*",addr:"0x2000"}}, pointer: [{name:"p",type:"int*",addr:"0x2000",value:"0x1000",targetName:"a",targetType:"int",targetAddr:"0x1000",targetValue:10}], info: "p 指向 a" },
-    { line: 5, vars: {pp:{value:"0x2000",type:"int**",addr:"0x3000"}}, pointer: [{name:"pp",type:"int**",addr:"0x3000",value:"0x2000",targetName:"p",targetType:"int*",targetAddr:"0x2000",targetValue:"0x1000",targetIsPointer:true},{name:"p",type:"int*",addr:"0x2000",value:"0x1000",targetName:"a",targetType:"int",targetAddr:"0x1000",targetValue:10}], info: "pp 存储 p 的地址，pp 指向 p" },
-    { line: 6, vars: {a:{value:99,type:"int",addr:"0x1000"}}, pointer: [{name:"pp",type:"int**",addr:"0x3000",value:"0x2000",targetName:"p",targetType:"int*",targetAddr:"0x2000",targetValue:"0x1000",targetIsPointer:true},{name:"p",type:"int*",addr:"0x2000",value:"0x1000",targetName:"a",targetType:"int",targetAddr:"0x1000",targetValue:99}], info: "**pp = 99：先解引用 pp 得到 p，再解引用 p 修改 a" },
-    { line: 7, output: "a = 99", info: "a 被修改为 99" },
-    { line: 9, info: "程序结束" }
-  ]
+  steps: CTeachingTraces["pointer.html:demo5"]
 });
 createDemo("demo6", {
   title: "指针与字符串",
@@ -299,27 +243,7 @@ int main() {
     return 0;
 }`,
   vizTypes: ["vars","array","pointer","console"],
-  steps: [
-    { line: 2, info: "main() 开始" },
-    { line: 3, vars: {str:{value:"0x5000",type:"char*"}}, info: "str 指向字符串常量 \"Hello\" 的首地址" },
-    { line: 4, vars: {p:{value:"0x5000",type:"char*"}}, pointer: [{name:"p",type:"char*",addr:"0x2000",value:"0x5000",targetName:"str[0]",targetType:"char",targetAddr:"0x5000",targetValue:"'H'"}], info: "p 也指向首字符 'H'" },
-    { line: 5, array: {name:"str",cells:[{val:"'H'",highlight:true},{val:"'e'"},{val:"'l'"},{val:"'l'"},{val:"'o'"},{val:"'\\0'"}]}, info: "*p = 'H' != '\\0'，进入循环" },
-    { line: 6, output: "H ", info: "打印 H" },
-    { line: 7, vars: {p:{value:"0x5001",type:"char*"}}, pointer: [{name:"p",type:"char*",addr:"0x2000",value:"0x5001",targetName:"str[1]",targetType:"char",targetAddr:"0x5001",targetValue:"'e'"}], info: "p++，指向下一个字符" },
-    { line: 5, array: {name:"str",cells:[{val:"'H'"},{val:"'e'",highlight:true},{val:"'l'"},{val:"'l'"},{val:"'o'"},{val:"'\\0'"}]}, info: "*p = 'e'" },
-    { line: 6, output: "H e ", info: "打印 e" },
-    { line: 7, vars: {p:{value:"0x5002",type:"char*"}}, pointer: [{name:"p",type:"char*",addr:"0x2000",value:"0x5002",targetName:"str[2]",targetType:"char",targetAddr:"0x5002",targetValue:"'l'"}], info: "p++" },
-    { line: 5, array: {name:"str",cells:[{val:"'H'"},{val:"'e'"},{val:"'l'",highlight:true},{val:"'l'"},{val:"'o'"},{val:"'\\0'"}]}, info: "*p = 'l'" },
-    { line: 6, output: "H e l ", info: "打印 l" },
-    { line: 7, vars: {p:{value:"0x5003",type:"char*"}}, pointer: [{name:"p",type:"char*",addr:"0x2000",value:"0x5003",targetName:"str[3]",targetType:"char",targetAddr:"0x5003",targetValue:"'l'"}], info: "p++" },
-    { line: 6, output: "H e l l ", info: "打印第二个 l" },
-    { line: 7, vars: {p:{value:"0x5004",type:"char*"}}, pointer: [{name:"p",type:"char*",addr:"0x2000",value:"0x5004",targetName:"str[4]",targetType:"char",targetAddr:"0x5004",targetValue:"'o'"}], info: "p++" },
-    { line: 6, output: "H e l l o ", info: "打印 o" },
-    { line: 7, vars: {p:{value:"0x5005",type:"char*"}}, pointer: [{name:"p",type:"char*",addr:"0x2000",value:"0x5005",targetName:"str[5]",targetType:"char",targetAddr:"0x5005",targetValue:"'\\0'"}], info: "p++，现在指向结束符" },
-    { line: 5, array: {name:"str",cells:[{val:"'H'"},{val:"'e'"},{val:"'l'"},{val:"'l'"},{val:"'o'"},{val:"'\\0'",highlight:true}]}, info: "*p = '\\0'，循环条件为假，退出" },
-    { line: 9, output: "H e l l o ", info: "输出换行" },
-    { line: 11, info: "程序结束" }
-  ]
+  steps: CTeachingTraces["pointer.html:demo6"]
 });
 /* ========== demo6: malloc 与 free ========== */
 /* ========== demo6: 字符指针数组排序 ========== */
@@ -348,31 +272,7 @@ int main() {
     return 0;
 }`,
   vizTypes: ["vars","array","loop","console"],
-  steps: [
-    { line: 3, info: "main() 开始" },
-    { line: 4, vars: {names:{value:"char*[4]",type:"array"}}, array: [{name:"names[]（指针）", cells:[{val:"0x1000"},{val:"0x1100"},{val:"0x1200"},{val:"0x1300"}]}, {name:"字符串常量区（不动）", cells:[{val:"Pear"},{val:"Apple"},{val:"Kiwi"},{val:"Banana"}], markers:[{index:0,label:"0x1000"},{index:1,label:"0x1100"},{index:2,label:"0x1200"},{index:3,label:"0x1300"}]}], info: "names 是 4 个字符指针的数组：每个元素存一个地址，指向常量区的字符串。注意两套格子：上面是地址，下面才是字符串本体" },
-    { line: 5, vars: {tmp:{value:"?",type:"char*"}}, info: "tmp 是交换用的临时指针" },
-    { line: 7, vars: {i:{value:0,type:"int"}}, loop: [{label:"i=0",active:true}], info: "外层 i=0：把最大的字符串冒泡到末尾" },
-    { line: 9, vars: {j:{value:0,type:"int"}}, loop: [{label:"i=0 j=0",active:true}], array: [{name:"names[]（指针）", cells:[{val:"0x1000",highlight:true},{val:"0x1100",highlight:true},{val:"0x1200"},{val:"0x1300"}]}, {name:"字符串常量区（不动）", cells:[{val:"Pear",highlight:true},{val:"Apple",highlight:true},{val:"Kiwi"},{val:"Banana"}], markers:[{index:0,label:"0x1000"},{index:1,label:"0x1100"},{index:2,label:"0x1200"},{index:3,label:"0x1300"}]}], info: "j=0：strcmp(names[0], names[1]) 即比较 \"Pear\" 和 \"Apple\"：'P' > 'A'，需要交换" },
-    { line: 10, vars: {tmp:{value:"0x1000",type:"char*"}}, info: "tmp = names[0]：暂存地址 0x1000" },
-    { line: 12, array: [{name:"names[]（指针）", cells:[{val:"0x1100",highlight:true},{val:"0x1000",highlight:true},{val:"0x1200"},{val:"0x1300"}]}, {name:"字符串常量区（不动）", cells:[{val:"Pear"},{val:"Apple"},{val:"Kiwi"},{val:"Banana"}], markers:[{index:0,label:"0x1000"},{index:1,label:"0x1100"},{index:2,label:"0x1200"},{index:3,label:"0x1300"}]}], info: "names[0]、names[1] 互换地址——看常量区：字符串一个字节都没动，动的只是上面的地址！" },
-    { line: 9, vars: {j:{value:1,type:"int"}}, loop: [{label:"i=0 j=1",active:true}], array: [{name:"names[]（指针）", cells:[{val:"0x1100"},{val:"0x1000",highlight:true},{val:"0x1200",highlight:true},{val:"0x1300"}]}, {name:"字符串常量区（不动）", cells:[{val:"Pear",highlight:true},{val:"Apple"},{val:"Kiwi",highlight:true},{val:"Banana"}], markers:[{index:0,label:"0x1000"},{index:1,label:"0x1100"},{index:2,label:"0x1200"},{index:3,label:"0x1300"}]}], info: "j=1：比较 \"Pear\" 和 \"Kiwi\"：'P' > 'K'，交换" },
-    { line: 10, vars: {tmp:{value:"0x1000",type:"char*"}}, info: "tmp = names[1]" },
-    { line: 12, array: [{name:"names[]（指针）", cells:[{val:"0x1100"},{val:"0x1200",highlight:true},{val:"0x1000",highlight:true},{val:"0x1300"}]}, {name:"字符串常量区（不动）", cells:[{val:"Pear"},{val:"Apple"},{val:"Kiwi"},{val:"Banana"}], markers:[{index:0,label:"0x1000"},{index:1,label:"0x1100"},{index:2,label:"0x1200"},{index:3,label:"0x1300"}]}], info: "names[1]、names[2] 互换地址" },
-    { line: 9, vars: {j:{value:2,type:"int"}}, loop: [{label:"i=0 j=2",active:true}], array: [{name:"names[]（指针）", cells:[{val:"0x1100"},{val:"0x1200"},{val:"0x1000",highlight:true},{val:"0x1300",highlight:true}]}, {name:"字符串常量区（不动）", cells:[{val:"Pear",highlight:true},{val:"Apple"},{val:"Kiwi"},{val:"Banana",highlight:true}], markers:[{index:0,label:"0x1000"},{index:1,label:"0x1100"},{index:2,label:"0x1200"},{index:3,label:"0x1300"}]}], info: "j=2：比较 \"Pear\" 和 \"Banana\"：'P' > 'B'，交换" },
-    { line: 10, vars: {tmp:{value:"0x1000",type:"char*"}}, info: "tmp = names[2]" },
-    { line: 12, array: [{name:"names[]（指针）", cells:[{val:"0x1100"},{val:"0x1200"},{val:"0x1300",highlight:true},{val:"0x1000",highlight:true}]}, {name:"字符串常量区（不动）", cells:[{val:"Pear"},{val:"Apple"},{val:"Kiwi"},{val:"Banana"}], markers:[{index:0,label:"0x1000"},{index:1,label:"0x1100"},{index:2,label:"0x1200"},{index:3,label:"0x1300"}]}], info: "names[2]、names[3] 互换地址——最大的 \"Pear\" 的地址冒泡到末尾" },
-    { line: 7, vars: {i:{value:1,type:"int"}}, loop: [{label:"i=1",active:true}], info: "外层 i=1" },
-    { line: 9, vars: {j:{value:0,type:"int"}}, loop: [{label:"i=1 j=0",active:true}], info: "j=0：比较 \"Apple\" 和 \"Kiwi\"：'A' < 'K'，不交换" },
-    { line: 9, vars: {j:{value:1,type:"int"}}, loop: [{label:"i=1 j=1",active:true}], array: [{name:"names[]（指针）", cells:[{val:"0x1100"},{val:"0x1200",highlight:true},{val:"0x1300",highlight:true},{val:"0x1000"}]}, {name:"字符串常量区（不动）", cells:[{val:"Pear"},{val:"Apple"},{val:"Kiwi",highlight:true},{val:"Banana",highlight:true}], markers:[{index:0,label:"0x1000"},{index:1,label:"0x1100"},{index:2,label:"0x1200"},{index:3,label:"0x1300"}]}], info: "j=1：比较 \"Kiwi\" 和 \"Banana\"：'K' > 'B'，交换" },
-    { line: 10, vars: {tmp:{value:"0x1200",type:"char*"}}, info: "tmp = names[1]" },
-    { line: 12, array: [{name:"names[]（指针）", cells:[{val:"0x1100"},{val:"0x1300",highlight:true},{val:"0x1200",highlight:true},{val:"0x1000"}]}, {name:"字符串常量区（不动）", cells:[{val:"Pear"},{val:"Apple"},{val:"Kiwi"},{val:"Banana"}], markers:[{index:0,label:"0x1000"},{index:1,label:"0x1100"},{index:2,label:"0x1200"},{index:3,label:"0x1300"}]}], info: "names[1]、names[2] 互换地址" },
-    { line: 7, vars: {i:{value:2,type:"int"}}, loop: [{label:"i=2",active:true}], info: "外层 i=2" },
-    { line: 9, vars: {j:{value:0,type:"int"}}, loop: [{label:"i=2 j=0",active:true}], info: "j=0：比较 \"Apple\" 和 \"Banana\"：'A' < 'B'，不交换。数组已有序" },
-    { line: 16, loop: [{label:"i=3",active:false}], info: "排序完成，进入输出循环" },
-    { line: 17, output: "Apple\nBanana\nKiwi\nPear", info: "按指针顺序输出：Apple、Banana、Kiwi、Pear——字典序排列" },
-    { line: 19, info: "程序结束。全程只搬了 3 次指针（每次只是一个地址），字符串常量区原地未动——对长字符串数组，这比逐个复制内容轻量得多" }
-  ]
+  steps: CTeachingTraces["pointer.html:demo7"]
 });
 createDemo("demo8", {
   title: "动态内存：malloc 与 free",
@@ -390,16 +290,7 @@ int main() {
     return 0;
 }`,
   vizTypes: ["vars","pointer","console"],
-  steps: [
-    { line: 3, info: "main() 开始" },
-    { line: 4, vars: {p:{value:"0xA000",type:"int*",addr:"0x2000"}}, pointer: [{name:"p",type:"int*",addr:"0x2000",value:"0xA000",targetName:"堆内存",targetType:"int",targetAddr:"0xA000",targetValue:"?"}], info: "malloc(sizeof(int))：在【堆】上申请 4 字节，返回地址 0xA000。堆内存不随函数结束自动释放，由你手动管理" },
-    { line: 5, info: "好习惯：检查 malloc 是否成功——内存不足时会返回 NULL" },
-    { line: 6, pointer: [{name:"p",type:"int*",addr:"0x2000",value:"0xA000",targetName:"堆内存",targetType:"int",targetAddr:"0xA000",targetValue:42}], info: "*p = 42：往堆内存里写数据" },
-    { line: 7, output: "*p = 42", info: "读出并打印 42" },
-    { line: 8, pointer: [{name:"p",type:"int*",addr:"0x2000",value:"0xA000",targetName:"堆内存",targetType:"int",targetAddr:"0xA000",targetValue:42,targetInvalid:true}], info: "free(p)：把堆内存还给系统。注意 p 里还存着 0xA000，但这块内存已不属于你——此时再解引用就是野指针！" },
-    { line: 9, vars: {p:{value:"NULL",type:"int*",addr:"0x2000"}}, pointer: [], info: "好习惯：free 后立刻 p = NULL，防止误用野指针（对 NULL 解引用会立即报错，反而容易发现问题）" },
-    { line: 11, info: "程序结束" }
-  ]
+  steps: CTeachingTraces["pointer.html:demo8"]
 });
 /* ========== demo7: 动态数组 ========== */
 createDemo("demo9", {
@@ -420,25 +311,7 @@ int main() {
     return 0;
 }`,
   vizTypes: ["vars","array","loop","pointer","console"],
-  steps: [
-    { line: 3, info: "main() 开始" },
-    { line: 4, vars: {n:{value:5,type:"int"}}, info: "n = 5（假设 n 的值运行时才确定，无法写进数组定义）" },
-    { line: 5, vars: {arr:{value:"0xA000",type:"int*",addr:"0x2000"}}, array: {name:"arr（堆）", cells:[{val:null,empty:true},{val:null,empty:true},{val:null,empty:true},{val:null,empty:true},{val:null,empty:true}]}, pointer: [{name:"arr",type:"int*",addr:"0x2000",value:"0xA000",targetName:"arr[0]",targetType:"int",targetAddr:"0xA000",targetValue:"?"}], info: "malloc(n * sizeof(int))：在堆上申请 5 个连续 int，arr 指向首元素" },
-    { line: 6, vars: {i:{value:0,type:"int"}}, info: "声明循环变量 i" },
-    { line: 7, vars: {i:{value:0,type:"int"}}, loop: [{label:"i=0",active:true}], info: "i=0；i<5 为真" },
-    { line: 8, array: {name:"arr（堆）", cells:[{val:0,highlight:true},{val:null,empty:true},{val:null,empty:true},{val:null,empty:true},{val:null,empty:true}]}, pointer: [{name:"arr",type:"int*",addr:"0x2000",value:"0xA000",targetName:"arr[0]",targetType:"int",targetAddr:"0xA000",targetValue:0}], info: "arr[0] = 0：堆上的数组可以像普通数组一样用下标访问" },
-    { line: 7, vars: {i:{value:1,type:"int"}}, loop: [{label:"i=1",active:true}], info: "i=1" },
-    { line: 8, array: {name:"arr（堆）", cells:[{val:0},{val:10,highlight:true},{val:null,empty:true},{val:null,empty:true},{val:null,empty:true}]}, info: "arr[1] = 10" },
-    { line: 7, vars: {i:{value:2,type:"int"}}, loop: [{label:"i=2",active:true}], info: "i=2" },
-    { line: 8, array: {name:"arr（堆）", cells:[{val:0},{val:10},{val:20,highlight:true},{val:null,empty:true},{val:null,empty:true}]}, info: "arr[2] = 20" },
-    { line: 7, vars: {i:{value:3,type:"int"}}, loop: [{label:"i=3",active:true}], info: "i=3" },
-    { line: 8, array: {name:"arr（堆）", cells:[{val:0},{val:10},{val:20},{val:30,highlight:true},{val:null,empty:true}]}, info: "arr[3] = 30" },
-    { line: 7, vars: {i:{value:4,type:"int"}}, loop: [{label:"i=4",active:true}], info: "i=4" },
-    { line: 8, array: {name:"arr（堆）", cells:[{val:0},{val:10},{val:20},{val:30},{val:40,highlight:true}]}, info: "arr[4] = 40" },
-    { line: 10, output: "arr[3] = 30", info: "验证结果：arr[3] = 30" },
-    { line: 11, array: {name:"arr（堆）", cells:[{val:0,empty:true},{val:10,empty:true},{val:20,empty:true},{val:30,empty:true},{val:40,empty:true}]}, pointer: [{name:"arr",type:"int*",addr:"0x2000",value:"0xA000",targetName:"arr[0]",targetType:"int",targetAddr:"0xA000",targetValue:0,targetInvalid:true}], info: "free(arr)：整块堆内存一次归还（malloc 多少次，free 就多少次，一一对应）" },
-    { line: 13, info: "程序结束" }
-  ]
+  steps: CTeachingTraces["pointer.html:demo9"]
 });
 /* ========== 章节练习：3 道预测输出 + 3 道改错 ========== */
 createQuiz("quiz0", {

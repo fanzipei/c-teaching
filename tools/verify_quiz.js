@@ -30,7 +30,7 @@ async function compileAndRun(code, name, workdir) {
     return { ok: false, stage: 'compile', detail: String(detail || 'gcc 未返回错误信息').slice(0, 300) };
   }
   try {
-    const { stdout } = await execFileP(exe, [], { timeout: 5000, maxBuffer: 1024 * 1024 });
+    const { stdout } = await execFileP(exe, [], { cwd: workdir, timeout: 5000, maxBuffer: 1024 * 1024 });
     return { ok: true, stdout };
   } catch (e) {
     return { ok: false, stage: 'run', detail: String(e.message).slice(0, 300) };

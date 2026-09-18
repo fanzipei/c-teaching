@@ -6,7 +6,7 @@
 <meta name="description" content="C语言函数交互演示：函数定义、值传递、返回值、作用域、递归，可视化调用栈与递归调用树。">
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
 <title>函数 - C语言教学演示</title>
-<link rel="stylesheet" href="style.css?v=28">
+<link rel="stylesheet" href="style.css?v=31">
 </head>
 <body>
 <nav></nav>
@@ -79,8 +79,9 @@
 </div>
 </main>
 
-<script src="site-config.js?v=28"></script>
-<script src="demo-engine.js?v=28"></script>
+<script src="site-config.js?v=31"></script>
+<script src="demo-engine.js?v=31"></script>
+<script src="demo-traces.js?v=31"></script>
 <script>
 createDemo("demo0", {
   title: "函数的定义与调用",
@@ -98,16 +99,7 @@ int main() {
     return 0;
 }`,
   vizTypes: ["vars","stack","console"],
-  steps: [
-    { line: 7, info: "main() 开始执行" },
-    { line: 8, vars: {x:{value:"?",type:"int"}}, info: "准备调用 add(3, 5)，x 尚未赋值" },
-    { line: 2, stack: [{name:"main",value:"x=?"},{name:"add",value:"a=3,b=5",highlight:true}], info: "跳转到 add 函数，形参 a=3, b=5 被初始化" },
-    { line: 3, vars: {a:{value:3,type:"int"},b:{value:5,type:"int"},result:{value:8,type:"int"}}, info: "计算 result = a + b = 8" },
-    { line: 4, stack: [{name:"main",value:"x=?"},{name:"add",value:"a=3, b=5",ret:8,highlight:true}], info: "return 8；add 函数执行完毕" },
-    { line: 8, vars: {x:{value:8,type:"int"}}, stack: [{name:"main",value:"x=8",highlight:true}], info: "回到 main，返回值 8 赋给 x" },
-    { line: 9, output: "x = 8", info: "打印 x = 8" },
-    { line: 10, info: "程序结束" }
-  ]
+  steps: CTeachingTraces["function.html:demo0"]
 });
 createDemo("demo1", {
   title: "返回值与表达式",
@@ -125,19 +117,7 @@ int main() {
     return 0;
 }`,
   vizTypes: ["vars","stack","console"],
-  steps: [
-    { line: 6, info: "main() 开始" },
-    { line: 7, vars: {a:{value:4,type:"int"}}, info: "a = 4" },
-    { line: 8, info: "计算 square(a) + square(a+1)，先调用 square(a)" },
-    { line: 2, stack: [{name:"main",value:"a=4"},{name:"square",value:"n=4",highlight:true}], vars: {n:{value:4,type:"int"}}, info: "square(4)：n = 4" },
-    { line: 3, stack: [{name:"main",value:"a=4"},{name:"square",value:"n=4",ret:16,highlight:true}], info: "return 4*4 = 16" },
-    { line: 8, info: "square(a) 返回 16；接下来计算 square(a+1)=square(5)" },
-    { line: 2, stack: [{name:"main",value:"a=4"},{name:"square",value:"n=5",highlight:true}], vars: {n:{value:5,type:"int"}}, info: "square(5)：n = 5" },
-    { line: 3, stack: [{name:"main",value:"a=4"},{name:"square",value:"n=5",ret:25,highlight:true}], info: "return 5*5 = 25" },
-    { line: 8, vars: {b:{value:41,type:"int"}}, info: "b = 16 + 25 = 41" },
-    { line: 9, output: "b = 41", info: "输出 b = 41" },
-    { line: 11, info: "程序结束" }
-  ]
+  steps: CTeachingTraces["function.html:demo1"]
 });
 createDemo("demo2", {
   title: "局部变量与作用域",
@@ -157,18 +137,7 @@ int main() {
     return 0;
 }`,
   vizTypes: ["vars","stack","console"],
-  steps: [
-    { line: 7, info: "main() 开始" },
-    { line: 8, vars: {x:{value:10,type:"int"}}, stack: [{name:"main",value:"x=10",highlight:true}], info: "main 中定义 x = 10" },
-    { line: 9, output: "main: x=10", info: "main 打印 x=10" },
-    { line: 10, info: "调用 foo()" },
-    { line: 3, vars: {x:{value:100,type:"int"}}, stack: [{name:"main",value:"x=10"},{name:"foo",value:"x=100",highlight:true}], info: "foo 中定义了另一个 x = 100，与 main 的 x 无关" },
-    { line: 4, output: "main: x=10\nfoo: x=100", info: "foo 打印自己的 x=100" },
-    { line: 5, stack: [{name:"main",value:"x=10",highlight:true}], info: "foo 结束，foo 的 x 被销毁" },
-    { line: 11, vars: {x:{value:10,type:"int"}}, info: "回到 main，x 仍然是 10" },
-    { line: 11, output: "main: x=10\nfoo: x=100\nmain again: x=10", info: "main 再次打印 x=10" },
-    { line: 13, info: "程序结束" }
-  ]
+  steps: CTeachingTraces["function.html:demo2"]
 });
 createDemo("demo3", {
   title: "递归函数",
@@ -228,24 +197,7 @@ int main() {
     return 0;
 }`,
   vizTypes: ["vars","stack","console"],
-  steps: [
-    { line: 7, info: "main() 开始" },
-    { line: 8, vars: {f:{value:"?",type:"int"}}, info: "准备调用 factorial(4)" },
-    { line: 3, stack: [{name:"main",value:"f=?"},{name:"factorial",value:"n=4",highlight:true}], vars: {n:{value:4,type:"int"}}, info: "factorial(4)：n=4，n<=1 为假，继续递归" },
-    { line: 4, info: "计算 4 * factorial(3)，先求 factorial(3)" },
-    { line: 3, stack: [{name:"main",value:"f=?"},{name:"factorial",value:"n=4"},{name:"factorial",value:"n=3",highlight:true}], vars: {n:{value:3,type:"int"}}, info: "factorial(3)：n=3" },
-    { line: 4, info: "计算 3 * factorial(2)" },
-    { line: 3, stack: [{name:"main",value:"f=?"},{name:"factorial",value:"n=4"},{name:"factorial",value:"n=3"},{name:"factorial",value:"n=2",highlight:true}], vars: {n:{value:2,type:"int"}}, info: "factorial(2)：n=2" },
-    { line: 4, info: "计算 2 * factorial(1)" },
-    { line: 3, stack: [{name:"main",value:"f=?"},{name:"factorial",value:"n=4"},{name:"factorial",value:"n=3"},{name:"factorial",value:"n=2"},{name:"factorial",value:"n=1",highlight:true}], vars: {n:{value:1,type:"int"}}, info: "factorial(1)：n=1，触发终止条件" },
-    { line: 3, stack: [{name:"main",value:"f=?"},{name:"factorial",value:"n=4"},{name:"factorial",value:"n=3"},{name:"factorial",value:"n=2"},{name:"factorial",value:"n=1",ret:1,highlight:true}], info: "return 1" },
-    { line: 4, stack: [{name:"main",value:"f=?"},{name:"factorial",value:"n=4"},{name:"factorial",value:"n=3"},{name:"factorial",value:"n=2",ret:2,highlight:true}], info: "factorial(2) = 2 * 1 = 2" },
-    { line: 4, stack: [{name:"main",value:"f=?"},{name:"factorial",value:"n=4"},{name:"factorial",value:"n=3",ret:6,highlight:true}], info: "factorial(3) = 3 * 2 = 6" },
-    { line: 4, stack: [{name:"main",value:"f=?"},{name:"factorial",value:"n=4",ret:24,highlight:true}], info: "factorial(4) = 4 * 6 = 24" },
-    { line: 8, vars: {f:{value:24,type:"int"}}, stack: [{name:"main",value:"f=24",highlight:true}], info: "f = 24" },
-    { line: 9, output: "4! = 24", info: "输出 4! = 24" },
-    { line: 11, info: "程序结束" }
-  ]
+  steps: CTeachingTraces["function.html:demo3"]
 });
 createDemo("demo4", {
   title: "函数与数组",
@@ -268,26 +220,7 @@ int main() {
     return 0;
 }`,
   vizTypes: ["vars","array","stack","console"],
-  steps: [
-    { line: 11, info: "main() 开始" },
-    { line: 12, vars: {a:{value:"int[4]",type:"array"}}, array: {name:"a", cells:[{val:2},{val:4},{val:6},{val:8}]}, info: "定义数组 a = {2,4,6,8}" },
-    { line: 13, info: "调用 sum_array(a, 4)" },
-    { line: 2, stack: [{name:"main",value:"a[4]"},{name:"sum_array",value:"arr=a, n=4",highlight:true}], vars: {n:{value:4,type:"int"},s:{value:0,type:"int"}}, info: "进入 sum_array：arr 获得数组首地址，n=4" },
-    { line: 3, vars: {s:{value:0,type:"int"}}, info: "s = 0" },
-    { line: 5, vars: {i:{value:0,type:"int"}}, info: "i=0，循环开始" },
-    { line: 6, vars: {s:{value:2,type:"int"}}, array: {name:"a", cells:[{val:2,highlight:true},{val:4},{val:6},{val:8}]}, info: "s += arr[0] => s = 2" },
-    { line: 5, vars: {i:{value:1,type:"int"}}, info: "i=1" },
-    { line: 6, vars: {s:{value:6,type:"int"}}, array: {name:"a", cells:[{val:2},{val:4,highlight:true},{val:6},{val:8}]}, info: "s += arr[1] => s = 6" },
-    { line: 5, vars: {i:{value:2,type:"int"}}, info: "i=2" },
-    { line: 6, vars: {s:{value:12,type:"int"}}, array: {name:"a", cells:[{val:2},{val:4},{val:6,highlight:true},{val:8}]}, info: "s += arr[2] => s = 12" },
-    { line: 5, vars: {i:{value:3,type:"int"}}, info: "i=3" },
-    { line: 6, vars: {s:{value:20,type:"int"}}, array: {name:"a", cells:[{val:2},{val:4},{val:6},{val:8,highlight:true}]}, info: "s += arr[3] => s = 20" },
-    { line: 5, info: "i=4，循环结束" },
-    { line: 8, stack: [{name:"main",value:"a[4]"},{name:"sum_array",value:"arr=a, n=4",ret:20,highlight:true}], info: "return 20" },
-    { line: 13, vars: {total:{value:20,type:"int"}}, stack: [{name:"main",value:"total=20",highlight:true}], info: "total = 20" },
-    { line: 14, output: "total = 20", info: "输出 total = 20" },
-    { line: 15, info: "程序结束" }
-  ]
+  steps: CTeachingTraces["function.html:demo4"]
 });
 /* ========== demo6: 递归——斐波那契数列（含递归调用树） ========== */
 createDemo("demo5", {
@@ -309,20 +242,7 @@ int main() {
     return 0;
 }`,
   vizTypes: ["vars","array","stack","console"],
-  steps: [
-    { line: 9, info: "main() 开始" },
-    { line: 10, vars: {a:{value:"int[4]",type:"array"}}, array: {name:"a", cells:[{val:1},{val:2},{val:3},{val:4}]}, info: "定义数组 a = {1,2,3,4}" },
-    { line: 11, info: "调用 double_arr(a, 4)，传递数组首地址" },
-    { line: 2, stack: [{name:"main",value:"a[4]"},{name:"double_arr",value:"arr=a,n=4",highlight:true}], vars: {n:{value:4,type:"int"}}, info: "进入 double_arr，arr 获得 a 的首地址" },
-    { line: 4, vars: {i:{value:0,type:"int"}}, loop: [{label:"i=0",active:true}], array: {name:"a", cells:[{val:2,highlight:true},{val:2},{val:3},{val:4}]}, info: "i=0：arr[0]*=2 => 2" },
-    { line: 4, vars: {i:{value:1,type:"int"}}, loop: [{label:"i=1",active:true}], array: {name:"a", cells:[{val:2},{val:4,highlight:true},{val:3},{val:4}]}, info: "i=1：arr[1]*=2 => 4" },
-    { line: 4, vars: {i:{value:2,type:"int"}}, loop: [{label:"i=2",active:true}], array: {name:"a", cells:[{val:2},{val:4},{val:6,highlight:true},{val:4}]}, info: "i=2：arr[2]*=2 => 6" },
-    { line: 4, vars: {i:{value:3,type:"int"}}, loop: [{label:"i=3",active:true}], array: {name:"a", cells:[{val:2},{val:4},{val:6},{val:8,highlight:true}]}, info: "i=3：arr[3]*=2 => 8" },
-    { line: 6, stack: [{name:"main",value:"a[4]",highlight:true}], info: "double_arr 结束，返回 main" },
-    { line: 12, vars: {a:{value:"int[4]",type:"array"}}, array: {name:"a", cells:[{val:2},{val:4},{val:6},{val:8}]}, info: "main 中的 a 已经被修改" },
-    { line: 12, output: "2 4 6 8", info: "输出修改后的数组" },
-    { line: 14, info: "程序结束" }
-  ]
+  steps: CTeachingTraces["function.html:demo5"]
 });
 /* ========== demo6: 字符串连接（手工实现 strcat） ========== */
 createDemo("demo6", {
@@ -346,30 +266,7 @@ int main() {
     return 0;
 }`,
   vizTypes: ["vars","matrix","loop","stack","console"],
-  steps: [
-    { line: 12, info: "main() 开始" },
-    { line: 13, vars: {a:{value:"int[2][3]",type:"array"}}, matrix: {name:"a", rows:2, cols:3, cells:[[{val:1},{val:2},{val:3}],[{val:4},{val:5},{val:6}]]}, info: "定义矩阵 a" },
-    { line: 14, info: "调用 print_matrix(a, 2)" },
-    { line: 2, stack: [{name:"main",value:"a[2][3]"},{name:"print_matrix",value:"m=a,rows=2",highlight:true}], info: "进入函数，m 获得 a 的首地址，必须知道列数 3 才能正确计算偏移" },
-    { line: 4, vars: {i:{value:0,type:"int"}}, loop: [{label:"i=0",active:true}], info: "外层 i=0" },
-    { line: 5, vars: {j:{value:0,type:"int"}}, loop: [{label:"j=0",active:true}], matrix: {name:"a", rows:2, cols:3, cells:[[{val:1,highlight:true},{val:2},{val:3}],[{val:4},{val:5},{val:6}]]}, info: "内层 j=0，m[0][0]=1" },
-    { line: 6, output: "1 ", info: "打印 1" },
-    { line: 5, vars: {j:{value:1,type:"int"}}, loop: [{label:"j=1",active:true}], matrix: {name:"a", rows:2, cols:3, cells:[[{val:1,hl:true},{val:2,highlight:true},{val:3}],[{val:4},{val:5},{val:6}]]}, info: "j=1，m[0][1]=2" },
-    { line: 6, output: "1 2 ", info: "打印 2" },
-    { line: 5, vars: {j:{value:2,type:"int"}}, loop: [{label:"j=2",active:true}], matrix: {name:"a", rows:2, cols:3, cells:[[{val:1,hl:true},{val:2,hl:true},{val:3,highlight:true}],[{val:4},{val:5},{val:6}]]}, info: "j=2，m[0][2]=3" },
-    { line: 6, output: "1 2 3 ", info: "打印 3" },
-    { line: 8, output: "1 2 3 \n", info: "换行" },
-    { line: 4, vars: {i:{value:1,type:"int"}}, loop: [{label:"i=1",active:true}], info: "外层 i=1" },
-    { line: 5, vars: {j:{value:0,type:"int"}}, loop: [{label:"j=0",active:true}], matrix: {name:"a", rows:2, cols:3, cells:[[{val:1,hl:true},{val:2,hl:true},{val:3,hl:true}],[{val:4,highlight:true},{val:5},{val:6}]]}, info: "j=0，m[1][0]=4" },
-    { line: 6, output: "1 2 3 \n4 ", info: "打印 4" },
-    { line: 5, vars: {j:{value:1,type:"int"}}, loop: [{label:"j=1",active:true}], matrix: {name:"a", rows:2, cols:3, cells:[[{val:1,hl:true},{val:2,hl:true},{val:3,hl:true}],[{val:4,hl:true},{val:5,highlight:true},{val:6}]]}, info: "j=1，m[1][1]=5" },
-    { line: 6, output: "1 2 3 \n4 5 ", info: "打印 5" },
-    { line: 5, vars: {j:{value:2,type:"int"}}, loop: [{label:"j=2",active:true}], matrix: {name:"a", rows:2, cols:3, cells:[[{val:1,hl:true},{val:2,hl:true},{val:3,hl:true}],[{val:4,hl:true},{val:5,hl:true},{val:6,highlight:true}]]}, info: "j=2，m[1][2]=6" },
-    { line: 6, output: "1 2 3 \n4 5 6 ", info: "打印 6" },
-    { line: 8, output: "1 2 3 \n4 5 6 \n", info: "换行" },
-    { line: 9, stack: [{name:"main",value:"a[2][3]",highlight:true}], info: "函数结束" },
-    { line: 15, info: "程序结束" }
-  ]
+  steps: CTeachingTraces["function.html:demo6"]
 });
 createDemo("demo7", {
   title: "递归：斐波那契数列",
@@ -388,26 +285,7 @@ int main() {
 }`,
   vizTypes: ["vars","stack","graph","console"],
   graphTitle: "递归调用树",
-  steps: [
-    { line: 7, info: "main() 开始" },
-    { line: 8, vars: {r:{value:"?",type:"int"}}, info: "准备调用 fib(4)，r 尚未赋值" },
-    { line: 3, stack: [{name:"main",value:"r=?"},{name:"fib",value:"n=4",highlight:true}], vars: {n:{value:4,type:"int"}}, graph: {merge:true, nodes:[{id:"f4",label:"f(4)",x:140,y:10,highlight:true}]}, info: "fib(4)：n=4 > 1，需要递归" },
-    { line: 3, stack: [{name:"main",value:"r=?"},{name:"fib",value:"n=4"},{name:"fib",value:"n=3",highlight:true}], vars: {n:{value:3,type:"int"}}, graph: {merge:true, nodes:[{id:"f3",label:"f(3)",x:70,y:70,highlight:true}], edges:[{from:"f4",to:"f3",highlight:true}]}, info: "计算 fib(3)+fib(2)：先递归左半部分 fib(3)" },
-    { line: 3, stack: [{name:"main",value:"r=?"},{name:"fib",value:"n=4"},{name:"fib",value:"n=3"},{name:"fib",value:"n=2",highlight:true}], vars: {n:{value:2,type:"int"}}, graph: {merge:true, nodes:[{id:"f2a",label:"f(2)",x:30,y:135,highlight:true}], edges:[{from:"f3",to:"f2a",highlight:true}]}, info: "fib(3) 又要先求 fib(2)" },
-    { line: 4, stack: [{name:"main",value:"r=?"},{name:"fib",value:"n=4"},{name:"fib",value:"n=3"},{name:"fib",value:"n=2"},{name:"fib",value:"n=1",ret:1,highlight:true}], vars: {n:{value:1,type:"int"}}, graph: {merge:true, nodes:[{id:"f1a",label:"f(1)",x:8,y:200,done:true,sub:"= 1",highlight:true}], edges:[{from:"f2a",to:"f1a",highlight:true}]}, info: "fib(1)：触发终止条件，return 1" },
-    { line: 4, stack: [{name:"main",value:"r=?"},{name:"fib",value:"n=4"},{name:"fib",value:"n=3"},{name:"fib",value:"n=2"},{name:"fib",value:"n=0",ret:0,highlight:true}], vars: {n:{value:0,type:"int"}}, graph: {merge:true, nodes:[{id:"f0a",label:"f(0)",x:55,y:200,done:true,sub:"= 0",highlight:true}], edges:[{from:"f2a",to:"f0a",highlight:true}]}, info: "回到 fib(2)，再求 fib(0)，return 0" },
-    { line: 4, stack: [{name:"main",value:"r=?"},{name:"fib",value:"n=4"},{name:"fib",value:"n=3"},{name:"fib",value:"n=2",ret:1,highlight:true}], graph: {merge:true, nodes:[{id:"f2a",done:true,sub:"= 1"}]}, info: "fib(2) = fib(1)+fib(0) = 1+0 = 1，返回" },
-    { line: 4, stack: [{name:"main",value:"r=?"},{name:"fib",value:"n=4"},{name:"fib",value:"n=3"},{name:"fib",value:"n=1",ret:1,highlight:true}], graph: {merge:true, nodes:[{id:"f1c",label:"f(1)",x:110,y:135,done:true,sub:"= 1",highlight:true}], edges:[{from:"f3",to:"f1c",highlight:true}]}, info: "回到 fib(3)，求右半部分 fib(1)，return 1" },
-    { line: 4, stack: [{name:"main",value:"r=?"},{name:"fib",value:"n=4"},{name:"fib",value:"n=3",ret:2,highlight:true}], graph: {merge:true, nodes:[{id:"f3",done:true,sub:"= 2"}]}, info: "fib(3) = fib(2)+fib(1) = 1+1 = 2，返回" },
-    { line: 3, stack: [{name:"main",value:"r=?"},{name:"fib",value:"n=4"},{name:"fib",value:"n=2",highlight:true}], vars: {n:{value:2,type:"int"}}, graph: {merge:true, nodes:[{id:"f2b",label:"f(2)",x:210,y:70,highlight:true}], edges:[{from:"f4",to:"f2b",highlight:true}]}, info: "回到 fib(4)，求右半部分 fib(2)——注意它又从头算一遍！" },
-    { line: 4, stack: [{name:"main",value:"r=?"},{name:"fib",value:"n=4"},{name:"fib",value:"n=2"},{name:"fib",value:"n=1",ret:1,highlight:true}], vars: {n:{value:1,type:"int"}}, graph: {merge:true, nodes:[{id:"f1d",label:"f(1)",x:190,y:135,done:true,sub:"= 1",highlight:true}], edges:[{from:"f2b",to:"f1d",highlight:true}]}, info: "fib(1)，return 1" },
-    { line: 4, stack: [{name:"main",value:"r=?"},{name:"fib",value:"n=4"},{name:"fib",value:"n=2"},{name:"fib",value:"n=0",ret:0,highlight:true}], vars: {n:{value:0,type:"int"}}, graph: {merge:true, nodes:[{id:"f0b",label:"f(0)",x:235,y:135,done:true,sub:"= 0",highlight:true}], edges:[{from:"f2b",to:"f0b",highlight:true}]}, info: "fib(0)，return 0" },
-    { line: 4, stack: [{name:"main",value:"r=?"},{name:"fib",value:"n=4"},{name:"fib",value:"n=2",ret:1,highlight:true}], graph: {merge:true, nodes:[{id:"f2b",done:true,sub:"= 1"}]}, info: "fib(2) = 1+0 = 1，返回" },
-    { line: 4, stack: [{name:"main",value:"r=?"},{name:"fib",value:"n=4",ret:3,highlight:true}], graph: {merge:true, nodes:[{id:"f4",done:true,sub:"= 3"}]}, info: "fib(4) = fib(3)+fib(2) = 2+1 = 3，返回 main" },
-    { line: 8, vars: {r:{value:3,type:"int"}}, stack: [{name:"main",value:"r=3",highlight:true}], info: "r = 3。观察调用树：fib(2) 被重复计算了 2 次——n 更大时重复会爆炸式增长，这就是朴素递归低效的原因" },
-    { line: 9, output: "fib(4) = 3", info: "输出 fib(4) = 3" },
-    { line: 10, info: "程序结束" }
-  ]
+  steps: CTeachingTraces["function.html:demo7"]
 });
 /* ========== demo7: 递归——汉诺塔 ========== */
 createDemo("demo8", {
@@ -430,29 +308,7 @@ int main() {
     return 0;
 }`,
   vizTypes: ["stack","hanoi","console"],
-  steps: [
-    { line: 12, info: "main() 开始" },
-    { line: 13, hanoi: [{peg:"A",disks:[3,2,1]},{peg:"B",disks:[]},{peg:"C",disks:[]}], info: "调用 hanoi(3, 'A', 'C', 'B')：把 3 个盘子从 A 移到 C，B 作辅助柱" },
-    { line: 3, stack: [{name:"main",value:""},{name:"hanoi",value:"n=3, A→C (辅B)",highlight:true}], info: "n=3 ≠ 1，拆解为三步：① 上面 2 个盘子 A→B ② 盘子 3 A→C ③ 2 个盘子 B→C" },
-    { line: 7, stack: [{name:"main",value:""},{name:"hanoi",value:"n=3, A→C (辅B)"},{name:"hanoi",value:"n=2, A→B (辅C)",highlight:true}], info: "先执行①：递归 hanoi(2, A, B, C)" },
-    { line: 3, stack: [{name:"main",value:""},{name:"hanoi",value:"n=3, A→C (辅B)"},{name:"hanoi",value:"n=2, A→B (辅C)",highlight:true}], info: "n=2 ≠ 1，同样拆解：先把盘子 1 从 A 移到 C" },
-    { line: 7, stack: [{name:"main",value:""},{name:"hanoi",value:"n=3, A→C (辅B)"},{name:"hanoi",value:"n=2, A→B (辅C)"},{name:"hanoi",value:"n=1, A→C (辅B)",highlight:true}], info: "递归 hanoi(1, A, C, B)" },
-    { line: 4, outputAppend: "A -> C", hanoi: [{peg:"A",disks:[3,2]},{peg:"B",disks:[]},{peg:"C",disks:[{size:1,highlight:true}]}], info: "n=1 到达终止条件：直接把盘子 1 从 A 移到 C" },
-    { line: 6, stack: [{name:"main",value:""},{name:"hanoi",value:"n=3, A→C (辅B)"},{name:"hanoi",value:"n=2, A→B (辅C)",highlight:true}], info: "hanoi(1) 返回，继续 hanoi(2) 自己的移动" },
-    { line: 8, outputAppend: "A -> B", hanoi: [{peg:"A",disks:[3]},{peg:"B",disks:[{size:2,highlight:true}]},{peg:"C",disks:[1]}], info: "hanoi(2) 移动盘子 2：A→B" },
-    { line: 9, stack: [{name:"main",value:""},{name:"hanoi",value:"n=3, A→C (辅B)"},{name:"hanoi",value:"n=2, A→B (辅C)"},{name:"hanoi",value:"n=1, C→B (辅A)",highlight:true}], info: "再递归 hanoi(1, C, B, A)：把盘子 1 从 C 移到 B" },
-    { line: 4, outputAppend: "C -> B", hanoi: [{peg:"A",disks:[3]},{peg:"B",disks:[2,{size:1,highlight:true}]},{peg:"C",disks:[]}], info: "盘子 1 从 C 移到 B。①完成：上面 2 个盘子已到 B" },
-    { line: 6, stack: [{name:"main",value:""},{name:"hanoi",value:"n=3, A→C (辅B)",highlight:true}], info: "hanoi(2) 返回，A 上只剩最大的盘子 3" },
-    { line: 8, outputAppend: "A -> C", hanoi: [{peg:"A",disks:[]},{peg:"B",disks:[2,1]},{peg:"C",disks:[{size:3,highlight:true}]}], info: "②hanoi(3) 移动最大的盘子 3：A→C" },
-    { line: 9, stack: [{name:"main",value:""},{name:"hanoi",value:"n=3, A→C (辅B)"},{name:"hanoi",value:"n=2, B→C (辅A)",highlight:true}], info: "③递归 hanoi(2, B, C, A)：把 B 上的 2 个盘子移到 C" },
-    { line: 7, stack: [{name:"main",value:""},{name:"hanoi",value:"n=3, A→C (辅B)"},{name:"hanoi",value:"n=2, B→C (辅A)"},{name:"hanoi",value:"n=1, B→A (辅C)",highlight:true}], info: "先递归 hanoi(1, B, A, C)：把盘子 1 从 B 移到 A" },
-    { line: 4, outputAppend: "B -> A", hanoi: [{peg:"A",disks:[{size:1,highlight:true}]},{peg:"B",disks:[2]},{peg:"C",disks:[3]}], info: "盘子 1 从 B 移到 A" },
-    { line: 8, outputAppend: "B -> C", hanoi: [{peg:"A",disks:[1]},{peg:"B",disks:[]},{peg:"C",disks:[3,{size:2,highlight:true}]}], stack: [{name:"main",value:""},{name:"hanoi",value:"n=3, A→C (辅B)"},{name:"hanoi",value:"n=2, B→C (辅A)",highlight:true}], info: "hanoi(2) 移动盘子 2：B→C" },
-    { line: 9, stack: [{name:"main",value:""},{name:"hanoi",value:"n=3, A→C (辅B)"},{name:"hanoi",value:"n=2, B→C (辅A)"},{name:"hanoi",value:"n=1, A→C (辅B)",highlight:true}], info: "递归 hanoi(1, A, C, B)：把盘子 1 从 A 移到 C" },
-    { line: 4, outputAppend: "A -> C", hanoi: [{peg:"A",disks:[]},{peg:"B",disks:[]},{peg:"C",disks:[3,2,{size:1,highlight:true}]}], info: "盘子 1 从 A 移到 C，③完成，3 个盘子全部到位！" },
-    { line: 6, stack: [{name:"main",value:""}], info: "所有递归调用依次返回。共移动 7 步 = 2³−1；n 个盘子需要 2ⁿ−1 步" },
-    { line: 14, info: "程序结束" }
-  ]
+  steps: CTeachingTraces["function.html:demo8"]
 });
 /* ========== 综合应用：用函数封装栈与队列 ========== */
 createDemo("demo9", {
@@ -532,27 +388,7 @@ int main() {
     return 0;
 }`,
   vizTypes: ["vars","array","stack","console"],
-  steps: [
-    { line: 23, info: "main() 开始" },
-    { line: 24, stack: [{name:"main",value:"",highlight:true}], info: "调用 init() 初始化栈" },
-    { line: 8, vars: {top:{value:-1,type:"int"}}, array: {name:"stack", cells:[{val:null,empty:true},{val:null,empty:true},{val:null,empty:true},{val:null,empty:true},{val:null,empty:true}], markers:[{index:0,label:"top=-1"}]}, stack: [{name:"main",value:""},{name:"init",value:"",highlight:true}], info: "进入 init()：top = -1 表示空栈（标记放在下标 0 处仅作提示）" },
-    { line: 25, stack: [{name:"main",value:"",highlight:true}], info: "init() 返回，调用 push(10)" },
-    { line: 16, vars: {top:{value:0,type:"int"},x:{value:10,type:"int"}}, array: {name:"stack", cells:[{val:10,highlight:true},{val:null,empty:true},{val:null,empty:true},{val:null,empty:true},{val:null,empty:true}], markers:[{index:0,label:"top"}]}, stack: [{name:"main",value:""},{name:"push",value:"x=10",highlight:true}], info: "进入 push(10)：先 ++top（top=0），再写入 stack[0]=10" },
-    { line: 26, stack: [{name:"main",value:"",highlight:true}], info: "push 返回，调用 push(20)" },
-    { line: 16, vars: {top:{value:1,type:"int"},x:{value:20,type:"int"}}, array: {name:"stack", cells:[{val:10},{val:20,highlight:true},{val:null,empty:true},{val:null,empty:true},{val:null,empty:true}], markers:[{index:1,label:"top"}]}, stack: [{name:"main",value:""},{name:"push",value:"x=20",highlight:true}], info: "push(20)：top=1，stack[1]=20" },
-    { line: 27, stack: [{name:"main",value:"",highlight:true}], info: "push 返回，调用 push(30)" },
-    { line: 16, vars: {top:{value:2,type:"int"},x:{value:30,type:"int"}}, array: {name:"stack", cells:[{val:10},{val:20},{val:30,highlight:true},{val:null,empty:true},{val:null,empty:true}], markers:[{index:2,label:"top"}]}, stack: [{name:"main",value:""},{name:"push",value:"x=30",highlight:true}], info: "push(30)：top=2，stack[2]=30" },
-    { line: 28, stack: [{name:"main",value:"",highlight:true}], info: "printf 前先调用 pop() 取栈顶" },
-    { line: 20, vars: {top:{value:1,type:"int"}}, array: {name:"stack", cells:[{val:10},{val:20},{val:30,empty:true},{val:null,empty:true},{val:null,empty:true}], markers:[{index:1,label:"top"}]}, stack: [{name:"main",value:""},{name:"pop",value:"",highlight:true,ret:30}], info: "进入 pop()：先取 stack[2]=30 作为返回值，再 top--（top=1）。30 仍在数组里但已不属于栈" },
-    { line: 28, output: "pop: 30", stack: [{name:"main",value:"",highlight:true}], info: "pop() 返回 30，printf 输出" },
-    { line: 29, stack: [{name:"main",value:"",highlight:true}], info: "再次调用 pop()" },
-    { line: 20, vars: {top:{value:0,type:"int"}}, array: {name:"stack", cells:[{val:10},{val:20,empty:true},{val:30,empty:true},{val:null,empty:true},{val:null,empty:true}], markers:[{index:0,label:"top"}]}, stack: [{name:"main",value:""},{name:"pop",value:"",highlight:true,ret:20}], info: "pop()：返回 20，top=0" },
-    { line: 29, output: "pop: 30\npop: 20", stack: [{name:"main",value:"",highlight:true}], info: "输出 20。后进先出（LIFO）" },
-    { line: 30, stack: [{name:"main",value:"",highlight:true}], info: "调用 is_empty() 判断栈是否为空" },
-    { line: 12, stack: [{name:"main",value:""},{name:"is_empty",value:"",highlight:true,ret:0}], info: "is_empty()：top=0 ≠ -1，返回 0（假），栈非空，走 else 分支" },
-    { line: 33, output: "pop: 30\npop: 20\n栈顶下标 top = 0", stack: [{name:"main",value:"",highlight:true}], info: "输出当前栈顶下标" },
-    { line: 35, info: "程序结束" }
-  ]
+  steps: CTeachingTraces["function.html:demo9"]
 });
 createDemo("demo10", {
   title: "用数组实现队列（Queue）",
@@ -596,29 +432,7 @@ int main() {
     return 0;
 }`,
   vizTypes: ["vars","array","stack","console"],
-  steps: [
-    { line: 23, info: "main() 开始" },
-    { line: 24, stack: [{name:"main",value:"",highlight:true}], info: "调用 init() 初始化队列" },
-    { line: 8, vars: {front:{value:0,type:"int"},rear:{value:0,type:"int"}}, array: {name:"queue", cells:[{val:null,empty:true},{val:null,empty:true},{val:null,empty:true},{val:null,empty:true},{val:null,empty:true}], markers:[{index:0,label:"front"},{index:0,label:"rear"}]}, stack: [{name:"main",value:""},{name:"init",value:"",highlight:true}], info: "进入 init()：front = rear = 0，空队列" },
-    { line: 25, stack: [{name:"main",value:"",highlight:true}], info: "init() 返回，调用 enqueue(1)" },
-    { line: 16, vars: {rear:{value:1,type:"int"},x:{value:1,type:"int"}}, array: {name:"queue", cells:[{val:1,highlight:true},{val:null,empty:true},{val:null,empty:true},{val:null,empty:true},{val:null,empty:true}], markers:[{index:0,label:"front"},{index:1,label:"rear"}]}, stack: [{name:"main",value:""},{name:"enqueue",value:"x=1",highlight:true}], info: "进入 enqueue(1)：queue[0]=1，rear 后移到 1" },
-    { line: 26, stack: [{name:"main",value:"",highlight:true}], info: "enqueue 返回，调用 enqueue(2)" },
-    { line: 16, vars: {rear:{value:2,type:"int"},x:{value:2,type:"int"}}, array: {name:"queue", cells:[{val:1},{val:2,highlight:true},{val:null,empty:true},{val:null,empty:true},{val:null,empty:true}], markers:[{index:0,label:"front"},{index:2,label:"rear"}]}, stack: [{name:"main",value:""},{name:"enqueue",value:"x=2",highlight:true}], info: "enqueue(2)：queue[1]=2，rear=2" },
-    { line: 27, stack: [{name:"main",value:"",highlight:true}], info: "enqueue 返回，调用 enqueue(3)" },
-    { line: 16, vars: {rear:{value:3,type:"int"},x:{value:3,type:"int"}}, array: {name:"queue", cells:[{val:1},{val:2},{val:3,highlight:true},{val:null,empty:true},{val:null,empty:true}], markers:[{index:0,label:"front"},{index:3,label:"rear"}]}, stack: [{name:"main",value:""},{name:"enqueue",value:"x=3",highlight:true}], info: "enqueue(3)：queue[2]=3，rear=3" },
-    { line: 28, stack: [{name:"main",value:"",highlight:true}], info: "printf 前先调用 dequeue() 取队首" },
-    { line: 20, vars: {front:{value:1,type:"int"}}, array: {name:"queue", cells:[{val:1,empty:true},{val:2},{val:3},{val:null,empty:true},{val:null,empty:true}], markers:[{index:1,label:"front"},{index:3,label:"rear"}]}, stack: [{name:"main",value:""},{name:"dequeue",value:"",highlight:true,ret:1}], info: "进入 dequeue()：取 queue[0]=1 作为返回值，front 后移到 1" },
-    { line: 28, output: "出队: 1", stack: [{name:"main",value:"",highlight:true}], info: "dequeue() 返回 1，printf 输出。先进先出（FIFO）" },
-    { line: 29, stack: [{name:"main",value:"",highlight:true}], info: "再次调用 dequeue()" },
-    { line: 20, vars: {front:{value:2,type:"int"}}, array: {name:"queue", cells:[{val:1,empty:true},{val:2,empty:true},{val:3},{val:null,empty:true},{val:null,empty:true}], markers:[{index:2,label:"front"},{index:3,label:"rear"}]}, stack: [{name:"main",value:""},{name:"dequeue",value:"",highlight:true,ret:2}], info: "dequeue()：返回 queue[1]=2，front=2" },
-    { line: 29, output: "出队: 1\n出队: 2", stack: [{name:"main",value:"",highlight:true}], info: "输出 2" },
-    { line: 30, stack: [{name:"main",value:"",highlight:true}], info: "调用 enqueue(4)" },
-    { line: 16, vars: {rear:{value:4,type:"int"},x:{value:4,type:"int"}}, array: {name:"queue", cells:[{val:1,empty:true},{val:2,empty:true},{val:3},{val:4,highlight:true},{val:null,empty:true}], markers:[{index:2,label:"front"},{index:4,label:"rear"}]}, stack: [{name:"main",value:""},{name:"enqueue",value:"x=4",highlight:true}], info: "enqueue(4)：queue[3]=4，rear=4" },
-    { line: 31, stack: [{name:"main",value:"",highlight:true}], info: "调用 is_empty() 判断队列是否为空" },
-    { line: 12, stack: [{name:"main",value:""},{name:"is_empty",value:"",highlight:true,ret:0}], info: "is_empty()：front=2 ≠ rear=4，返回 0（假），队列非空，走 else 分支" },
-    { line: 34, output: "出队: 1\n出队: 2\nfront=2 rear=4", stack: [{name:"main",value:"",highlight:true}], info: "队列中还剩 3 和 4（front 到 rear 之间）" },
-    { line: 36, info: "程序结束" }
-  ]
+  steps: CTeachingTraces["function.html:demo10"]
 });
 /* ========== 章节练习：3 道预测输出 + 3 道改错 ========== */
 createQuiz("quiz0", {

@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="多维数组与栈、队列：二维矩阵、转置、行列求和、邻接矩阵，以及数组实现栈与顺序队列。">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<title>数组2 - C语言教学演示</title>
+<link rel="stylesheet" href="style.css?v=31">
+</head>
+<body>
+<nav></nav>
+<main class="container" id="main-content">
+<h1>数组2</h1>
+<div class="intro">
+<div class="intro-flex" style="margin-top:1rem">
+<div class="intro-main">
+<p><strong>二维数组</strong>本质是「数组的数组」，常用于表示矩阵、表格。核心知识点：</p>
+<ul>
+<li>定义：<code>int a[3][4];</code> 表示 3 行 4 列的矩阵，在内存中按<strong>行优先</strong>连续存储</li>
+<li>初始化：<code>int a[2][3] = {{1,2,3}, {4,5,6}};</code> 内层大括号代表每一行</li>
+<li>访问元素：<code>a[i][j]</code>，下标从 0 开始</li>
+<li>遍历需要<strong>嵌套循环</strong>：外层控制行，内层控制列</li>
+</ul>
+</div>
+<div class="intro-diagram">
+<svg viewBox="0 0 320 118" width="320" role="img" aria-label="二维数组行优先存储示意图">
+  <defs><marker id="mat-arrow" markerWidth="8" markerHeight="8" refX="7" refY="3" orient="auto"><path d="M0,0 L0,6 L7,3 z" fill="#fab387"/></marker></defs>
+  <g font-family="Consolas,monospace" font-size="10" fill="#6c7086" text-anchor="middle">
+    <text x="92" y="18">j=0</text><text x="162" y="18">j=1</text><text x="232" y="18">j=2</text>
+    <text x="34" y="48">i=0</text><text x="34" y="90">i=1</text>
+  </g>
+  <g fill="#313244" stroke="#45475a" stroke-width="1.5">
+    <rect x="60" y="28" width="64" height="32" rx="6"/><rect x="130" y="28" width="64" height="32" rx="6"/><rect x="200" y="28" width="64" height="32" rx="6"/>
+    <rect x="60" y="70" width="64" height="32" rx="6"/><rect x="130" y="70" width="64" height="32" rx="6"/><rect x="200" y="70" width="64" height="32" rx="6"/>
+  </g>
+  <g font-family="Consolas,monospace" font-size="12" fill="#a6e3a1" text-anchor="middle" font-weight="bold">
+    <text x="92" y="48">1</text><text x="162" y="48">2</text><text x="232" y="48">3</text>
+    <text x="92" y="90">4</text><text x="162" y="90">5</text><text x="232" y="90">6</text>
+  </g>
+  <g stroke="#fab387" stroke-width="1.5" fill="none">
+    <line x1="124" y1="44" x2="130" y2="44" marker-end="url(#mat-arrow)"/>
+    <line x1="194" y1="44" x2="200" y2="44" marker-end="url(#mat-arrow)"/>
+    <path d="M 232 60 Q 232 104 196 78 L 128 82" marker-end="url(#mat-arrow)"/>
+    <line x1="124" y1="86" x2="130" y2="86" marker-end="url(#mat-arrow)"/>
+    <line x1="194" y1="86" x2="200" y2="86" marker-end="url(#mat-arrow)"/>
+  </g>
+</svg>
+<div class="diagram-caption">行优先存储：a[0][0] → a[0][1] → … → a[1][2] 依次相邻</div>
+</div>
+</div>
+<p><strong>推广到多维：</strong><code>int a[2][3][4];</code> 表示 2 层、每层 3 行、每行 4 列，共 24 个元素；用 <code>a[k][i][j]</code> 访问，三个下标分别小于 2、3、4。遍历使用三重循环，最后一维变化最快。</p>
+<p><strong>栈与队列：</strong>都可用一维数组保存数据。栈后进先出（LIFO），<code>top=-1</code> 为空，<code>top=容量-1</code> 为满；队列先进先出（FIFO），本章顺序队列的有效区间为 <code>[front,rear)</code>，<code>front==rear</code> 为空，<code>rear==容量</code> 时不能继续入队。出队不会自动复用前部空位。</p>
+<p>学完基础操作后，可在<a href="function.html#demo9">函数章的栈与队列综合应用</a>中学习如何封装这些操作。</p>
+</div>
+<h2>多维数组：以二维矩阵为例</h2>
+<div class="demo-grid">
+  <div id="demo0"></div>
+  <div id="demo1"></div>
+  <div id="demo2"></div>
+  <div id="demo3"></div>
+  <div id="demo4"></div>
+</div>
+<h2>栈与队列</h2>
+<div class="demo-grid">
+  <div id="demo5"></div>
+  <div id="demo6"></div>
+</div>
+<h2>章节练习</h2>
+<div class="demo-grid">
+  <div id="quiz0"></div>
+  <div id="quiz1"></div>
+  <div id="quiz2"></div>
+  <div id="quiz3"></div>
+</div>
+</main>
+<script src="site-config.js?v=31"></script>
+<script src="demo-engine.js?v=31"></script>
+<script src="demo-traces.js?v=31"></script>
+<script>
+createDemo("demo0", {
+  title: "二维数组的定义与初始化",
+  subtitle: "矩阵在内存中按行连续存放",
+  code: `#include <stdio.h>
+
+int main() {
+    int a[2][3] = {{1, 2, 3}, {4, 5, 6}};
+    int b[3][3] = {{1, 2}, {3}};
+    printf("a[1][2]=%d, b[2][0]=%d\\n", a[1][2], b[2][0]);
+    return 0;
+}`,
+  vizTypes: ["vars","matrix","console"],
+  steps: CTeachingTraces["array2.html:demo0"]
+});
+createDemo("demo1", {
+  title: "二维数组的遍历",
+  subtitle: "外层循环行，内层循环列",
+  code: `#include <stdio.h>
+
+int main() {
+    int a[2][3] = {{1, 2, 3}, {4, 5, 6}};
+    int i, j;
+    for (i = 0; i < 2; i++) {
+        for (j = 0; j < 3; j++) {
+            printf("%d ", a[i][j]);
+        }
+        printf("\\n");
+    }
+    return 0;
+}`,
+  vizTypes: ["vars","matrix","loop","console"],
+  steps: CTeachingTraces["array2.html:demo1"]
+});
+createDemo("demo2", {
+  title: "矩阵转置",
+  subtitle: "行列互换：b[j][i] = a[i][j]",
+  code: `#include <stdio.h>
+
+int main() {
+    int a[2][3] = {{1, 2, 3}, {4, 5, 6}};
+    int b[3][2];
+    int i, j;
+    for (i = 0; i < 2; i++) {
+        for (j = 0; j < 3; j++) {
+            b[j][i] = a[i][j];
+        }
+    }
+    printf("%d %d\\n%d %d\\n%d %d\\n", b[0][0], b[0][1], b[1][0], b[1][1], b[2][0], b[2][1]);
+    return 0;
+}`,
+  vizTypes: ["vars","matrix","loop","console"],
+  steps: CTeachingTraces["array2.html:demo2"]
+});
+createDemo("demo3", {
+  title: "行和与列和",
+  subtitle: "分别对每行、每列求和",
+  code: `#include <stdio.h>
+
+int main() {
+    int a[3][3] = {{1, 2, 3}, {4, 5, 6}, {7, 8, 9}};
+    int row_sum[3] = {0};
+    int col_sum[3] = {0};
+    int i, j;
+    for (i = 0; i < 3; i++) {
+        for (j = 0; j < 3; j++) {
+            row_sum[i] += a[i][j];
+            col_sum[j] += a[i][j];
+        }
+    }
+    printf("row: %d %d %d\\n", row_sum[0], row_sum[1], row_sum[2]);
+    printf("col: %d %d %d\\n", col_sum[0], col_sum[1], col_sum[2]);
+    return 0;
+}`,
+  vizTypes: ["vars","matrix","array","loop","console"],
+  steps: CTeachingTraces["array2.html:demo3"]
+});
+createDemo("demo4", {
+  title: "二维数组与图：邻接矩阵",
+  subtitle: "用 g[i][j]=1 表示顶点 i 与 j 之间有边，右侧同步显示图的形态",
+  code: `#include <stdio.h>
+
+int main() {
+    int g[4][4] = {0};
+    int i, j;
+    g[0][1] = g[1][0] = 1;
+    g[0][2] = g[2][0] = 1;
+    g[1][3] = g[3][1] = 1;
+    g[2][3] = g[3][2] = 1;
+    for (i = 0; i < 4; i++) {
+        int deg = 0;
+        for (j = 0; j < 4; j++) {
+            deg += g[i][j];
+        }
+        printf("%c 的度 = %d\\n", 'A' + i, deg);
+    }
+    return 0;
+}`,
+  vizTypes: ["vars","matrix","graph","loop","console"],
+  steps: CTeachingTraces["array2.html:demo4"]
+});
+createDemo("demo5", {
+  "title": "用数组实现栈：后进先出",
+  "subtitle": "top 是栈顶下标；入栈先判满，出栈先判空",
+  "code": "#include <stdio.h>\n\nint main() {\n    int stack[3] = {0};\n    int top = -1, x;\n    for (x = 10; x <= 40; x += 10) {\n        if (top < 2) {\n            stack[++top] = x;\n        } else {\n            printf(\"full\\n\");\n        }\n    }\n    while (top >= 0) {\n        x = stack[top--];\n        printf(\"%d \", x);\n    }\n    printf(\"\\n\");\n    return 0;\n}",
+  "vizTypes": [
+    "vars",
+    "array",
+    "console"
+  ],
+  "steps": CTeachingTraces["array2.html:demo5"]
+});
+createDemo("demo6", {
+  "title": "用数组实现队列：先进先出",
+  "subtitle": "顺序队列：front 指向队头，rear 指向下一个写入位置",
+  "code": "#include <stdio.h>\n\nint main() {\n    int queue[3] = {0};\n    int front = 0, rear = 0, x;\n    for (x = 10; x <= 30; x += 10) {\n        if (rear < 3) {\n            queue[rear++] = x;\n        }\n    }\n    while (front < rear) {\n        x = queue[front++];\n        printf(\"%d \", x);\n    }\n    printf(\"\\nfront=%d rear=%d\\n\", front, rear);\n    return 0;\n}",
+  "vizTypes": [
+    "vars",
+    "array",
+    "console"
+  ],
+  "steps": CTeachingTraces["array2.html:demo6"]
+});
+createQuiz("quiz0", {
+  type: "predict",
+  title: "二维数组：内层大括号初始化与按行求和",
+  code: `#include <stdio.h>
+
+int main() {
+    int a[2][3] = {{1, 2}, {4, 5, 6}};
+    int i, j;
+    for (i = 0; i < 2; i++) {
+        int row = 0;
+        for (j = 0; j < 3; j++) {
+            row += a[i][j];
+        }
+        printf("%d\\n", row);
+    }
+    return 0;
+}`,
+  answer: "3\n15",
+  explain: "内层大括号逐行初始化：第 0 行是 {1, 2}，第 3 列没给值<strong>自动补 0</strong>，所以第 0 行和为 1+2+0 = 3；第 1 行是 {4, 5, 6}，和为 15。嵌套循环外层走行、内层走列，正好符合二维数组按行优先的存储顺序。"
+});
+createQuiz("quiz1", {
+  type: "fix",
+  title: "用函数打印矩阵",
+  hint: "二维数组作函数参数：列数不能省略",
+  code: `#include <stdio.h>
+
+int row_sum(int m[][], int r) {
+    int j, s = 0;
+    for (j = 0; j < 3; j++) {
+        s += m[r][j];
+    }
+    return s;
+}
+
+int main() {
+    int a[2][3] = {{1, 2, 3}, {4, 5, 6}};
+    printf("%d\\n", row_sum(a, 1));
+    return 0;
+}`,
+  accept: [`#include <stdio.h>
+
+int row_sum(int m[][3], int r) {
+    int j, s = 0;
+    for (j = 0; j < 3; j++) {
+        s += m[r][j];
+    }
+    return s;
+}
+
+int main() {
+    int a[2][3] = {{1, 2, 3}, {4, 5, 6}};
+    printf("%d\\n", row_sum(a, 1));
+    return 0;
+}`, `#include <stdio.h>
+
+int row_sum(int m[2][3], int r) {
+    int j, s = 0;
+    for (j = 0; j < 3; j++) {
+        s += m[r][j];
+    }
+    return s;
+}
+
+int main() {
+    int a[2][3] = {{1, 2, 3}, {4, 5, 6}};
+    printf("%d\\n", row_sum(a, 1));
+    return 0;
+}`],
+  explain: "二维数组按行优先连续存储，编译器要靠<strong>列数</strong>才能把 m[r][j] 换算成地址 r*列数+j，所以形参里第二维（列数）必须写，第一维可以省略。最小修改：把 <code>int m[][]</code> 改成 <code>int m[][3]</code>（写全 <code>int m[2][3]</code> 也可以）。"
+});
+createQuiz("quiz2", {
+  type: "fix",
+  title: "计算矩阵每列的和",
+  hint: "求列和时行、列下标写反了",
+  code: `#include <stdio.h>
+
+int main() {
+    int a[2][3] = {{1, 2, 3}, {4, 5, 6}};
+    int i, j;
+    for (j = 0; j < 3; j++) {
+        int col = 0;
+        for (i = 0; i < 2; i++) {
+            col += a[j][i];
+        }
+        printf("%d ", col);
+    }
+    printf("\\n");
+    return 0;
+}`,
+  accept: [`#include <stdio.h>
+
+int main() {
+    int a[2][3] = {{1, 2, 3}, {4, 5, 6}};
+    int i, j;
+    for (j = 0; j < 3; j++) {
+        int col = 0;
+        for (i = 0; i < 2; i++) {
+            col += a[i][j];
+        }
+        printf("%d ", col);
+    }
+    printf("\\n");
+    return 0;
+}`],
+  explain: "外层 j 走列（0~2）、内层 i 走行（0~1），元素应当写成 <code>a[i][j]</code>（先行后列）。写成 <code>a[j][i]</code> 时，j=2 会访问 a[2][i]，第一维越界（数组只有 2 行），结果错误。改对后输出各列之和 <code>5 7 9</code>。"
+});
+createQuiz("quiz3", {
+  "type": "predict",
+  "title": "栈：交替入栈与出栈",
+  "code": "#include <stdio.h>\n\nint main() {\n    int s[3] = {0};\n    int top = -1, x;\n    s[++top] = 10;\n    s[++top] = 20;\n    x = s[top--];\n    s[++top] = 30;\n    printf(\"%d %d %d\\n\", x, s[top], top);\n    return 0;\n}",
+  "answer": "20 30 1",
+  "explain": "先弹出 20，使 top 回到 0；再入栈 30，覆盖原来的 20，top 回到 1。所有操作均在容量范围内。"
+});
+</script>
+</body>
+</html>

@@ -6,7 +6,7 @@
 <meta name="description" content="认识C程序：从 Hello World 开始，用简单有趣的小例子了解 C 语言编程的核心思想——输出、变量、计算、判断与循环。">
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
 <title>认识C程序 - C语言教学演示</title>
-<link rel="stylesheet" href="style.css?v=28">
+<link rel="stylesheet" href="style.css?v=31">
 </head>
 <body>
 <nav></nav>
@@ -63,8 +63,9 @@
 </div>
 </main>
 
-<script src="site-config.js?v=28"></script>
-<script src="demo-engine.js?v=28"></script>
+<script src="site-config.js?v=31"></script>
+<script src="demo-engine.js?v=31"></script>
+<script src="demo-traces.js?v=31"></script>
 <script>
 createDemo("demo0", {
   title: "Hello, World!",
@@ -76,12 +77,7 @@ int main() {
     return 0;
 }`,
   vizTypes: ["console"],
-  steps: [
-    { line: 0, info: "#include <stdio.h>：引入「标准输入输出工具箱」，printf 就装在里面" },
-    { line: 2, info: "程序从 main() 函数开始执行——每个 C 程序都有且只有一个 main" },
-    { line: 3, output: "Hello, World!", info: "printf 把双引号里的内容打印到屏幕；末尾的 \\n 表示换一行" },
-    { line: 4, info: "return 0 表示程序顺利结束。你的第一个 C 程序跑完了！" }
-  ]
+  steps: CTeachingTraces["intro.html:demo0"]
 });
 createDemo("demo1", {
   title: "printf：让程序说话",
@@ -95,13 +91,7 @@ int main() {
     return 0;
 }`,
   vizTypes: ["console"],
-  steps: [
-    { line: 2, info: "main() 开始" },
-    { line: 3, output: "你好，我是小 C！", info: "打印第一句话。末尾的 \\n 让光标换到下一行" },
-    { line: 4, output: "你好，我是小 C！\n我会算数、会数数、还会做决定。", info: "第二句话另起一行——如果去掉 \\n，两句话就会挤在同一行里" },
-    { line: 5, output: "你好，我是小 C！\n我会算数、会数数、还会做决定。\n跟我一起玩吧！", info: "程序就是这样一句一句、从上到下执行的" },
-    { line: 6, info: "程序结束" }
-  ]
+  steps: CTeachingTraces["intro.html:demo1"]
 });
 createDemo("demo2", {
   title: "变量：会变的盒子",
@@ -132,14 +122,7 @@ int main() {
     return 0;
 }`,
   vizTypes: ["vars","console"],
-  steps: [
-    { line: 2, info: "main() 开始" },
-    { line: 3, vars: {age:{value:18,type:"int"}}, info: "int age = 18：造一个名叫 age 的盒子（int 表示装整数），放进 18" },
-    { line: 4, output: "今年 18 岁", info: "%d 是占位符，打印时会被 age 的值替换" },
-    { line: 5, vars: {age:{value:19,type:"int"}}, info: "age = age + 1：把盒子里的旧值拿出来加 1，再放回去。盒子的内容变了！" },
-    { line: 6, output: "今年 18 岁\n明年 19 岁", info: "再次打印，%d 换成新值 19" },
-    { line: 7, info: "程序结束" }
-  ]
+  steps: CTeachingTraces["intro.html:demo2"]
 });
 // 成绩计算器：输入平时、期中、期末成绩，输出加权百分成绩
 function makeScoreDemo(usual, midterm, final) {
@@ -264,22 +247,7 @@ int main() {
     return 0;
 }`,
   vizTypes: ["vars","loop","console"],
-  steps: [
-    { line: 2, info: "main() 开始" },
-    { line: 4, vars: {i:{value:5,type:"int"}}, loop: [{label:"i=5",active:true}], info: "for 循环：i 从 5 开始，只要 i >= 1 就重复执行" },
-    { line: 5, output: "5...", info: "打印 5..." },
-    { line: 4, vars: {i:{value:4,type:"int"}}, loop: [{label:"i=5",active:false},{label:"i=4",active:true}], info: "i-- 让 i 减 1，i 变成 4，条件仍然成立，继续" },
-    { line: 5, output: "5...\n4...", info: "打印 4..." },
-    { line: 4, vars: {i:{value:3,type:"int"}}, loop: [{label:"i=5",active:false},{label:"i=4",active:false},{label:"i=3",active:true}], info: "i 变成 3，再来一轮" },
-    { line: 5, output: "5...\n4...\n3...", info: "打印 3..." },
-    { line: 4, vars: {i:{value:2,type:"int"}}, loop: [{label:"i=4",active:false},{label:"i=3",active:false},{label:"i=2",active:true}], info: "i 变成 2" },
-    { line: 5, output: "5...\n4...\n3...\n2...", info: "打印 2..." },
-    { line: 4, vars: {i:{value:1,type:"int"}}, loop: [{label:"i=3",active:false},{label:"i=2",active:false},{label:"i=1",active:true}], info: "i 变成 1，最后一轮" },
-    { line: 5, output: "5...\n4...\n3...\n2...\n1...", info: "打印 1..." },
-    { line: 4, loop: [{label:"i=1",active:false}], info: "i 变成 0，条件 i >= 1 不成立了，循环结束" },
-    { line: 7, output: "5...\n4...\n3...\n2...\n1...\n发射！", info: "循环外面的 printf 接着执行：发射！" },
-    { line: 8, info: "程序结束。注意体会：计算机把「重复 5 次」这件事包办了，一次都不偷懒" }
-  ]
+  steps: CTeachingTraces["intro.html:demo5"]
 });
 createDemo("demo6", {
   title: "数组：长春气温年鉴",
@@ -301,52 +269,7 @@ int main() {
     return 0;
 }`,
   vizTypes: ["vars","array","loop","console"],
-  steps: [
-    { line: 2, info: "main() 开始" },
-    { line: 3, vars: {temps:{value:"double[12]",type:"array"}}, array: {name:"temps", cells:[{val:-14.7},{val:-8.7},{val:2.5},{val:9.7},{val:16.5},{val:20},{val:25.9},{val:21.5},{val:17.2},{val:8.4},{val:-1.9},{val:-9.6}], markers:[{index:0,label:"最热"},{index:0,label:"最冷"}]}, info: "数组 temps 存下长春 12 个月的平均气温（2021 年数据）：一排带编号的格子，下标从 0 开始" },
-    { line: 6, vars: {hottest:{value:0,type:"int"},coldest:{value:0,type:"int"}}, info: "先假设 1 月（下标 0）暂时既是最热也是最冷" },
-    { line: 7, vars: {i:{value:0,type:"int"}}, loop: [{label:"i=0",active:true}], info: "开始逐月检查" },
-    { line: 8, output: "1 月: -14.7°C", vars: {i:{value:0,type:"int"}}, loop: [{label:"i=0",active:true}], array: {name:"temps", cells:[{val:-14.7,highlight:true},{val:-8.7},{val:2.5},{val:9.7},{val:16.5},{val:20},{val:25.9},{val:21.5},{val:17.2},{val:8.4},{val:-1.9},{val:-9.6}], markers:[{index:0,label:"最热"},{index:0,label:"最冷"}]}, info: "1 月：-14.7°C" },
-    { line: 9, info: "-14.7 > -14.7？不成立——没有超过 1 月，最热记录不变" },
-    { line: 10, info: "和自己持平，不刷新" },
-    { line: 8, output: "1 月: -14.7°C\n2 月: -8.7°C", vars: {i:{value:1,type:"int"}}, loop: [{label:"i=1",active:true}], array: {name:"temps", cells:[{val:-14.7},{val:-8.7,highlight:true},{val:2.5},{val:9.7},{val:16.5},{val:20},{val:25.9},{val:21.5},{val:17.2},{val:8.4},{val:-1.9},{val:-9.6}], markers:[{index:0,label:"最热"},{index:0,label:"最冷"}]}, info: "2 月：-8.7°C" },
-    { line: 9, vars: {hottest:{value:1,type:"int"}}, info: "-8.7 > -14.7，比 1 月 热！最热记录刷新为 2 月" },
-    { line: 10, info: "-8.7 < -14.7？不成立——还是没有 1 月 冷，最冷记录不变" },
-    { line: 8, output: "1 月: -14.7°C\n2 月: -8.7°C\n3 月: 2.5°C", vars: {i:{value:2,type:"int"}}, loop: [{label:"i=2",active:true}], array: {name:"temps", cells:[{val:-14.7},{val:-8.7},{val:2.5,highlight:true},{val:9.7},{val:16.5},{val:20},{val:25.9},{val:21.5},{val:17.2},{val:8.4},{val:-1.9},{val:-9.6}], markers:[{index:1,label:"最热"},{index:0,label:"最冷"}]}, info: "3 月：2.5°C" },
-    { line: 9, vars: {hottest:{value:2,type:"int"}}, info: "2.5 > -8.7，比 2 月 热！最热记录刷新为 3 月" },
-    { line: 10, info: "2.5 < -14.7？不成立——还是没有 1 月 冷，最冷记录不变" },
-    { line: 8, output: "1 月: -14.7°C\n2 月: -8.7°C\n3 月: 2.5°C\n4 月: 9.7°C", vars: {i:{value:3,type:"int"}}, loop: [{label:"i=3",active:true}], array: {name:"temps", cells:[{val:-14.7},{val:-8.7},{val:2.5},{val:9.7,highlight:true},{val:16.5},{val:20},{val:25.9},{val:21.5},{val:17.2},{val:8.4},{val:-1.9},{val:-9.6}], markers:[{index:2,label:"最热"},{index:0,label:"最冷"}]}, info: "4 月：9.7°C" },
-    { line: 9, vars: {hottest:{value:3,type:"int"}}, info: "9.7 > 2.5，比 3 月 热！最热记录刷新为 4 月" },
-    { line: 10, info: "9.7 < -14.7？不成立——还是没有 1 月 冷，最冷记录不变" },
-    { line: 8, output: "1 月: -14.7°C\n2 月: -8.7°C\n3 月: 2.5°C\n4 月: 9.7°C\n5 月: 16.5°C", vars: {i:{value:4,type:"int"}}, loop: [{label:"i=4",active:true}], array: {name:"temps", cells:[{val:-14.7},{val:-8.7},{val:2.5},{val:9.7},{val:16.5,highlight:true},{val:20},{val:25.9},{val:21.5},{val:17.2},{val:8.4},{val:-1.9},{val:-9.6}], markers:[{index:3,label:"最热"},{index:0,label:"最冷"}]}, info: "5 月：16.5°C" },
-    { line: 9, vars: {hottest:{value:4,type:"int"}}, info: "16.5 > 9.7，比 4 月 热！最热记录刷新为 5 月" },
-    { line: 10, info: "16.5 < -14.7？不成立——还是没有 1 月 冷，最冷记录不变" },
-    { line: 8, output: "1 月: -14.7°C\n2 月: -8.7°C\n3 月: 2.5°C\n4 月: 9.7°C\n5 月: 16.5°C\n6 月: 20.0°C", vars: {i:{value:5,type:"int"}}, loop: [{label:"i=5",active:true}], array: {name:"temps", cells:[{val:-14.7},{val:-8.7},{val:2.5},{val:9.7},{val:16.5},{val:20,highlight:true},{val:25.9},{val:21.5},{val:17.2},{val:8.4},{val:-1.9},{val:-9.6}], markers:[{index:4,label:"最热"},{index:0,label:"最冷"}]}, info: "6 月：20.0°C" },
-    { line: 9, vars: {hottest:{value:5,type:"int"}}, info: "20 > 16.5，比 5 月 热！最热记录刷新为 6 月" },
-    { line: 10, info: "20 < -14.7？不成立——还是没有 1 月 冷，最冷记录不变" },
-    { line: 8, output: "1 月: -14.7°C\n2 月: -8.7°C\n3 月: 2.5°C\n4 月: 9.7°C\n5 月: 16.5°C\n6 月: 20.0°C\n7 月: 25.9°C", vars: {i:{value:6,type:"int"}}, loop: [{label:"i=6",active:true}], array: {name:"temps", cells:[{val:-14.7},{val:-8.7},{val:2.5},{val:9.7},{val:16.5},{val:20},{val:25.9,highlight:true},{val:21.5},{val:17.2},{val:8.4},{val:-1.9},{val:-9.6}], markers:[{index:5,label:"最热"},{index:0,label:"最冷"}]}, info: "7 月：25.9°C" },
-    { line: 9, vars: {hottest:{value:6,type:"int"}}, info: "25.9 > 20，比 6 月 热！最热记录刷新为 7 月" },
-    { line: 10, info: "25.9 < -14.7？不成立——还是没有 1 月 冷，最冷记录不变" },
-    { line: 8, output: "1 月: -14.7°C\n2 月: -8.7°C\n3 月: 2.5°C\n4 月: 9.7°C\n5 月: 16.5°C\n6 月: 20.0°C\n7 月: 25.9°C\n8 月: 21.5°C", vars: {i:{value:7,type:"int"}}, loop: [{label:"i=7",active:true}], array: {name:"temps", cells:[{val:-14.7},{val:-8.7},{val:2.5},{val:9.7},{val:16.5},{val:20},{val:25.9},{val:21.5,highlight:true},{val:17.2},{val:8.4},{val:-1.9},{val:-9.6}], markers:[{index:6,label:"最热"},{index:0,label:"最冷"}]}, info: "8 月：21.5°C" },
-    { line: 9, info: "21.5 > 25.9？不成立——没有超过 7 月，最热记录不变" },
-    { line: 10, info: "21.5 < -14.7？不成立——还是没有 1 月 冷，最冷记录不变" },
-    { line: 8, output: "1 月: -14.7°C\n2 月: -8.7°C\n3 月: 2.5°C\n4 月: 9.7°C\n5 月: 16.5°C\n6 月: 20.0°C\n7 月: 25.9°C\n8 月: 21.5°C\n9 月: 17.2°C", vars: {i:{value:8,type:"int"}}, loop: [{label:"i=8",active:true}], array: {name:"temps", cells:[{val:-14.7},{val:-8.7},{val:2.5},{val:9.7},{val:16.5},{val:20},{val:25.9},{val:21.5},{val:17.2,highlight:true},{val:8.4},{val:-1.9},{val:-9.6}], markers:[{index:6,label:"最热"},{index:0,label:"最冷"}]}, info: "9 月：17.2°C" },
-    { line: 9, info: "17.2 > 25.9？不成立——没有超过 7 月，最热记录不变" },
-    { line: 10, info: "17.2 < -14.7？不成立——还是没有 1 月 冷，最冷记录不变" },
-    { line: 8, output: "1 月: -14.7°C\n2 月: -8.7°C\n3 月: 2.5°C\n4 月: 9.7°C\n5 月: 16.5°C\n6 月: 20.0°C\n7 月: 25.9°C\n8 月: 21.5°C\n9 月: 17.2°C\n10 月: 8.4°C", vars: {i:{value:9,type:"int"}}, loop: [{label:"i=9",active:true}], array: {name:"temps", cells:[{val:-14.7},{val:-8.7},{val:2.5},{val:9.7},{val:16.5},{val:20},{val:25.9},{val:21.5},{val:17.2},{val:8.4,highlight:true},{val:-1.9},{val:-9.6}], markers:[{index:6,label:"最热"},{index:0,label:"最冷"}]}, info: "10 月：8.4°C" },
-    { line: 9, info: "8.4 > 25.9？不成立——没有超过 7 月，最热记录不变" },
-    { line: 10, info: "8.4 < -14.7？不成立——还是没有 1 月 冷，最冷记录不变" },
-    { line: 8, output: "1 月: -14.7°C\n2 月: -8.7°C\n3 月: 2.5°C\n4 月: 9.7°C\n5 月: 16.5°C\n6 月: 20.0°C\n7 月: 25.9°C\n8 月: 21.5°C\n9 月: 17.2°C\n10 月: 8.4°C\n11 月: -1.9°C", vars: {i:{value:10,type:"int"}}, loop: [{label:"i=10",active:true}], array: {name:"temps", cells:[{val:-14.7},{val:-8.7},{val:2.5},{val:9.7},{val:16.5},{val:20},{val:25.9},{val:21.5},{val:17.2},{val:8.4},{val:-1.9,highlight:true},{val:-9.6}], markers:[{index:6,label:"最热"},{index:0,label:"最冷"}]}, info: "11 月：-1.9°C" },
-    { line: 9, info: "-1.9 > 25.9？不成立——没有超过 7 月，最热记录不变" },
-    { line: 10, info: "-1.9 < -14.7？不成立——还是没有 1 月 冷，最冷记录不变" },
-    { line: 8, output: "1 月: -14.7°C\n2 月: -8.7°C\n3 月: 2.5°C\n4 月: 9.7°C\n5 月: 16.5°C\n6 月: 20.0°C\n7 月: 25.9°C\n8 月: 21.5°C\n9 月: 17.2°C\n10 月: 8.4°C\n11 月: -1.9°C\n12 月: -9.6°C", vars: {i:{value:11,type:"int"}}, loop: [{label:"i=11",active:true}], array: {name:"temps", cells:[{val:-14.7},{val:-8.7},{val:2.5},{val:9.7},{val:16.5},{val:20},{val:25.9},{val:21.5},{val:17.2},{val:8.4},{val:-1.9},{val:-9.6,highlight:true}], markers:[{index:6,label:"最热"},{index:0,label:"最冷"}]}, info: "12 月：-9.6°C" },
-    { line: 9, info: "-9.6 > 25.9？不成立——没有超过 7 月，最热记录不变" },
-    { line: 10, info: "-9.6 < -14.7？不成立——还是没有 1 月 冷，最冷记录不变" },
-    { line: 7, loop: [{label:"i=11",active:false}], info: "12 个月全部检查完，循环结束" },
-    { line: 12, output: "1 月: -14.7°C\n2 月: -8.7°C\n3 月: 2.5°C\n4 月: 9.7°C\n5 月: 16.5°C\n6 月: 20.0°C\n7 月: 25.9°C\n8 月: 21.5°C\n9 月: 17.2°C\n10 月: 8.4°C\n11 月: -1.9°C\n12 月: -9.6°C\n最热是 7 月（25.9°C）", info: "公布结果：最热是 7 月（25.9°C）" },
-    { line: 13, output: "1 月: -14.7°C\n2 月: -8.7°C\n3 月: 2.5°C\n4 月: 9.7°C\n5 月: 16.5°C\n6 月: 20.0°C\n7 月: 25.9°C\n8 月: 21.5°C\n9 月: 17.2°C\n10 月: 8.4°C\n11 月: -1.9°C\n12 月: -9.6°C\n最热是 7 月（25.9°C）\n最冷是 1 月（-14.7°C）", info: "最冷是 1 月（-14.7°C）" },
-    { line: 14, info: "程序结束。体会一下：数组存下一组同类数据，循环负责重复，判断负责比较——三者合体，就是数据分析的雏形" }
-  ]
+  steps: CTeachingTraces["intro.html:demo6"]
 });
 </script>
 </body>

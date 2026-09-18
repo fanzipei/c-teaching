@@ -1,7 +1,7 @@
 // 检查所有 demo：代码中的 if/else if 行是否有对应步骤高亮（条件求值不应被跳过）
 const { chromium } = require('playwright');
 const path = require('path');
-const PAGES = ['intro.html','datatype.html','condition.html','loop.html','function.html','array.html','pointer.html','struct.html'];
+const PAGES = require('../site-config').map(chapter => chapter.page);
 (async () => {
   const browser = await chromium.launch();
   for (const p of PAGES) {

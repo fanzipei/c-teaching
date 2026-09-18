@@ -1,7 +1,7 @@
 // 全站步骤行号对齐审计：step.line 是 0-based，应对应代码中该步描述的语句
 const { chromium } = require('playwright');
 const path = require('path');
-const PAGES = ['intro.html','datatype.html','condition.html','loop.html','function.html','array.html','pointer.html','struct.html'];
+const PAGES = require('../site-config').map(chapter => chapter.page);
 (async () => {
   const browser = await chromium.launch();
   let totalFlag = 0;

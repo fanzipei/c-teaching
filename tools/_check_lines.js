@@ -1,6 +1,6 @@
 const { chromium } = require('playwright');
 const path = require('path');
-const PAGES = ['intro.html','datatype.html','condition.html','loop.html','function.html','array.html','pointer.html','struct.html'];
+const PAGES = require('../site-config').map(chapter => chapter.page);
 (async () => {
   const browser = await chromium.launch();
   for (const p of PAGES) {

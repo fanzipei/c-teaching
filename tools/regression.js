@@ -66,7 +66,8 @@ const PAGES = CHAPTERS.map(chapter => chapter.page);
         q.container.querySelector('.quiz-card').classList.contains('completed')).length);
 
     const expectTotal = result.demos + result.quizzes;
-    const ok = errors.length === 0 && result.demos > 0 &&
+    const chapter = CHAPTERS.find(chapter => chapter.page === p);
+    const ok = errors.length === 0 && result.demos === chapter.demo && result.quizzes === chapter.quiz &&
       result.completedAfterRun === result.demos &&
       result.quizWrongRejected === result.quizzes &&
       result.quizRightAccepted === result.quizzes &&
@@ -144,6 +145,37 @@ const PAGES = CHAPTERS.map(chapter => chapter.page);
   console.log(`${interactionOk ? 'PASS' : 'FAIL'} 真实交互  移动导航=${navExpanded}` +
     ` 键盘前进=${afterNext} 键盘回退=${afterPrevious} 慢=${slowInterval}ms 快=${fastState.interval}ms(${fastState.label})`);
   await interactionCtx.close();
+
+  // 4) 数组章节拆分：旧完成记录仅迁移到原内容，新样例/新练习不能被误标完成。
+  const migrationCtx = await browser.newContext();
+  const migrationPage = await migrationCtx.newPage();
+  const localUrl = name => 'file://' + path.resolve(__dirname, '..', name);
+  await migrationPage.goto(localUrl('index.html'));
+  await migrationPage.evaluate(() => {
+    localStorage.clear();
+    for (let i = 0; i < 13; i++) localStorage.setItem('cteaching:done:array.html:demo' + i, '1');
+    for (let i = 0; i < 6; i++) localStorage.setItem('cteaching:done:array.html:quiz' + i, '1');
+  });
+  await migrationPage.reload();
+  const migratedBadges = await migrationPage.locator('.topic-progress').allTextContents();
+  let migrationOk = migratedBadges.includes('继续学习 · 11 / 14') &&
+    migratedBadges.includes('继续学习 · 8 / 11');
+  for (const [name, expectedDone] of [['array1.html', 11], ['array2.html', 8]]) {
+    await migrationPage.goto(localUrl(name));
+    migrationOk = migrationOk && await migrationPage.locator('.demo-card.completed, .quiz-card.completed').count() === expectedDone;
+    migrationOk = migrationOk && await migrationPage.locator('#quiz3 .quiz-card.completed').count() === 0;
+  }
+  for (const [oldId, destination] of [
+    ['demo7', 'array1.html#demo7'], ['demo8', 'array2.html#demo0'],
+    ['quiz1', 'array1.html#quiz1'], ['quiz4', 'array2.html#quiz1'], ['quiz5', 'array2.html#quiz2']
+  ]) {
+    await migrationPage.goto(localUrl('array.html') + '#' + oldId);
+    await migrationPage.waitForURL('**/' + destination);
+    migrationOk = migrationOk && await migrationPage.locator(destination.slice(destination.indexOf('#'))).count() === 1;
+  }
+  if (!migrationOk) failures++;
+  console.log(`${migrationOk ? 'PASS' : 'FAIL'} 数组章节拆分：原进度迁移、新内容未完成、旧锚点跳转`);
+  await migrationCtx.close();
 
   await browser.close();
   console.log(failures ? `\n共 ${failures} 项失败` : '\n全部通过');

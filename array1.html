@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="一维数组与字符串：初始化、遍历、排序、逆序、字符串连接、比较、查找和数字统计。">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<title>数组1 - C语言教学演示</title>
+<link rel="stylesheet" href="style.css?v=31">
+</head>
+<body>
+<nav></nav>
+<main class="container" id="main-content">
+<h1>数组1</h1>
+<div class="intro">
+<div class="intro-flex">
+<div class="intro-main">
+<p><strong>一维数组</strong>是相同类型数据的连续存储集合。核心知识点：</p>
+<ul>
+<li>定义：<code>int arr[5];</code> 分配 5 个连续的 int 空间，下标从 0 开始</li>
+<li>初始化：<code>int arr[5] = {1,2,3,4,5};</code> 部分初始化时其余自动为 0</li>
+<li>数组名在多数表达式中会转换为<strong>指向首元素的指针</strong>（数组本身不是指针）：<code>arr[i]</code> 等价于 <code>*(arr+i)</code></li>
+<li>越界访问是未定义行为：访问 <code>arr[-1]</code> 或 <code>arr[5]</code> 可能崩溃</li>
+<li>数组长度必须用常量或宏定义，不能用变量（C99 前）</li>
+<li><strong>字符数组与字符串</strong>：以 <code>'\0'</code> 结尾的 char 数组，<code>printf</code> 用 <code>%s</code> 整体输出；连接/比较/查找都可以逐字符手工实现</li>
+</ul>
+</div>
+<div class="intro-diagram">
+<svg viewBox="0 0 320 66" width="320" role="img" aria-label="一维数组内存示意图">
+  <defs><marker id="arr-arrow" markerWidth="8" markerHeight="8" refX="7" refY="3" orient="auto"><path d="M0,0 L0,6 L7,3 z" fill="#89b4fa"/></marker></defs>
+  <g font-family="Consolas,monospace" font-size="10" fill="#6c7086" text-anchor="middle">
+    <text x="39" y="16">arr[0]</text><text x="97" y="16">arr[1]</text><text x="155" y="16">arr[2]</text><text x="213" y="16">arr[3]</text><text x="271" y="16">arr[4]</text>
+  </g>
+  <g fill="#313244" stroke="#45475a" stroke-width="1.5">
+    <rect x="12" y="24" width="54" height="36" rx="6"/><rect x="70" y="24" width="54" height="36" rx="6"/><rect x="128" y="24" width="54" height="36" rx="6"/><rect x="186" y="24" width="54" height="36" rx="6"/><rect x="244" y="24" width="54" height="36" rx="6"/>
+  </g>
+  <g font-family="Consolas,monospace" font-size="14" fill="#a6e3a1" text-anchor="middle" font-weight="bold">
+    <text x="39" y="47">10</text><text x="97" y="47">20</text><text x="155" y="47">30</text><text x="213" y="47">40</text><text x="271" y="47">50</text>
+  </g>
+  <line x1="66" y1="42" x2="70" y2="42" stroke="#89b4fa" stroke-width="1.5" marker-end="url(#arr-arrow)"/>
+  <line x1="124" y1="42" x2="128" y2="42" stroke="#89b4fa" stroke-width="1.5" marker-end="url(#arr-arrow)"/>
+  <line x1="182" y1="42" x2="186" y2="42" stroke="#89b4fa" stroke-width="1.5" marker-end="url(#arr-arrow)"/>
+  <line x1="240" y1="42" x2="244" y2="42" stroke="#89b4fa" stroke-width="1.5" marker-end="url(#arr-arrow)"/>
+</svg>
+<div class="diagram-caption">一段连续的内存：5 个格子紧挨着，下标从 0 开始</div>
+</div>
+</div>
+
+</div>
+<h2>一维数组</h2>
+<div class="demo-grid">
+  <div id="demo0"></div>
+  <div id="demo1"></div>
+  <div id="demo2"></div>
+  <div id="demo3"></div>
+  <div id="demo4"></div>
+  <div id="demo8"></div>
+</div>
+<h2>字符数组与字符串</h2>
+<div class="demo-grid">
+  <div id="demo5"></div>
+  <div id="demo6"></div>
+  <div id="demo7"></div>
+  <div id="demo9"></div>
+</div>
+<h2>章节练习</h2>
+<div class="demo-grid">
+  <div id="quiz0"></div>
+  <div id="quiz1"></div>
+  <div id="quiz2"></div>
+  <div id="quiz3"></div>
+</div>
+</main>
+<script src="site-config.js?v=31"></script>
+<script src="demo-engine.js?v=31"></script>
+<script src="demo-traces.js?v=31"></script>
+<script>
+createDemo("demo0", {
+  title: "数组的定义与初始化",
+  subtitle: "多种初始化方式对比",
+  code: `#include <stdio.h>
+
+int main() {
+    int a[5] = {10, 20, 30, 40, 50};
+    int b[5] = {1, 2};
+    int c[] = {5, 6, 7};
+    printf("a[0]=%d, b[4]=%d, c[2]=%d\\n", a[0], b[4], c[2]);
+    return 0;
+}`,
+  vizTypes: ["vars","array","console"],
+  steps: CTeachingTraces["array1.html:demo0"]
+});
+createDemo("demo1", {
+  title: "数组遍历",
+  subtitle: "用循环逐个访问元素",
+  code: `#include <stdio.h>
+
+int main() {
+    int arr[5] = {10, 20, 30, 40, 50};
+    int i;
+    for (i = 0; i < 5; i++) {
+        printf("arr[%d] = %d\\n", i, arr[i]);
+    }
+    return 0;
+}`,
+  vizTypes: ["vars","array","loop","console"],
+  steps: CTeachingTraces["array1.html:demo1"]
+});
+createDemo("demo2", {
+  title: "数组元素的修改",
+  subtitle: "通过下标读取和写入",
+  code: `#include <stdio.h>
+
+int main() {
+    int arr[5] = {1, 2, 3, 4, 5};
+    arr[0] = 100;
+    arr[2] = arr[0] + arr[1];
+    arr[4] *= 10;
+    printf("%d %d %d %d %d\\n", arr[0], arr[1], arr[2], arr[3], arr[4]);
+    return 0;
+}`,
+  vizTypes: ["vars","array","console"],
+  steps: CTeachingTraces["array1.html:demo2"]
+});
+createDemo("demo3", {
+  title: "求和与求最值",
+  subtitle: "遍历数组完成统计",
+  code: `#include <stdio.h>
+
+int main() {
+    int arr[6] = {3, 7, 2, 9, 1, 5};
+    int sum = 0;
+    int max = arr[0];
+    int min = arr[0];
+    int i;
+    for (i = 0; i < 6; i++) {
+        sum += arr[i];
+        if (arr[i] > max) max = arr[i];
+        if (arr[i] < min) min = arr[i];
+    }
+    printf("sum=%d max=%d min=%d\\n", sum, max, min);
+    return 0;
+}`,
+  vizTypes: ["vars","array","console"],
+steps: CTeachingTraces["array1.html:demo3"]
+});
+createDemo("demo4", {
+  title: "冒泡排序",
+  subtitle: "两两比较，逐渐把最大的元素「冒泡」到末尾",
+  diagram: `
+<svg viewBox="0 0 320 126" width="320" role="img" aria-label="冒泡排序：数组 5 3 4 1 2，前两个元素比较后 5 和 3 交换，最大元素逐步冒泡到末尾">
+  <defs>
+    <marker id="bb-arrow" markerWidth="8" markerHeight="8" refX="7" refY="3" orient="auto"><path d="M0,0 L0,6 L7,3 z" fill="#89b4fa"/></marker>
+    <marker id="bb-arrow-s" markerWidth="8" markerHeight="8" refX="7" refY="3" orient="auto-start-reverse"><path d="M0,0 L0,6 L7,3 z" fill="#89b4fa"/></marker>
+  </defs>
+  <g font-family="Consolas,monospace">
+    <text x="66" y="12" font-size="10" fill="#89b4fa" text-anchor="middle">5 &gt; 3，交换</text>
+    <path d="M 30 38 Q 66 16 102 38" fill="none" stroke="#89b4fa" stroke-width="1.5" marker-start="url(#bb-arrow-s)" marker-end="url(#bb-arrow)"/>
+    <g fill="#313244" stroke="#45475a" stroke-width="1.5">
+      <rect x="12" y="40" width="54" height="36" rx="6"/><rect x="70" y="40" width="54" height="36" rx="6"/><rect x="128" y="40" width="54" height="36" rx="6"/><rect x="186" y="40" width="54" height="36" rx="6"/>
+    </g>
+    <rect x="244" y="40" width="54" height="36" rx="6" fill="#313244" stroke="#a6e3a1" stroke-width="1.5"/>
+    <g font-size="14" fill="#a6e3a1" text-anchor="middle" font-weight="bold">
+      <text x="39" y="63">5</text><text x="97" y="63">3</text><text x="155" y="63">4</text><text x="213" y="63">1</text><text x="271" y="63">2</text>
+    </g>
+    <g font-size="10" fill="#6c7086" text-anchor="middle">
+      <text x="39" y="92">arr[0]</text><text x="97" y="92">arr[1]</text><text x="155" y="92">arr[2]</text><text x="213" y="92">arr[3]</text><text x="271" y="92">arr[4]</text>
+    </g>
+    <text x="66" y="110" font-size="11" fill="#a6e3a1" text-anchor="middle">交换后：3 5</text>
+    <text x="271" y="110" font-size="10" fill="#a6e3a1" text-anchor="middle">最大元素冒泡到末尾</text>
+  </g>
+</svg>
+<div class="diagram-caption">两两比较、逆序就交换：每轮把最大元素「冒泡」到末尾</div>
+`,
+  code: `#include <stdio.h>
+
+int main() {
+    int arr[5] = {5, 3, 4, 1, 2};
+    int i, j;
+    for (i = 0; i < 4; i++) {
+        for (j = 0; j < 4 - i; j++) {
+            if (arr[j] > arr[j+1]) {
+                int tmp = arr[j];
+                arr[j] = arr[j+1];
+                arr[j+1] = tmp;
+            }
+        }
+    }
+    printf("%d %d %d %d %d\\n", arr[0], arr[1], arr[2], arr[3], arr[4]);
+    return 0;
+}`,
+  vizTypes: ["vars","array","console"],
+  steps: CTeachingTraces["array1.html:demo4"]
+});
+createDemo("demo5", {
+  title: "字符数组与字符串：连接",
+  subtitle: "字符串就是以 '\\0' 结尾的字符数组——手工实现 strcat",
+  code: `#include <stdio.h>
+
+int main() {
+    char dest[12] = "Hello";
+    char src[] = "World";
+    int i = 0, j = 0;
+    while (dest[i] != '\\0') i++;
+    while (src[j] != '\\0') {
+        dest[i] = src[j];
+        i++;
+        j++;
+    }
+    dest[i] = '\\0';
+    printf("%s\\n", dest);
+    return 0;
+}`,
+  vizTypes: ["vars","array","console"],
+  steps: CTeachingTraces["array1.html:demo5"]
+});
+createDemo("demo6", {
+  title: "字符数组与字符串：比较",
+  subtitle: "逐字符比较，遇到第一个不同就出结果——手工实现 strcmp",
+  code: `#include <stdio.h>
+
+int main() {
+    char s1[] = "apple";
+    char s2[] = "apply";
+    int i = 0;
+    while (s1[i] != '\\0' && s2[i] != '\\0' && s1[i] == s2[i]) i++;
+    printf("%d\\n", s1[i] - s2[i]);
+    return 0;
+}`,
+  vizTypes: ["vars","array","console"],
+  steps: CTeachingTraces["array1.html:demo6"]
+});
+createDemo("demo7", {
+  title: "字符数组与字符串：查找子串",
+  subtitle: "外层挑起点、内层逐字符比对——手工实现 strstr",
+  code: `#include <stdio.h>
+
+int main() {
+    char text[] = "hello world";
+    char pat[] = "wor";
+    int i, j;
+    int found;
+    int pos = -1;
+    for (i = 0; text[i] != '\\0'; i++) {
+        found = 1;
+        for (j = 0; pat[j] != '\\0'; j++) {
+            if (text[i + j] != pat[j]) {
+                found = 0;
+                break;
+            }
+        }
+        if (found == 1) {
+            pos = i;
+            break;
+        }
+    }
+    printf("位置 = %d\\n", pos);
+    return 0;
+}`,
+  vizTypes: ["vars","array","loop","console"],
+  steps: CTeachingTraces["array1.html:demo7"]
+});
+createDemo("demo8", {
+  "title": "数组逆序：交换首尾元素",
+  "subtitle": "两个下标向中间移动，只交换前半段，奇数长度的中间元素保持不变",
+  "code": "#include <stdio.h>\n\nint main() {\n    int a[5] = {1, 2, 3, 4, 5};\n    int left = 0, right = 4, temp, i;\n    while (left < right) {\n        temp = a[left];\n        a[left] = a[right];\n        a[right] = temp;\n        left++;\n        right--;\n    }\n    for (i = 0; i < 5; i++) {\n        printf(\"%d \", a[i]);\n    }\n    printf(\"\\n\");\n    return 0;\n}",
+  "vizTypes": [
+    "vars",
+    "array",
+    "console"
+  ],
+  "steps": CTeachingTraces["array1.html:demo8"]
+});
+createDemo("demo9", {
+  "title": "统计字符串中的数字",
+  "subtitle": "遇到 '\\0' 停止；字符 '0' 和字符串结束符不同",
+  "code": "#include <stdio.h>\n\nint main() {\n    char s[] = \"C2026!\";\n    int i = 0, count = 0;\n    while (s[i] != '\\0') {\n        if (s[i] >= '0' && s[i] <= '9') {\n            count++;\n        }\n        i++;\n    }\n    printf(\"digits = %d\\n\", count);\n    return 0;\n}",
+  "vizTypes": [
+    "vars",
+    "array",
+    "console"
+  ],
+  "steps": CTeachingTraces["array1.html:demo9"]
+});
+createQuiz("quiz0", {
+  type: "predict",
+  title: "部分初始化：没写的元素是几",
+  code: `#include <stdio.h>
+
+int main() {
+    int a[5] = {1, 2, 3};
+    int i, sum = 0;
+    for (i = 0; i < 5; i++) {
+        sum += a[i];
+    }
+    printf("sum = %d\\n", sum);
+    return 0;
+}`,
+  answer: "sum = 6",
+  explain: "初始化列表只给了 3 个值，但数组有 5 个元素：C 语言规定<strong>剩余元素自动初始化为 0</strong>，所以 a[3]、a[4] 都是 0。求和 1+2+3+0+0 = 6。"
+});
+createQuiz("quiz1", {
+  type: "predict",
+  title: "数组名作函数参数：函数里的修改会带回来",
+  code: `#include <stdio.h>
+
+void double_it(int a[], int n) {
+    int i;
+    for (i = 0; i < n; i++) {
+        a[i] *= 2;
+    }
+}
+
+int main() {
+    int a[4] = {1, 2, 3, 4};
+    int i;
+    double_it(a, 4);
+    for (i = 0; i < 4; i++) {
+        printf("%d ", a[i]);
+    }
+    printf("\\n");
+    return 0;
+}`,
+  answer: "2 4 6 8",
+  explain: "数组名作为实参时传的是<strong>首元素地址</strong>，形参 a 和实参 a 指向同一段内存，函数里把每个元素乘 2，main 里打印的就是修改后的结果 <code>2 4 6 8</code>（数组传参不是值拷贝）。"
+});
+createQuiz("quiz2", {
+  type: "fix",
+  title: "遍历并打印数组",
+  hint: "遍历数组时下标越界（差一错误）",
+  code: `#include <stdio.h>
+
+int main() {
+    int a[5] = {10, 20, 30, 40, 50};
+    int i, sum = 0;
+    for (i = 0; i <= 5; i++) {
+        sum += a[i];
+    }
+    printf("sum = %d\\n", sum);
+    return 0;
+}`,
+  accept: [`#include <stdio.h>
+
+int main() {
+    int a[5] = {10, 20, 30, 40, 50};
+    int i, sum = 0;
+    for (i = 0; i < 5; i++) {
+        sum += a[i];
+    }
+    printf("sum = %d\\n", sum);
+    return 0;
+}`, `#include <stdio.h>
+
+int main() {
+    int a[5] = {10, 20, 30, 40, 50};
+    int i, sum = 0;
+    for (i = 0; i <= 4; i++) {
+        sum += a[i];
+    }
+    printf("sum = %d\\n", sum);
+    return 0;
+}`],
+  explain: "数组 a[5] 的合法下标是 <strong>0~4</strong>，条件 <code>i <= 5</code> 让循环多走一次，读到越界的 a[5]，结果是不确定的垃圾值（越界在 C 里不报错，最危险）。最小修改：把 <code>i <= 5</code> 改成 <code>i < 5</code>（或 <code>i <= 4</code>）。"
+});
+createQuiz("quiz3", {
+  "type": "fix",
+  "title": "字符串复制：为结束符留位置",
+  "code": "#include <stdio.h>\n\nint main() {\n    char src[] = \"cat\";\n    char dst[3];\n    int i = 0;\n    while (src[i] != '\\0') {\n        dst[i] = src[i];\n        i++;\n    }\n    dst[i] = '\\0';\n    printf(\"%s\\n\", dst);\n    return 0;\n}",
+  "accept": [
+    "#include <stdio.h>\n\nint main() {\n    char src[] = \"cat\";\n    char dst[4];\n    int i = 0;\n    while (src[i] != '\\0') {\n        dst[i] = src[i];\n        i++;\n    }\n    dst[i] = '\\0';\n    printf(\"%s\\n\", dst);\n    return 0;\n}"
+  ],
+  "hint": "3 个可见字符之外，还需要保存什么？",
+  "explain": "cat 有 3 个字符，还需一个位置存放 '\\0'，目标数组至少有 4 个元素。改正后输出 cat。"
+});
+</script>
+</body>
+</html>

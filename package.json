@@ -1,5 +1,7 @@
 {
   "scripts": {
+    "build:traces": "node tools/rebuild_traces.js",
+    "test:steps": "node tools/verify_steps.js",
     "test": "node tools/regression.js && node tools/check_mobile.js && node tools/accessibility.js && node tools/check_flowcharts.js",
     "test:regression": "node tools/regression.js",
     "test:mobile": "node tools/check_mobile.js",
