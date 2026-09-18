@@ -89,6 +89,46 @@ const path = require('path');
     assert.deepEqual(arrayChecks, { i: [5,6,7,8,9], j: [0,1,2,3,4], incI: [6,7,8,9,10], incJ: [1,2,3,4,5], declarations: true, found: true, outerConditions: 7, breaks: 7 });
 
     await page.goto('file://' + path.resolve(__dirname, '..', 'intro.html'));
+    for (const input of ['1', '5', '10', '100', '0', '101', 'abc']) {
+      const state = await page.evaluate(input => {
+        const d = demos.demo5; d.reset();
+        while (d.currentStep < d.config.input.step - 1) d.next();
+        d.next();
+        document.getElementById('demo5-input').value = input;
+        d.submitInput();
+        while (d.currentStep < d.config.steps.length - 1) {
+          const before = JSON.stringify(d.snapshot());
+          d.next();
+          const after = JSON.stringify(d.snapshot());
+          d.prev();
+          if (JSON.stringify(d.snapshot()) !== before) throw Error('sum rewind');
+          d.next();
+          if (JSON.stringify(d.snapshot()) !== after) throw Error('sum replay');
+        }
+        return { code: d.config.code, output: d.output.join('\n'), vars: d.variables,
+          additions: d.config.steps.filter(s => s.line === 12).map(s => s.vars.sum.value),
+          checks: d.config.steps.filter(s => s.line === 11 && s.info.startsWith('判断')).length,
+          increments: d.config.steps.filter(s => s.line === 11 && s.info.startsWith('执行 i++')).length };
+      }, input);
+      const n = Number(input), valid = Number.isInteger(n) && n >= 1 && n <= 100;
+      if (valid) {
+        assert.equal(state.additions.length, n);
+        assert.equal(state.checks, n + 1);
+        assert.equal(state.increments, n);
+        assert.equal(state.vars.sum.value, n * (n + 1) / 2);
+        assert.equal(state.vars.i.value, n + 1);
+        state.additions.forEach((sum, i) => assert.equal(sum, (i + 1) * (i + 2) / 2));
+      } else {
+        assert.equal(state.additions.length, 0);
+        assert.ok(state.output.includes('请输入1~100的整数'));
+      }
+      const source = path.join(temp, 'sum.c'), exe = path.join(temp, process.platform === 'win32' ? 'sum.exe' : 'sum');
+      fs.writeFileSync(source, state.code);
+      execFileSync('gcc', ['-std=c90', source, '-o', exe], { env });
+      const run = require('child_process').spawnSync(exe, [], { input: input + '\n', encoding: 'utf8', cwd: temp, env });
+      assert.equal(run.status, valid ? 0 : 1);
+      assert.equal(state.output.replace(input + '\n', ''), run.stdout.replace(/\r/g, ''), 'sum C output');
+    }
     for (const [id, input, expected] of [['demo3', '100 100 100', '100.0'], ['demo4', '30', '继续努力'], ['demo4', '90', '及格啦']]) {
       const output = await page.evaluate(({id,input}) => {
         const d = demos[id]; d.reset();
@@ -111,7 +151,7 @@ const path = require('path');
       assert.ok(state.lines.includes(input === '18 92.5 B' ? 10 : 12));
       assert.ok(state.output.includes(input === '18 92.5 B' ? 'ret=3' : 'input error'));
     }
-    console.log(`PASS ${checked} demos audited; ${compiled} compiled traces + 3 live input demos; reported array regressions`);
+    console.log(`PASS ${checked} demos audited; ${compiled} compiled traces + 4 live input demos; array regressions and interactive sums`);
   } finally {
     await browser.close(); fs.rmSync(temp, { recursive: true, force: true });
   }

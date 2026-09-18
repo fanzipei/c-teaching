@@ -6,7 +6,7 @@
 <meta name="description" content="认识C程序：从 Hello World 开始，用简单有趣的小例子了解 C 语言编程的核心思想——输出、变量、计算、判断与循环。">
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
 <title>认识C程序 - C语言教学演示</title>
-<link rel="stylesheet" href="style.css?v=31">
+<link rel="stylesheet" href="style.css?v=32">
 </head>
 <body>
 <nav></nav>
@@ -63,9 +63,9 @@
 </div>
 </main>
 
-<script src="site-config.js?v=31"></script>
-<script src="demo-engine.js?v=31"></script>
-<script src="demo-traces.js?v=31"></script>
+<script src="site-config.js?v=32"></script>
+<script src="demo-engine.js?v=32"></script>
+<script src="demo-traces.js?v=32"></script>
 <script>
 createDemo("demo0", {
   title: "Hello, World!",
@@ -210,45 +210,100 @@ int main() {
   };
 }
 createDemo("demo4", makeJudgeDemo(85));
-createDemo("demo5", {
-  title: "循环：不知疲倦地重复",
-  subtitle: "倒计时这种重复劳动，交给计算机最合适",
-  diagram: `
-<svg viewBox="0 0 320 100" width="320" role="img" aria-label="for 循环倒计时：5、4、3、2、1 五个圆形气泡依次用箭头相连，最后箭头指向星形的发射文字块">
-  <defs><marker id="cd-arrow" markerWidth="8" markerHeight="8" refX="7" refY="3" orient="auto"><path d="M0,0 L0,6 L7,3 z" fill="#89b4fa"/></marker></defs>
-  <text x="122" y="14" font-family="Consolas,monospace" font-size="10" fill="#6c7086" text-anchor="middle">for (i = 5; i &gt;= 1; i--)</text>
-  <g fill="#313244" stroke="#45475a" stroke-width="1.5">
-    <circle cx="30" cy="45" r="15"/><circle cx="76" cy="45" r="15"/><circle cx="122" cy="45" r="15"/><circle cx="168" cy="45" r="15"/><circle cx="214" cy="45" r="15"/>
-  </g>
-  <g font-family="Consolas,monospace" font-size="14" fill="#cdd6f4" text-anchor="middle">
-    <text x="30" y="50">5</text><text x="76" y="50">4</text><text x="122" y="50">3</text><text x="168" y="50">2</text><text x="214" y="50">1</text>
-  </g>
-  <g stroke="#89b4fa" stroke-width="1.5">
-    <line x1="46" y1="45" x2="58" y2="45" marker-end="url(#cd-arrow)"/>
-    <line x1="92" y1="45" x2="104" y2="45" marker-end="url(#cd-arrow)"/>
-    <line x1="138" y1="45" x2="150" y2="45" marker-end="url(#cd-arrow)"/>
-    <line x1="184" y1="45" x2="196" y2="45" marker-end="url(#cd-arrow)"/>
-    <line x1="230" y1="45" x2="252" y2="44" marker-end="url(#cd-arrow)"/>
-  </g>
-  <polygon points="283,17 290.1,35.3 309.6,36.3 294.4,48.7 299.5,67.6 283,57 266.5,67.6 271.6,48.7 256.4,36.3 275.9,35.3" fill="#313244" stroke="#f9e2af" stroke-width="1.5"/>
-  <text x="283" y="50" font-family="Consolas,monospace" font-size="13" font-weight="bold" fill="#f9e2af" text-anchor="middle">发射！</text>
-  <text x="122" y="88" font-family="Consolas,monospace" font-size="10" fill="#6c7086" text-anchor="middle">每数一个数，i 减 1；数到 1 后循环结束</text>
-</svg>
-<div class="diagram-caption">for 循环让 i 从 5 数到 1，条件不成立后执行循环外的「发射！」</div>
-`,
-  code: `#include <stdio.h>
+// 逐次累加：每轮分别展示条件判断、sum += i 和 i++。
+function makeSumDemo(input = '100') {
+  const token = String(input).match(/^\s*[+-]?\d+/);
+  const n = token ? Number(token[0]) : 100;
+  const valid = Boolean(token) && Number.isSafeInteger(n) && n >= 1 && n <= 100;
+  const prompt = '请输入求和上限（1~100）：';
+  const echoed = prompt + input + '\n';
+  const value = number => ({ value: number, type: 'int' });
+  const steps = [
+    { line: 2, info: 'main() 开始' },
+    { line: 3, vars: { n: value(100) }, info: 'n 默认是 100，表示从 1 加到 100' },
+    { line: 4, vars: { sum: value(0) }, info: '还没有加任何数，总和 sum 从 0 开始' },
+    { line: 5, vars: { i: value('未初始化') }, info: '声明 i，用来记录当前要加的数，尚未赋值' },
+    { line: 6, output: prompt, info: '输出提示；下一步 scanf 等待输入，直接回车使用 100' },
+    { line: 7, vars: { n: value(n) }, output: echoed,
+      branch: [{ label: '输入合法，开始累加', active: valid }, { label: '输入不合法，结束程序', active: !valid }],
+      info: valid ? 'scanf 读入 n=' + n + '；错误条件为假，跳过错误分支' : 'scanf 读取失败或上限不在 1~100 内；错误条件为真，进入错误分支' }
+  ];
+  if (!valid) {
+    steps.push(
+      { line: 8, output: echoed + '请输入1~100的整数\n', info: '提示输入错误，不进入求和循环' },
+      { line: 9, info: 'return 1，程序结束；重置后可以重新输入' }
+    );
+  } else {
+    steps.push({ line: 11, vars: { i: value(1) }, info: 'for 初始化：i=1，只执行一次', loop: [{ label: '从 1 开始', active: true }] });
+    let sum = 0;
+    const terms = [];
+    for (let i = 1; i <= n; i++) {
+      steps.push({ line: 11, info: '判断 i <= n：' + i + ' <= ' + n + ' 为真，进入循环体',
+        branch: [{ label: i + ' <= ' + n + '：继续累加', active: true }, { label: '超过上限：结束循环', active: false }] });
+      const before = sum;
+      sum += i;
+      terms.push({ label: '+' + i, active: true });
+      const recent = terms.slice(-10).map((term, index, list) => ({ ...term, active: index === list.length - 1 }));
+      steps.push({ line: 12, vars: { sum: value(sum) }, loop: recent,
+        info: '第 ' + i + ' 次累加：' + before + ' + ' + i + ' = ' + sum + '；此时 i 仍是 ' + i });
+      steps.push({ line: 11, vars: { i: value(i + 1) },
+        info: '执行 i++：i 从 ' + i + ' 变为 ' + (i + 1) + '；sum 保持 ' + sum + '，接下来再判断条件' });
+    }
+    steps.push(
+      { line: 11, info: '判断 i <= n：' + (n + 1) + ' <= ' + n + ' 为假，退出循环，不再累加',
+        branch: [{ label: (n + 1) + ' <= ' + n + '：继续累加', active: false }, { label: '超过上限：结束循环', active: true }] },
+      { line: 14, output: echoed + '1+...+' + n + ' = ' + sum + '\n', info: '累计执行 ' + n + ' 次加法，结果为 ' + sum },
+      { line: 15, info: 'return 0，程序结束；重置后可改用 5 或 10，观察较短的累加过程' }
+    );
+  }
+  return {
+    title: '笨小孩：从1加到100',
+    subtitle: '从 sum=0 开始，一个数一个数地加；默认加到 100，也可以输入 1~100 的其他上限',
+    diagram: `<svg viewBox="0 0 340 110" width="340" role="img" aria-label="累加过程：0加1得到1，再加2得到3，再加3得到6，一直加到100得到5050">
+      <g fill="#313244" stroke="#45475a" stroke-width="1.5">
+        <rect x="8" y="28" width="55" height="36" rx="6"/><rect x="94" y="28" width="55" height="36" rx="6"/>
+        <rect x="180" y="28" width="55" height="36" rx="6"/><rect x="266" y="28" width="66" height="36" rx="6"/>
+      </g>
+      <g fill="#cdd6f4" font-family="Consolas,monospace" font-size="15" text-anchor="middle">
+        <text x="35" y="51">0</text><text x="121" y="51">1</text><text x="207" y="51">3</text><text x="299" y="51">5050</text>
+      </g>
+      <g fill="#89b4fa" font-size="12" text-anchor="middle">
+        <text x="78" y="22">+1</text><text x="78" y="51">→</text>
+        <text x="164" y="22">+2</text><text x="164" y="51">→</text>
+        <text x="250" y="22">…+100</text><text x="250" y="51">→</text>
+        <text x="170" y="94">判断 i ≤ n → sum += i → i++ → 再判断</text>
+      </g>
+    </svg><div class="diagram-caption">i 是这次要加的数，sum 是已经累积的总和；右侧列出最近 10 次加法</div>`,
+    code: `#include <stdio.h>
 
 int main() {
+    int n = 100;
+    int sum = 0;
     int i;
-    for (i = 5; i >= 1; i--) {
-        printf("%d...\\n", i);
+    printf("请输入求和上限（1~100）：");
+    if (scanf("%d", &n) != 1 || n < 1 || n > 100) {
+        printf("请输入1~100的整数\\n");
+        return 1;
     }
-    printf("发射！\\n");
+    for (i = 1; i <= n; i++) {
+        sum += i;
+    }
+    printf("1+...+%d = %d\\n", n, sum);
     return 0;
 }`,
-  vizTypes: ["vars","loop","console"],
-  steps: CTeachingTraces["intro.html:demo5"]
-});
+    vizTypes: ['vars', 'loop', 'branch', 'console'],
+    input: {
+      step: 5,
+      defaultValue: '100',
+      placeholder: '输入上限，例如 5、10 或 100',
+      onSubmit: function (demo, input) {
+        demo.config.steps = makeSumDemo(input).steps;
+      }
+    },
+    steps
+  };
+}
+createDemo('demo5', makeSumDemo());
 createDemo("demo6", {
   title: "数组：长春气温年鉴",
   subtitle: "一排格子存下 12 个月的平均气温，找出最热和最冷的月份",

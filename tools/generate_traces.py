@@ -1,6 +1,6 @@
 """Build statement-level demo traces with GCC; pycparser locates C statements.
 
-Input: tools/demo-audit-input.json exported from the browser configurations.
+Arguments: browser configuration JSON, output trace JSON (temporary build files).
 The generated C runs only in a temporary directory. No browser C execution.
 """
 from pathlib import Path
@@ -191,8 +191,9 @@ class Instrument:
         return '#include <stdio.h>\n#include <stdlib.h>\n#include <string.h>\n'+defines+'\n#include "'+str(ROOT/'tools/trace-runtime.h').replace('\\','/')+'"\n'+'\n'.join(top+self.types+self.serializers+functions)
 
 def main():
-    input_path=Path(sys.argv[1]) if len(sys.argv)>1 else ROOT/'tools/demo-audit-input.json'
-    output_path=Path(sys.argv[2]) if len(sys.argv)>2 else ROOT/'tools/demo-trace-raw.json'
+    if len(sys.argv)!=3:raise SystemExit('Usage: generate_traces.py INPUT_JSON OUTPUT_JSON (or npm run build:traces)')
+    input_path=Path(sys.argv[1])
+    output_path=Path(sys.argv[2])
     configs=json.loads(input_path.read_text(encoding='utf-8'))
     results={};errors=[]
     env=dict(os.environ)

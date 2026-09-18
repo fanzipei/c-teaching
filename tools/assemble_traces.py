@@ -199,8 +199,9 @@ def assemble(cfg,raw):
     return steps
 
 def main():
-    input_path=Path(sys.argv[1]) if len(sys.argv)>1 else ROOT/'tools/demo-audit-input.json'
-    raw_path=Path(sys.argv[2]) if len(sys.argv)>2 else ROOT/'tools/demo-trace-raw.json'
+    if len(sys.argv)!=3:raise SystemExit('Usage: assemble_traces.py INPUT_JSON RAW_JSON (or npm run build:traces)')
+    input_path=Path(sys.argv[1])
+    raw_path=Path(sys.argv[2])
     configs=json.loads(input_path.read_text(encoding='utf8'))
     raw=json.loads(raw_path.read_text(encoding='utf8'))
     result={}

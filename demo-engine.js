@@ -367,7 +367,10 @@ class CDemo {
     if (this.config.vizTypes.includes('struct')) document.getElementById(`${id}-struct`).innerHTML = '';
     if (this.config.vizTypes.includes('branch')) document.getElementById(`${id}-branch`).innerHTML = '';
     if (this.config.vizTypes.includes('loop')) document.getElementById(`${id}-loop`).innerHTML = '';
-    if (this.config.vizTypes.includes('flowchart')) this.renderFlowchart();
+    if (this.config.vizTypes.includes('flowchart')) {
+      this.renderFlowchart();
+      this.updateFlowchart(null);
+    }
     document.getElementById(`${id}-info`).textContent = this.lastInfo;
     document.getElementById(`${id}-btn-play`).textContent = '▶ 运行';
     document.getElementById(`${id}-btn-next`).disabled = false;
