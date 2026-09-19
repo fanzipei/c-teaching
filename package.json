@@ -1,4 +1,5 @@
 {
+  "license": "Apache-2.0",
   "scripts": {
     "build:traces": "node tools/rebuild_traces.js",
     "test:steps": "node tools/verify_steps.js",

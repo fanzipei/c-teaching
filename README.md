@@ -80,3 +80,7 @@ node tools/bump_version.js
 生成器仅在维护时使用 Python、pycparser 和 GCC，网站浏览仍为纯静态且支持离线。编译和文件读写都在临时目录中执行。`test:steps` 会检查源代码指纹，避免修改代码后遗漏重建步骤；同时逐步核对可视化状态和回退，并将终端输出与独立编译的原程序比较。
 
 数组章节入口为 `array1.html` 和 `array2.html`；旧 `array.html` 链接（含演示、练习锚点）自动跳转，旧章节的已完成记录会迁移到对应的新位置。
+
+## 许可证
+
+本项目采用 [Apache License 2.0](LICENSE) 许可证。
