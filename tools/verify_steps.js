@@ -88,6 +88,49 @@ const path = require('path');
     });
     assert.deepEqual(arrayChecks, { i: [5,6,7,8,9], j: [0,1,2,3,4], incI: [6,7,8,9,10], incJ: [1,2,3,4,5], declarations: true, found: true, outerConditions: 7, breaks: 7 });
 
+    await page.goto('file://' + path.resolve(__dirname, '..', 'pointer2.html'));
+    const pointerChecks = await page.evaluate(() => {
+      function at(id, source, phase = 'statement') {
+        const cfg = demos[id].config;
+        const found = cfg.steps.find(s => cfg.code.split('\n')[s.line].trim() === source && s.phase === phase);
+        if (!found) throw Error('Missing statement: ' + source);
+        return found;
+      }
+      const chars = at('demo6', "fixed[1] = 'e';");
+      const returned = at('demo7', 'int *p = make_value(value);', 'declaration');
+      const released = at('demo7', 'free(p);');
+      const cleared = at('demo7', 'p = NULL;');
+      const resuming = at('demo7', 'int *p = make_value(value);', 'resume');
+      const rebound = at('demo6', 'literal = "dog";');
+      const copied = at('demo8', 'p = target;');
+      const owner = at('demo8', '*pp = target;');
+      const caller = copied.pointer.find(p => p.name === 'main[0].p');
+      const callee = copied.pointer.find(p => p.name === 'p');
+      const mainPointer = owner.pointer.find(p => p.name === 'p');
+      return {
+        buffer: chars.array.find(a => a.name === 'buffer').cells.map(c => c.val),
+        shared: ['p', 'fixed', 'view'].every(name => chars.pointer.find(p => p.name === name).targetValue === 'b'),
+        literal: chars.pointer.find(p => p.name === 'literal').targetValue,
+        pointerAddress: chars.vars.literal.value === chars.pointer.find(p => p.name === 'literal').value,
+        stack: returned.stack.map(s => s.name),
+        heapValue: returned.array.find(a => a.name === 'p（堆）').cells[0].val,
+        heapPresent: returned.memory.some(m => m.storage.startsWith('堆')),
+        heapBetweenFrames: resuming.memory.some(m => m.storage.startsWith('堆')),
+        literalSurvives: rebound.memory.some(m => m.name === '字符串字面量' && m.val === 'cat\\0'),
+        constTarget: chars.pointer.find(p => p.name === 'fixed').targetType,
+        aliases: chars.array.find(a => a.name === 'buffer').markers.find(m => m.index === 0).label,
+        rowType: demos.demo0.config.steps.flatMap(s => s.pointer || []).at(-1).targetType,
+        released: released.memory.every(m => !m.storage.startsWith('堆')) && released.array.length === 0 && released.vars.p.value === '失效指针',
+        cleared: cleared.pointer.find(p => p.name === 'p').value,
+        copied: caller.addr !== callee.addr && caller.value !== callee.value && caller.targetName === 'a' && callee.targetName === 'b',
+        owner: owner.pointer.find(p => p.name === 'pp').targetAddr === mainPointer.addr && mainPointer.targetName === 'b'
+      };
+    });
+    assert.deepEqual(pointerChecks, { buffer: ['b','e','t','\\0'], shared: true, literal: 'c', pointerAddress: true,
+      stack: ['main'], heapValue: 7, heapPresent: true, heapBetweenFrames: true, literalSurvives: true, constTarget: 'char',
+      aliases: 'p / fixed / view', rowType: 'int[3]', released: true, cleared: 'NULL', copied: true, owner: true });
+    console.log('PASS pointer semantics: string aliases, const access, heap lifetime, pointer parameter copies');
+
     await page.goto('file://' + path.resolve(__dirname, '..', 'intro.html'));
     for (const input of ['1', '5', '10', '100', '0', '101', 'abc']) {
       const state = await page.evaluate(input => {

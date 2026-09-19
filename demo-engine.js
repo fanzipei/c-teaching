@@ -707,7 +707,7 @@ class CDemo {
 
   renderMemory(cells) {
     const el = document.getElementById(`${this.config.id}-memory`);
-    el.innerHTML = cells.map(c => `<div class="mem-cell ${c.highlight ? 'highlight' : ''}"><span class="addr">${c.addr}</span><span class="val">${c.val}</span>${c.name ? `<span class="name">${c.name}</span>` : ''}</div>`).join('');
+    el.innerHTML = cells.map(c => `<div class="mem-cell ${c.highlight ? 'highlight' : ''}"><span class="addr">${this.escapeHtml(c.addr)}</span><span class="val">${this.escapeHtml(c.val)}</span>${c.name ? `<span class="name">${this.escapeHtml(c.name)}</span>` : ''}${c.storage ? `<span class="name">${this.escapeHtml(c.storage)}</span>` : ''}</div>`).join('');
   }
 
   renderStack(items) {

@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="C语言指针1交互演示：取地址与解引用、指针运算、数组访问与参数传递。">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<title>指针1 - C语言教学演示</title>
+<link rel="stylesheet" href="style.css?v=33">
+</head>
+<body>
+<nav></nav>
+<main class="container" id="main-content">
+<h1>指针1</h1>
+<div class="intro">
+<p>指针变量保存地址。学习时分清三个问题：<strong>指针自身在哪里、它保存哪个地址、那个地址上的对象是什么</strong>。</p>
+<ul>
+<li><code>int *p = &amp;a;</code> 声明指针并取 a 的地址；<code>*p = 20;</code> 修改 a；<code>p = &amp;b;</code> 改变指向。</li>
+<li>C 的参数传递都是值传递。传入地址值后，函数可以通过这个地址修改调用者的对象，但形参本身仍是独立的变量。</li>
+<li>数组是连续的元素集合，不是指针变量。数组表达式在多数场合转换为首元素地址；<code>sizeof(a)</code> 和 <code>&amp;a</code> 等场合不作这种转换。</li>
+<li><code>p + 1</code> 跨过一个元素；指针差表示元素个数。同一数组内及尾后位置可进行相应运算，但尾后指针不能解引用。</li>
+<li>解引用需要有效对象、正确类型和有效范围。未初始化、NULL、越界或指向已失效对象的指针都不能解引用。</li>
+</ul>
+</div>
+<div class="demo-grid">
+  <div id="demo0"></div>
+  <div id="demo1"></div>
+  <div id="demo2"></div>
+  <div id="demo3"></div>
+  <div id="demo4"></div>
+  <div id="demo5"></div>
+  <div id="demo6"></div>
+</div>
+<h2>章节练习</h2>
+<div class="quiz-grid">
+  <div id="quiz0"></div>
+  <div id="quiz1"></div>
+  <div id="quiz2"></div>
+  <div id="quiz3"></div>
+  <div id="quiz4"></div>
+  <div id="quiz5"></div>
+</div>
+</main>
+<script src="site-config.js?v=33"></script>
+<script src="demo-engine.js?v=33"></script>
+<script src="demo-traces.js?v=33"></script>
+<script>
+createDemo("demo0", {
+  title: "指针基础：& 与 *",
+  subtitle: "取地址和解引用是互逆操作",
+  code: `#include <stdio.h>
+
+int main() {
+    int a = 10;
+    int *p = &a;
+    *p = 20;
+    printf("a = %d\\n", a);
+    return 0;
+}`,
+  vizTypes: ["vars","pointer","console"],
+  steps: CTeachingTraces["pointer1.html:demo0"]
+});
+createDemo("demo1", {
+  title: "指针与数组",
+  subtitle: "数组表达式通常转换为首元素地址，指针也支持下标访问",
+  code: `#include <stdio.h>
+
+int main() {
+    int arr[3] = {10, 20, 30};
+    int *p = arr;
+    printf("*p = %d\\n", *p);
+    printf("*(p+1) = %d\\n", *(p+1));
+    p++;
+    printf("*p = %d\\n", *p);
+    return 0;
+}`,
+  vizTypes: ["vars","array","pointer","console"],
+  steps: CTeachingTraces["pointer1.html:demo1"]
+});
+createDemo("demo2", {
+  title: "指针作为函数参数",
+  subtitle: "比较传入数值副本与传入地址值：C 始终按值传递",
+  code: `#include <stdio.h>
+
+void swap_wrong(int a, int b) {
+    int tmp = a;
+    a = b;
+    b = tmp;
+}
+
+void swap(int *pa, int *pb) {
+    int tmp = *pa;
+    *pa = *pb;
+    *pb = tmp;
+}
+
+int main() {
+    int x = 3, y = 7;
+    swap_wrong(x, y);
+    printf("wrong: x=%d, y=%d\\n", x, y);
+    swap(&x, &y);
+    printf("right: x=%d, y=%d\\n", x, y);
+    return 0;
+}`,
+  vizTypes: ["vars","pointer","stack","console"],
+  steps: CTeachingTraces["pointer1.html:demo2"]
+});
+createDemo("demo3", {
+  title: "指针运算",
+  subtitle: "加减整数、两指针相减得到元素个数",
+  diagram: "<p>本例 p 指向 arr[1]，q 指向 arr[4]。q - p 是 3 个元素，p + 2 指向 arr[3]。元素的字节大小由类型和实现决定；右侧数组标记与指针图会同步显示实际指向。</p>",
+  code: `#include <stdio.h>
+
+int main() {
+    int arr[5] = {10, 20, 30, 40, 50};
+    int *p = &arr[1];
+    int *q = &arr[4];
+    printf("q - p = %ld\\n", (long)(q - p));
+    printf("*(p + 2) = %d\\n", *(p + 2));
+    return 0;
+}`,
+  vizTypes: ["vars","array","pointer","console"],
+  steps: CTeachingTraces["pointer1.html:demo3"]
+});
+createDemo("demo4", {
+  "title": "两个指针与同一个对象",
+  "subtitle": "复制地址不会复制被指向的变量，改指向也不会带走另一个指针",
+  code: `#include <stdio.h>
+
+int main() {
+    int a = 1, b = 2;
+    int *p = &a;
+    int *q = p;
+    *q = 7;
+    p = &b;
+    *p = 9;
+    printf("a=%d b=%d *q=%d\\n", a, b, *q);
+    return 0;
+}`,
+  "vizTypes": [
+    "vars",
+    "pointer",
+    "memory",
+    "console"
+  ],
+  "diagram": "<p>先比较 p 和 q 自身的地址，再比较它们保存的地址。执行 <code>p = &amp;b</code> 后，q 仍指向 a；<code>*p = 9</code> 只改变 b。</p>",
+  "steps": CTeachingTraces["pointer1.html:demo4"]
+});
+createDemo("demo5", {
+  "title": "查找元素并返回地址",
+  "subtitle": "找到时返回数组元素的地址，找不到时返回 NULL",
+  code: `#include <stdio.h>
+
+int *find(int a[], int n, int target) {
+    int i;
+    for (i = 0; i < n; i++) {
+        if (a[i] == target) {
+            return &a[i];
+        }
+    }
+    return NULL;
+}
+
+int main() {
+    int values[3] = {2, 7, 9};
+    int *p = find(values, 3, 7);
+    if (p != NULL) {
+        *p = 70;
+    }
+    p = find(values, 3, 5);
+    if (p == NULL) {
+        printf("not found\\n");
+    }
+    printf("values[1]=%d\\n", values[1]);
+    return 0;
+}`,
+  "vizTypes": [
+    "vars",
+    "array",
+    "pointer",
+    "stack",
+    "branch",
+    "console"
+  ],
+  "diagram": "<p>函数返回的是 main 中数组元素的地址，数组在调用返回后仍然存在。对比两次查找的分支和返回值：NULL 不能解引用；非 NULL 也只有在对象仍有效且访问未越界时才能解引用。</p>",
+  "steps": CTeachingTraces["pointer1.html:demo5"]
+});
+createDemo("demo6", {
+  "title": "数组对象与指针变量",
+  "subtitle": "sizeof 数组得到整个数组的大小，指针加法按元素移动",
+  code: `#include <stdio.h>
+
+int main() {
+    int a[4] = {10, 20, 30, 40};
+    int *p = a;
+    int count = sizeof(a) / sizeof(a[0]);
+    p = p + 2;
+    *p = 99;
+    printf("count=%d a[2]=%d\\n", count, a[2]);
+    return 0;
+}`,
+  "vizTypes": [
+    "vars",
+    "array",
+    "pointer",
+    "memory",
+    "console"
+  ],
+  "diagram": "<p><code>a</code> 是包含 4 个 int 的数组，不能执行 <code>a = p</code>；p 是可重新赋值的指针。<code>sizeof(a)</code> 不发生数组到指针的转换；<code>sizeof(p)</code> 只是指针变量的大小，不能用它推算数组长度。</p>",
+  "steps": CTeachingTraces["pointer1.html:demo6"]
+});
+createQuiz("quiz0", {
+  type: "predict",
+  title: "取地址 & 与解引用 *",
+  code: `#include <stdio.h>
+
+int main() {
+    int a = 5;
+    int b = 10;
+    int *p = &a;
+    *p = *p + 3;
+    p = &b;
+    *p = *p + 1;
+    printf("a = %d, b = %d\\n", a, b);
+    return 0;
+}`,
+  answer: "a = 8, b = 11",
+  explain: "<code>p = &a</code> 后 <code>*p</code> 就是 a，<code>*p = *p + 3</code> 把 a 改成 8；随后 <code>p = &b</code> 让 p 改指向 b，之后的 <code>*p = *p + 1</code> 修改的是 b（变为 11）。指针可以被重新赋值：指向谁，<code>*p</code> 操作的就是谁。"
+});
+createQuiz("quiz1", {
+  type: "predict",
+  title: "指针与数组：下标与指针算术",
+  code: `#include <stdio.h>
+
+int main() {
+    int arr[5] = {10, 20, 30, 40, 50};
+    int *p = arr;
+    printf("%d %d\\n", arr[2], *(arr + 2));
+    printf("%d\\n", *p + *(p + 1));
+    return 0;
+}`,
+  answer: "30 30\n30",
+  explain: "<code>arr[i]</code> 与 <code>*(arr + i)</code> 完全等价，所以第一行两个值都是 30；<code>*p + *(p + 1)</code> 即 arr[0] + arr[1] = 10 + 20 = 30。注意指针加 1 移动的是一个元素的位置，而不是一个字节。"
+});
+createQuiz("quiz2", {
+  type: "fix",
+  title: "用函数交换两个数",
+  hint: "swap 调用：忘记传地址",
+  code: `#include <stdio.h>
+
+void swap(int *pa, int *pb) {
+    int tmp = *pa;
+    *pa = *pb;
+    *pb = tmp;
+}
+
+int main() {
+    int x = 3, y = 8;
+    swap(x, y);
+    printf("x = %d, y = %d\\n", x, y);
+    return 0;
+}`,
+  accept: [`#include <stdio.h>
+
+void swap(int *pa, int *pb) {
+    int tmp = *pa;
+    *pa = *pb;
+    *pb = tmp;
+}
+
+int main() {
+    int x = 3, y = 8;
+    swap(&x, &y);
+    printf("x = %d, y = %d\\n", x, y);
+    return 0;
+}`],
+  explain: "swap 的形参是 <code>int *</code>，调用时必须传变量的<strong>地址</strong>。<code>swap(x, y)</code> 把整数 3 和 8 当成地址传进去，函数解引用的是非法地址（编译器会警告，运行时崩溃）。最小修改：调用处改为 <code>swap(&x, &y);</code>，改对后输出 x = 8, y = 3。"
+});
+createQuiz("quiz3", {
+  "type": "predict",
+  "title": "指针副本的去向",
+  code: `#include <stdio.h>
+int main() {
+    int a = 4, b = 8;
+    int *p = &a;
+    int *q = p;
+    p = &b;
+    *q = *q + 2;
+    *p = *p + 1;
+    printf("%d %d %d\\n", a, b, *q);
+    return 0;
+}`,
+  "answer": "6 9 6",
+  "explain": "q 保存的是 a 的地址；p 改指向 b 不影响 q。两次解引用分别把 a 改为 6、b 改为 9。"
+});
+createQuiz("quiz4", {
+  "type": "predict",
+  "title": "沿数组移动指针",
+  code: `#include <stdio.h>
+int main() {
+    int a[4] = {3, 6, 9, 12};
+    int *p = a + 1;
+    *p = 20;
+    p = p + 2;
+    printf("%d %d %d\\n", a[1], *p, *(p - 1));
+    return 0;
+}`,
+  "answer": "20 12 9",
+  "explain": "p 最初指向 a[1]，再移动两个元素后指向 a[3]。p - 1 指向 a[2]，这些访问都在数组范围内。"
+});
+createQuiz("quiz5", {
+  "type": "fix",
+  "title": "指针初始化与解引用",
+  code: `#include <stdio.h>
+int main() {
+    int score = 60;
+    int *p;
+    *p = 90;
+    printf("%d\\n", score);
+    return 0;
+}`,
+  "accept": [
+    "#include <stdio.h>\nint main() {\n    int score = 60;\n    int *p = &score;\n    *p = 90;\n    printf(\"%d\\n\", score);\n    return 0;\n}"
+  ],
+  "hint": "先让 p 指向 score，再修改它指向的值。",
+  "explain": "局部指针未初始化时不能解引用。用 <code>int *p = &amp;score;</code> 建立有效指向，输出 90；仅置为 NULL 仍不能执行 <code>*p = 90</code>。"
+});
+</script>
+</body>
+</html>

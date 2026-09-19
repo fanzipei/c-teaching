@@ -177,6 +177,34 @@ const PAGES = CHAPTERS.map(chapter => chapter.page);
   console.log(`${migrationOk ? 'PASS' : 'FAIL'} 数组章节拆分：原进度迁移、新内容未完成、旧锚点跳转`);
   await migrationCtx.close();
 
+  // Pointer split: preserve old progress and deep links without completing new content.
+  const pointerCtx = await browser.newContext();
+  const pointerPage = await pointerCtx.newPage();
+  await pointerPage.goto(localUrl('index.html'));
+  await pointerPage.evaluate(() => {
+    localStorage.clear();
+    for (let i = 0; i < 10; i++) localStorage.setItem('cteaching:done:pointer.html:demo' + i, '1');
+    for (let i = 0; i < 6; i++) localStorage.setItem('cteaching:done:pointer.html:quiz' + i, '1');
+  });
+  await pointerPage.reload();
+  let pointerOk = true;
+  const pointerMapping = await pointerPage.evaluate(() => CTEACHING_POINTER_LEGACY);
+  for (const [name, expectedDone, firstNew] of [['pointer1.html', 7, 4], ['pointer2.html', 9, 6]]) {
+    await pointerPage.goto(localUrl(name));
+    pointerOk = pointerOk && await pointerPage.locator('.demo-card.completed, .quiz-card.completed').count() === expectedDone;
+    for (let i = 0; i < 3; i++) {
+      pointerOk = pointerOk && await pointerPage.locator(`#demo${firstNew+i} .demo-card.completed, #quiz${3+i} .quiz-card.completed`).count() === 0;
+    }
+  }
+  for (const [oldId, [name, newId]] of Object.entries(pointerMapping)) {
+    await pointerPage.goto(localUrl('pointer.html') + '#' + oldId);
+    await pointerPage.waitForURL('**/' + name + '#' + newId);
+    pointerOk = pointerOk && await pointerPage.locator('#' + newId).count() === 1;
+  }
+  if (!pointerOk) failures++;
+  console.log(`${pointerOk ? 'PASS' : 'FAIL'} 指针章节拆分：原进度迁移、新内容未完成、全部旧锚点跳转`);
+  await pointerCtx.close();
+
   await browser.close();
   console.log(failures ? `\n共 ${failures} 项失败` : '\n全部通过');
   process.exit(failures ? 1 : 0);

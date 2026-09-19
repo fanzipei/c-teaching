@@ -15,7 +15,7 @@ def plain(v):
     return v
 
 def assemble(cfg,raw):
-    steps=[];address_regions=[];previous={};last_output='';last_flow=None
+    steps=[];address_regions=[];previous={};last_output='';last_flow=None;freed_targets=set();object_memory={}
     tree=[];tree_edges=[];tree_stack=[];pegs={'A':[3,2,1],'B':[],'C':[]}
     vt=cfg['vizTypes'];source=cfg['code'].splitlines()
     flow=cfg.get('flowchart',{});nodes={n['id']:n for n in flow.get('nodes',[])}
@@ -54,15 +54,27 @@ def assemble(cfg,raw):
         line=event['line'];phase=event['phase'];expr=event['expression']
         assert 0<=line<len(source),(cfg['title'],event)
         visible={v['name']:v for v in event['variables']}
+        # Keep caller objects visible when a callee shadows their names.
+        # The innermost name stays unqualified for expression/index evaluation.
+        for v in event['variables']:
+            if visible[v['name']] is not v:
+                visible[f'{event["frames"][v["depth"]]}[{v["depth"]}].{v["name"]}']=v
         for v in event['variables']:
             register_address(v['addr'],v['size'])
         for v in event['variables']:
             value=v['value']
             if isinstance(value,dict) and 'pointer' in value:
+                if 'elements' in value:freed_targets.discard(address(value['pointer']))
                 if 'text' in value:register_address(value['pointer'],len(value['text'].encode())+1)
                 elif 'elements' in value:register_address(value['pointer'],len(value['elements'])*4)
+        released=re.fullmatch(r'free\((\w+)\)',expr) if phase=='statement' else None
+        if released:
+            value=visible.get(released[1],{}).get('value',{})
+            if isinstance(value,dict) and address(value.get('pointer')):
+                freed_targets.add(address(value['pointer']))
+                object_memory.pop(addr(value['pointer']),None)
         scalars={k:v['value'] for k,v in visible.items() if isinstance(v['value'],(int,float))}
-        variables={};arrays=[];matrices=[];pointers=[];structs=[];memory=[]
+        variables={};arrays=[];matrices=[];pointers=[];structs=[];memory=[];memory_targets=set()
         touched=re.findall(r'\b([a-zA-Z_]\w*)\s*\[([^\]]+)\](?:\s*\[([^\]]+)\])?',expr)
         accesses={}
         for name,a,b in touched:
@@ -77,7 +89,12 @@ def assemble(cfg,raw):
         for name,v in visible.items():
             value=v['value'];typ=v['type'];char=bool(re.search(r'\bchar\b',typ))
             variables[name]={'value':display(value,char and not isinstance(value,dict)),'type':typ}
-            memory.append({'name':name,'addr':addr(v['addr']),'val':display(value,char),'highlight':previous.get(name)!=value})
+            pointer_value=isinstance(value,dict) and 'pointer' in value
+            if pointer_value:variables[name]['value']=addr(value['pointer'])
+            memory.append({'name':name,'addr':addr(v['addr']),'val':addr(value['pointer']) if pointer_value else display(value,char),'storage':('静态存储期' if v['depth']<0 else '调用帧：'+event['frames'][v['depth']]),'highlight':previous.get(name)!=value})
+            if pointer_value and address(value['pointer']) in freed_targets:
+                variables[name]['value']='失效指针'
+                memory[-1]['val']='失效指针'
             if isinstance(value,list):
                 if value and isinstance(value[0],list):
                     cells=[]
@@ -111,16 +128,34 @@ def assemble(cfg,raw):
                 variables[name]['value']=typ
             elif isinstance(value,dict) and 'pointer' in value:
                 pointer=value['pointer'];target=value.get('target','未初始化或不可访问')
-                target_name=next((other['name'] for other in event['variables'] if address(other['addr'])==address(pointer)), '')
+                if 'text' in value:target=value['text'][0] if value['text'] else '\\0'
+                target_name=next((label for label,other in visible.items() if address(other['addr'])==address(pointer)), '')
+                array_backed=False
                 for other in event['variables']:
                     if isinstance(other['value'],list) and address(other['addr'])<=address(pointer)<address(other['addr'])+other['size']:
                         count=len(other['value']);offset=(address(pointer)-address(other['addr']))//(other['size']//count)
                         target_name=f'{other["name"]}[{offset}]'
+                        array_backed=True
                         for a in arrays:
                             if a['name']==other['name']:a.setdefault('markers',[]).append({'index':offset,'label':name})
-                pointers.append({'name':name,'type':typ,'addr':addr(v['addr']),'value':addr(pointer),'targetName':target_name or ('NULL' if not address(pointer) else '指向的对象'),'targetAddr':addr(pointer),'targetValue':display(target,char),'targetType':typ.replace('*','',1)})
+                if not address(pointer):target='无目标对象'
+                if address(pointer) in freed_targets:
+                    target_name='已释放的对象';target='不可访问（已释放）'
+                if 'elements' in value:
+                    target_name=target_name or '动态分配的对象（堆）'
+                    if pointer not in memory_targets:
+                        memory.append({'name':'动态分配的对象','addr':addr(pointer),'val':display(value['elements']),'storage':'堆：直到 free 释放','highlight':previous.get(name)!=value})
+                        memory_targets.add(pointer)
+                if 'text' in value and not array_backed and pointer not in memory_targets:
+                    target_name=target_name or '字符串字面量'
+                    memory.append({'name':'字符串字面量','addr':addr(pointer),'val':value['text']+'\\0','storage':'静态存储期，不可修改','highlight':previous.get(name)!=value})
+                    memory_targets.add(pointer)
+                target_type=re.sub(r'\*\s*(?:(?:const|volatile|restrict)\s*)*$','',typ).strip()
+                if target_type==typ:
+                    target_type=re.sub(r'\s*\(\s*\*\s*(?:(?:const|volatile|restrict)\s*)*\)(?=\[)','',typ)
+                pointers.append({'name':name,'type':typ,'addr':addr(v['addr']),'value':'失效指针' if address(pointer) in freed_targets else addr(pointer),'targetName':target_name or ('NULL' if not address(pointer) else '指向的对象'),'targetAddr':addr(pointer),'targetValue':display(target,char),'targetType':target_type})
                 if isinstance(target,dict) and 'pointer' not in target:structs.append({'name':'*'+name,'addr':addr(pointer),'fields':fields(target)})
-                if 'text' in value and 'array' in vt and name in ('str','names'):
+                if 'text' in value and 'array' in vt and not array_backed:
                     arrays.append({'name':name,'cells':[{'val':c} for c in value['text']]+[{'val':'\\0'}]})
                 if 'elements' in value and 'array' in vt:
                     arrays.append({'name':name+'（堆）','cells':[{'val':display(c),'empty':c=='未初始化','highlight':[i] in accesses.get(name,[])} for i,c in enumerate(value['elements'])]})
@@ -128,11 +163,24 @@ def assemble(cfg,raw):
             offset=address(visible['p']['value'].get('pointer'))-address(visible['str']['value'].get('pointer'))
             for a in arrays:
                 if a['name']=='str' and 0<=offset<len(a['cells']):a['markers']=[{'index':offset,'label':'p'}];a['cells'][offset]['highlight']=True
+        # Objects outlive pointer variables: retain literals, and heap blocks until free.
+        for cell in memory:
+            if cell['name'] in ('动态分配的对象','字符串字面量'):
+                object_memory[cell['addr']]=copy.deepcopy(cell)
+        current_addresses={cell['addr'] for cell in memory}
+        for location,cell in object_memory.items():
+            if location not in current_addresses:memory.append({**cell,'highlight':False})
+        for a in arrays:
+            grouped={}
+            for marker in a.get('markers',[]):grouped.setdefault(marker['index'],[]).append(marker['label'])
+            if grouped:a['markers']=[{'index':index,'label':' / '.join(dict.fromkeys(labels))} for index,labels in grouped.items()]
         for filename,content in event.get('files',{}).items():variables[filename]={'type':'文件内容','value':content.replace('\n','\\n') or '空'}
         info={'enter':'进入函数：','declaration':'声明：','initialize':'循环初始化：','update':'循环更新：','statement':'执行：','call':'调用函数：','resume':'调用返回：','return':'返回：','switch':'选择分支：','case':'进入分支：'}.get(phase,'执行：')+expr
         if phase=='condition':info='判断 '+expr+'：'+('真，继续相应分支。' if event['result'] else '假，跳过相应分支或退出循环。')
         if phase=='return' and event.get('return'):info+='，返回值 '+event['return']
         if phase=='declaration' and any(v['value']=='未初始化' for v in variables.values()):info+='；未赋初值的变量显示为“未初始化”。'
+        note=cfg.get('stepNotes',{}).get(source[line].strip())
+        if note and phase not in ('call','resume'):info+='。'+note
         # Values are complete snapshots; leaving a scope must remove its locals.
         s={'line':line,'phase':phase,'info':info,'stateComplete':True,'vars':variables}
         for key,data in [('array',arrays),('matrix',matrices),('pointer',pointers),('struct',structs),('memory',memory)]:
@@ -141,7 +189,14 @@ def assemble(cfg,raw):
         if 'stack' in vt:
             s['stack']=[]
             for depth,name in enumerate(event['frames']):
-                values=[v['name']+'='+str(display(v['value'])) for v in event['variables'] if v['depth']==depth]
+                values=[]
+                for v in event['variables']:
+                    if v['depth']!=depth:continue
+                    value=v['value']
+                    if isinstance(value,dict) and 'pointer' in value:
+                        text='失效指针' if address(value['pointer']) in freed_targets else addr(value['pointer'])
+                    else:text=str(display(value))
+                    values.append(v['name']+'='+text)
                 frame={'name':name,'value':', '.join(values),'highlight':depth==event['depth']}
                 if phase=='return' and depth==event['depth'] and event.get('return'):frame['ret']=event['return']
                 s['stack'].append(frame)

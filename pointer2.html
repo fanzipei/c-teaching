@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="C语言指针2交互演示：多级指针、字符串与 const、堆栈生命周期与形参实参。">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<title>指针2 - C语言教学演示</title>
+<link rel="stylesheet" href="style.css?v=33">
+</head>
+<body>
+<nav></nav>
+<main class="container" id="main-content">
+<h1>指针2</h1>
+<div class="intro">
+<p>进一步区分<strong>对象、地址、访问权限和生命周期</strong>。右侧的指针图、内存和调用栈会随每一步同步变化，可后退比较函数调用前后和 free 前后的状态。</p>
+<h2>字符数组与字符指针</h2>
+<ul>
+<li><code>char a[] = "cat";</code> 建立包含 <code>'c'、'a'、't'、'\0'</code> 的可修改数组；<code>sizeof(a)</code> 是 4，<code>strlen(a)</code> 是 3。数组不能整体赋值。</li>
+<li><code>const char *p = "cat";</code> 建立指针，指向有静态存储期的字符串字面量。p 可以重新赋值；修改字面量是未定义行为。在 C 中即使用 <code>char *p</code> 接收字面量，也不能修改它。</li>
+<li>指针可以指向字符数组、字面量或动态分配的字符缓冲区。是否能写取决于对象及访问类型，不能仅凭“字符指针”判断。<code>sizeof(p)</code> 是指针大小，取决于实现，不能当作字符串长度。</li>
+</ul>
+<h2>const、变量与参数</h2>
+<ul>
+<li><code>const int limit = 3;</code> 声明只读对象，它仍是有类型和生命周期的对象；C 中它通常不能代替要求整数常量表达式的场合。const 不意味着对象一定放在某个只读内存区域。</li>
+<li><code>const char *p</code> 限制通过 p 改字符；<code>char *const p</code> 限制 p 改指向；<code>const char *const p</code> 同时限制两者。不能强行去掉 const 来修改原本就定义为 const 的对象。</li>
+<li>实参表达式的值被复制给形参。指针形参能通过 <code>*p</code> 改对象，但 <code>p = ...</code> 只改形参；通过 <code>int **pp</code> 和 <code>*pp = ...</code> 才能修改调用者的指针对象。</li>
+<li>数组形参 <code>int a[]</code> 会调整为 <code>int *a</code>，因此应另传长度。二维数组的行指针 <code>int (*p)[3]</code> 与 <code>int **p</code> 不是同一种类型。</li>
+</ul>
+<h2>栈、堆与存储期</h2>
+<ul>
+<li>普通局部变量和形参通常借助调用栈实现，其自动存储期随所属作用域结束。调用栈是教学模型，C 标准不要求具体物理布局。不能返回局部自动对象的地址供调用者使用。</li>
+<li><code>malloc</code> 分配的对象通常称为“堆内存”，没有自动初始化，也不会随申请它的函数返回而释放。申请失败返回 NULL；成功后应初始化、使用，并由明确的持有者调用一次 <code>free</code>。</li>
+<li>局部指针变量与它指向的堆对象是两个对象，生命周期可以不同。<code>free(p)</code> 释放对象，不会替你把 p 或其他别名置 NULL；释放后它们不能再用于访问该对象。<code>p = NULL</code> 也不会修复其他别名。</li>
+<li>字符串字面量和静态存储期对象持续整个程序运行。不能对字面量、普通局部数组或局部变量调用 free。演示地址经过归一化，仅用于比较对象与指向。</li>
+</ul>
+</div>
+<div class="demo-grid">
+  <div id="demo0"></div>
+  <div id="demo1"></div>
+  <div id="demo2"></div>
+  <div id="demo3"></div>
+  <div id="demo4"></div>
+  <div id="demo5"></div>
+  <div id="demo6"></div>
+  <div id="demo7"></div>
+  <div id="demo8"></div>
+</div>
+<h2>章节练习</h2>
+<div class="quiz-grid">
+  <div id="quiz0"></div>
+  <div id="quiz1"></div>
+  <div id="quiz2"></div>
+  <div id="quiz3"></div>
+  <div id="quiz4"></div>
+  <div id="quiz5"></div>
+</div>
+</main>
+<script src="site-config.js?v=33"></script>
+<script src="demo-engine.js?v=33"></script>
+<script src="demo-traces.js?v=33"></script>
+<script>
+createDemo("demo0", {
+  title: "二维数组与指针",
+  subtitle: "a[i][j] 等价于 *(*(a+i)+j)",
+  code: `#include <stdio.h>
+
+int main() {
+    int a[2][3] = {{1, 2, 3}, {4, 5, 6}};
+    int (*p)[3] = a;
+    printf("a[0][0]=%d, p[0][0]=%d\\n", a[0][0], p[0][0]);
+    printf("a[1][1]=%d, p[1][1]=%d\\n", a[1][1], p[1][1]);
+    return 0;
+}`,
+  vizTypes: ["vars","matrix","pointer","console"],
+  steps: CTeachingTraces["pointer2.html:demo0"]
+});
+createDemo("demo1", {
+  title: "多级指针",
+  subtitle: "指针的指针：int** pp",
+  diagram: `
+<svg viewBox="0 0 320 112" width="320" role="img" aria-label="多级指针：pp 指向 p，p 指向 x 的链式示意图">
+  <defs><marker id="pp-arrow" markerWidth="8" markerHeight="8" refX="7" refY="3" orient="auto"><path d="M0,0 L0,6 L7,3 z" fill="#89b4fa"/></marker></defs>
+  <g font-family="Consolas,monospace" font-size="10" fill="#6c7086" text-anchor="middle">
+    <text x="52" y="22">int **pp</text><text x="160" y="22">int *p</text><text x="268" y="22">int a</text>
+  </g>
+  <rect x="12" y="30" width="80" height="34" rx="6" fill="#313244" stroke="#45475a" stroke-width="1.5"/>
+  <rect x="120" y="30" width="80" height="34" rx="6" fill="#313244" stroke="#45475a" stroke-width="1.5"/>
+  <rect x="228" y="30" width="80" height="34" rx="6" fill="#313244" stroke="#45475a" stroke-width="1.5"/>
+  <g font-family="Consolas,monospace" font-size="13" fill="#a6e3a1" text-anchor="middle" font-weight="bold">
+    <text x="52" y="52">0x2000</text><text x="160" y="52">0x1000</text><text x="268" y="52">10</text>
+  </g>
+  <line x1="94" y1="47" x2="116" y2="47" stroke="#89b4fa" stroke-width="1.5" marker-end="url(#pp-arrow)"/>
+  <line x1="202" y1="47" x2="224" y2="47" stroke="#89b4fa" stroke-width="1.5" marker-end="url(#pp-arrow)"/>
+  <g font-family="Consolas,monospace" font-size="10" fill="#6c7086" text-anchor="middle">
+    <text x="52" y="80">地址 0x3000</text><text x="160" y="80">地址 0x2000</text><text x="268" y="80">地址 0x1000</text>
+  </g>
+  <text x="160" y="102" font-family="Consolas,monospace" font-size="11" fill="#a6adc8" text-anchor="middle">*pp 得到的是 p，**pp 才是 a</text>
+</svg>
+<div class="diagram-caption">多级指针：pp → p → a，必须解引用两次（**pp）才能改到 a</div>
+`,
+  code: `#include <stdio.h>
+
+int main() {
+    int a = 10;
+    int *p = &a;
+    int **pp = &p;
+    **pp = 99;
+    printf("a = %d\\n", a);
+    return 0;
+}`,
+  vizTypes: ["vars","pointer","console"],
+  steps: CTeachingTraces["pointer2.html:demo1"]
+});
+createDemo("demo2", {
+  title: "指针与字符串",
+  subtitle: "const char * 指向字符串字面量，逐个读取字符",
+  code: `#include <stdio.h>
+
+int main() {
+    const char *str = "Hello";
+    const char *p = str;
+    while (*p != '\\0') {
+        printf("%c ", *p);
+        p++;
+    }
+    printf("\\n");
+    return 0;
+}`,
+  vizTypes: ["vars","array","pointer","console"],
+  steps: CTeachingTraces["pointer2.html:demo2"]
+});
+createDemo("demo3", {
+  title: "字符指针数组：字符串字典序排序",
+  subtitle: "只交换指针，字符串本身原地不动——轻量排序",
+  code: `#include <stdio.h>
+#include <string.h>
+
+int main() {
+    const char *names[4] = {"Pear", "Apple", "Kiwi", "Banana"};
+    const char *tmp;
+    int i, j;
+    for (i = 0; i < 3; i++) {
+        for (j = 0; j < 3 - i; j++) {
+            if (strcmp(names[j], names[j+1]) > 0) {
+                tmp = names[j];
+                names[j] = names[j+1];
+                names[j+1] = tmp;
+            }
+        }
+    }
+    for (i = 0; i < 4; i++) {
+        printf("%s\\n", names[i]);
+    }
+    return 0;
+}`,
+  vizTypes: ["vars","array","loop","console"],
+  steps: CTeachingTraces["pointer2.html:demo3"]
+});
+createDemo("demo4", {
+  title: "动态内存：malloc 与 free",
+  subtitle: "堆内存由你手动管理：申请、使用、归还",
+  code: `#include <stdio.h>
+#include <stdlib.h>
+
+int main() {
+    int *p = malloc(sizeof(int));
+    if (p == NULL) return 1;
+    *p = 42;
+    printf("*p = %d\\n", *p);
+    free(p);
+    p = NULL;
+    return 0;
+}`,
+  vizTypes: ["vars","pointer","console"],
+  steps: CTeachingTraces["pointer2.html:demo4"]
+});
+createDemo("demo5", {
+  title: "malloc 动态数组",
+  subtitle: "按需要分配数组，并明确释放时机",
+  code: `#include <stdio.h>
+#include <stdlib.h>
+
+int main() {
+    int n = 5;
+    int *arr = malloc(n * sizeof(int));
+    int i;
+    if (arr == NULL) {
+        return 1;
+    }
+    for (i = 0; i < n; i++) {
+        arr[i] = i * 10;
+    }
+    printf("arr[3] = %d\\n", arr[3]);
+    free(arr);
+    arr = NULL;
+    return 0;
+}`,
+  vizTypes: ["vars","array","loop","pointer","console"],
+  steps: CTeachingTraces["pointer2.html:demo5"]
+});
+createDemo("demo6", {
+  "title": "字符数组、字符串常量与 const",
+  "subtitle": "观察字符副本、地址共享，以及两种 const 限制",
+  code: `#include <stdio.h>
+#include <string.h>
+
+int main() {
+    char buffer[] = "cat";
+    char *p = buffer;
+    const char *literal = "cat";
+    char *const fixed = buffer;
+    const char *view = buffer;
+    const int limit = 3;
+    p[0] = 'b';
+    fixed[1] = 'e';
+    printf("%s %s %s\\n", buffer, view, literal);
+    literal = "dog";
+    printf("%s %d %d %d\\n", literal, (int)sizeof(buffer), (int)strlen(view), limit);
+    return 0;
+}`,
+  "vizTypes": [
+    "vars",
+    "array",
+    "pointer",
+    "memory",
+    "console"
+  ],
+  "diagram": "<p><code>buffer</code> 持有可修改的字符副本；literal 指向不可修改的字符串字面量。<code>const char *view</code> 不能通过 view 修改字符，但 p 可以修改同一个 buffer，所以 view 看到的内容也会变化。<code>char *const fixed</code> 不能改指向，却可以修改 buffer。literal 的重新赋值只改地址，不修改字面量。</p>",
+  "stepNotes": {
+  "char buffer[] = \"cat\";": "创建独立的 4 个字符，包括结尾的空字符，数组内容可修改。",
+  "const char *literal = \"cat\";": "只创建指针对象；目标字面量有静态存储期，不能写入。",
+  "p[0] = 'b';": "通过 p 改的是 buffer[0]，view 与 fixed 也指向这组字符。",
+  "fixed[1] = 'e';": "fixed 不能重新赋值，但它指向的字符数组允许修改。",
+  "literal = \"dog\";": "改变指针保存的地址；原来的字符串字面量没有改变。"
+},
+  "steps": CTeachingTraces["pointer2.html:demo6"]
+});
+createDemo("demo7", {
+  "title": "函数返回后，内存还在吗",
+  "subtitle": "自动对象随函数调用结束，动态分配的对象直到 free 才释放",
+  code: `#include <stdio.h>
+#include <stdlib.h>
+
+int *make_value(int value) {
+    int local = value;
+    int *heap = malloc(sizeof(int));
+    if (heap == NULL) {
+        return NULL;
+    }
+    *heap = local;
+    local = 0;
+    return heap;
+}
+
+int main() {
+    int value = 7;
+    int *p = make_value(value);
+    if (p == NULL) {
+        return 1;
+    }
+    printf("value=%d heap=%d\\n", value, *p);
+    *p = *p + 1;
+    free(p);
+    p = NULL;
+    return 0;
+}`,
+  "vizTypes": [
+    "vars",
+    "pointer",
+    "memory",
+    "array",
+    "stack",
+    "branch",
+    "console"
+  ],
+  "diagram": "<p>注意 make_value 返回时形参 value、局部变量 local 和指针变量 heap 离开调用栈，而分配的 int 仍可通过 p 访问。<code>return &amp;local</code> 会返回失效对象的地址，不能这样替代。执行 free 后动态对象消失；随后 p 置 NULL。地址是示意编号，不能据其大小判断实际内存区域。</p>",
+  "stepNotes": {
+  "int *heap = malloc(sizeof(int));": "堆对象尚未初始化；heap 本身是当前函数的局部指针变量。",
+  "*heap = local;": "把 7 复制到堆对象；之后修改 local 不会修改这份副本。",
+  "return heap;": "返回地址值；函数退出后局部对象消失，堆对象继续存在。",
+  "int *p = make_value(value);": "调用已返回：p 接收堆对象的地址，调用栈中只剩 main。",
+  "free(p);": "堆对象已释放，p 成为失效指针，不能再次解引用或重复释放。",
+  "p = NULL;": "清空 p；这一步不会自动修改其他指针别名。"
+},
+  "steps": CTeachingTraces["pointer2.html:demo7"]
+});
+createDemo("demo8", {
+  "title": "形参与实参：修改值还是修改指向",
+  "subtitle": "指针也按值传递；要改调用者的指针，需要再传一层地址",
+  code: `#include <stdio.h>
+
+void change_copy(int *p, int *target) {
+    *p = 11;
+    p = target;
+    *p = 22;
+}
+
+void change_owner(int **pp, int *target) {
+    *pp = target;
+}
+
+int main() {
+    int a = 1, b = 2;
+    int *p = &a;
+    change_copy(p, &b);
+    printf("%d %d %d\\n", a, b, *p);
+    change_owner(&p, &b);
+    *p = 33;
+    printf("%d %d %d\\n", a, b, *p);
+    return 0;
+}`,
+  "vizTypes": [
+    "vars",
+    "pointer",
+    "memory",
+    "stack",
+    "console"
+  ],
+  "diagram": "<p>进入 change_copy 后，调用栈中出现两个独立的 p，它们最初保存同一个地址。形参 <code>p = target</code> 只改副本；<code>*p</code> 则访问副本指向的对象。进入 change_owner 时，pp 指向 main 的 p，<code>*pp = target</code> 才能改变 main 中 p 的指向。</p>",
+  "stepNotes": {
+  "p = target;": "只改变 change_copy 的形参 p；main 的 p 仍指向 a。",
+  "*p = 22;": "形参 p 此时指向 b，写入会改变 main 的 b。",
+  "*pp = target;": "pp 指向 main 的指针变量 p，因此这次赋值改变调用者的指向。",
+  "*p = 33;": "main 的 p 已指向 b，因此 b 变成 33。"
+},
+  "steps": CTeachingTraces["pointer2.html:demo8"]
+});
+createQuiz("quiz0", {
+  type: "predict",
+  title: "malloc 动态数组",
+  code: `#include <stdio.h>
+#include <stdlib.h>
+
+int main() {
+    int n = 4;
+    int *arr = malloc(n * sizeof(int));
+    int sum = 0;
+    int i;
+    for (i = 0; i < n; i++) {
+        arr[i] = (i + 1) * 10;
+        sum += arr[i];
+    }
+    printf("arr[2] = %d\\n", arr[2]);
+    printf("sum = %d\\n", sum);
+    free(arr);
+    return 0;
+}`,
+  answer: "arr[2] = 30\nsum = 100",
+  explain: "malloc 在堆上申请 4 个 int，循环写入 10、20、30、40：arr[2] = 30，sum = 10+20+30+40 = 100。<code>free(arr)</code> 只是归还内存，不影响已经打印的输出，但 malloc 的内存用完必须 free，否则就是内存泄漏。"
+});
+createQuiz("quiz1", {
+  type: "fix",
+  title: "通过指针的指针修改变量",
+  hint: "多级指针：少解引用了一层",
+  code: `#include <stdio.h>
+
+int main() {
+    int a = 10;
+    int *p = &a;
+    int **pp = &p;
+    *pp = 99;
+    printf("a = %d\\n", a);
+    return 0;
+}`,
+  accept: [`#include <stdio.h>
+
+int main() {
+    int a = 10;
+    int *p = &a;
+    int **pp = &p;
+    **pp = 99;
+    printf("a = %d\\n", a);
+    return 0;
+}`],
+  explain: "<code>pp</code> 指向 p，<code>*pp</code> 解引用一层得到的是<strong>指针 p 本身</strong>，<code>*pp = 99</code> 改的是 p 里存的地址（把整数当指针，编译器会警告），a 根本没变。要顺着 pp → p → a 走到 a，必须解引用两层：<code>**pp = 99;</code>。"
+});
+createQuiz("quiz2", {
+  type: "fix",
+  title: "用指针遍历字符串",
+  hint: "遍历字符串：循环条件少了 *",
+  code: `#include <stdio.h>
+
+int main() {
+    char *s = "hello";
+    char *p = s;
+    while (p != '\\0') {
+        printf("%c", *p);
+        p++;
+    }
+    printf("\\n");
+    return 0;
+}`,
+  accept: [`#include <stdio.h>
+
+int main() {
+    char *s = "hello";
+    char *p = s;
+    while (*p != '\\0') {
+        printf("%c", *p);
+        p++;
+    }
+    printf("\\n");
+    return 0;
+}`, `#include <stdio.h>
+
+int main() {
+    char *s = "hello";
+    char *p = s;
+    while (*p) {
+        printf("%c", *p);
+        p++;
+    }
+    printf("\\n");
+    return 0;
+}`],
+  explain: "<code>p != '\\0'</code> 比较的是<strong>指针本身</strong>和 0，p 永远不为空，循环永不停止，最终读到字符串外崩溃。应该判断 p 指向的字符：<code>while (*p != '\\0')</code>（也可简写为 <code>while (*p)</code>）。"
+});
+createQuiz("quiz3", {
+  "type": "predict",
+  "title": "字符串的副本与只读访问",
+  code: `#include <stdio.h>
+int main() {
+    char a[] = "sun";
+    const char *view = a;
+    const char *word = "sun";
+    a[0] = 'r';
+    word = "moon";
+    printf("%s %s %s\\n", a, view, word);
+    return 0;
+}`,
+  "answer": "run run moon",
+  "explain": "view 与 a 访问同一组字符；const 限制通过 view 写入，并不阻止通过 a 修改。word 可以改指向另一个字面量，字面量本身没有被修改。"
+});
+createQuiz("quiz4", {
+  "type": "predict",
+  "title": "传入指针后的重新赋值",
+  code: `#include <stdio.h>
+void choose(int *p, int *q) {
+    *p = 5;
+    p = q;
+    *p = 9;
+}
+int main() {
+    int a = 1, b = 2;
+    int *p = &a;
+    choose(p, &b);
+    printf("%d %d %d\\n", a, b, *p);
+    return 0;
+}`,
+  "answer": "5 9 5",
+  "explain": "choose 的形参 p 是地址值的副本。它先修改 a，再改指向 b 并修改 b；main 的 p 始终指向 a。"
+});
+createQuiz("quiz5", {
+  "type": "fix",
+  "title": "字符串中的字符能否修改",
+  code: `#include <stdio.h>
+int main() {
+    char *word = "cat";
+    word[0] = 'b';
+    printf("%s\\n", word);
+    return 0;
+}`,
+  "accept": [
+    "#include <stdio.h>\nint main() {\n    char word[] = \"cat\";\n    word[0] = 'b';\n    printf(\"%s\\n\", word);\n    return 0;\n}"
+  ],
+  "hint": "需要一份拥有可修改字符存储空间的副本。",
+  "explain": "C 中字符串字面量不能修改，原程序有未定义行为。改为字符数组后，初始化会复制包括结尾空字符在内的 4 个字符，输出 bat。"
+});
+</script>
+</body>
+</html>
