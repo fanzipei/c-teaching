@@ -440,6 +440,29 @@ h3 {
 }
 
 /* 内存视图 */
+.string-comparison {
+  overflow-x: auto;
+  margin: 1rem 0;
+}
+.string-comparison table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 560px;
+}
+.string-comparison caption {
+  text-align: left;
+  font-weight: bold;
+  padding-bottom: 0.6rem;
+}
+.string-comparison th, .string-comparison td {
+  border: 1px solid var(--border);
+  padding: 0.7rem;
+  text-align: left;
+  vertical-align: top;
+}
+.string-comparison thead th {
+  background: var(--memory-bg);
+}
 .memory-view {
   display: grid;
   grid-template-columns: repeat(4, 1fr);

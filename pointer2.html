@@ -3,10 +3,10 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="description" content="C语言指针2交互演示：多级指针、字符串与 const、堆栈生命周期与形参实参。">
+<meta name="description" content="C语言指针2交互演示：多级指针、字符数组与字符串常量、堆栈生命周期与形参实参。">
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
 <title>指针2 - C语言教学演示</title>
-<link rel="stylesheet" href="style.css?v=33">
+<link rel="stylesheet" href="style.css?v=34">
 </head>
 <body>
 <nav></nav>
@@ -15,15 +15,25 @@
 <div class="intro">
 <p>进一步区分<strong>对象、地址、访问权限和生命周期</strong>。右侧的指针图、内存和调用栈会随每一步同步变化，可后退比较函数调用前后和 free 前后的状态。</p>
 <h2>字符数组与字符指针</h2>
+<p>下面两列的 str 分别属于两个独立的程序。字符指针是保存地址的变量；字符数组拥有自己的字符存储空间，数组名在多数表达式中转换为首元素地址，但数组本身不是指针变量。</p>
+<div class="string-comparison" role="region" aria-label="字符指针与字符数组对比" tabindex="0">
+<table>
+<caption>改变地址与修改字符，是两件不同的事</caption>
+<thead><tr><th scope="col">比较项目</th><th scope="col">字符指针<br><code>char *str = "hello";</code></th><th scope="col">字符数组<br><code>char str[6] = "hello";</code></th></tr></thead>
+<tbody>
+<tr><th scope="row">建立的对象</th><td>一个指针变量，保存字符串字面量的地址</td><td>6 个字符的数组，保存 hello 和结尾的空字符副本</td></tr>
+<tr><th scope="row"><code>str[0] = 'H';</code></th><td>不能这样修改字面量：属于未定义行为，可能运行时崩溃，不一定编译报错</td><td>合法，数组中的内容变为 Hello</td></tr>
+<tr><th scope="row"><code>str = NULL;</code></th><td>合法，指针改为空；之后不能再解引用或当作字符串读取</td><td>不合法，数组不能整体赋值，编译器会诊断错误</td></tr>
+<tr><th scope="row"><code>str = "world";</code></th><td>合法，改指向另一个字面量，原字面量未改变</td><td>不合法；数组初始化与后续赋值是不同的操作</td></tr>
+<tr><th scope="row"><code>sizeof(str)</code></th><td>指针变量的大小，取决于实现，不是字符串长度</td><td>整个数组的大小，此例为 6 字节</td></tr>
+<tr><th scope="row">初始化后 <code>strlen(str)</code></th><td>5，不计结尾的空字符</td><td>5，不计结尾的空字符</td></tr>
+</tbody>
+</table>
+</div>
+<p><code>char str[N] = "hello";</code> 要作为字符串使用，N 至少为 6，以容纳结尾的 <code>'\0'</code>。数组在其生命周期内不能通过给数组名赋值来改变位置；可以修改其中的元素。</p>
+<p>字符指针能否用于修改字符，还取决于它当前指向哪里：<code>char *p = buffer;</code> 若指向可修改的字符数组，<code>p[0] = 'H';</code> 就是合法的。不能把“字符串字面量不能修改”推广成“字符指针都不能修改字符”。</p>
+<h2>变量与参数</h2>
 <ul>
-<li><code>char a[] = "cat";</code> 建立包含 <code>'c'、'a'、't'、'\0'</code> 的可修改数组；<code>sizeof(a)</code> 是 4，<code>strlen(a)</code> 是 3。数组不能整体赋值。</li>
-<li><code>const char *p = "cat";</code> 建立指针，指向有静态存储期的字符串字面量。p 可以重新赋值；修改字面量是未定义行为。在 C 中即使用 <code>char *p</code> 接收字面量，也不能修改它。</li>
-<li>指针可以指向字符数组、字面量或动态分配的字符缓冲区。是否能写取决于对象及访问类型，不能仅凭“字符指针”判断。<code>sizeof(p)</code> 是指针大小，取决于实现，不能当作字符串长度。</li>
-</ul>
-<h2>const、变量与参数</h2>
-<ul>
-<li><code>const int limit = 3;</code> 声明只读对象，它仍是有类型和生命周期的对象；C 中它通常不能代替要求整数常量表达式的场合。const 不意味着对象一定放在某个只读内存区域。</li>
-<li><code>const char *p</code> 限制通过 p 改字符；<code>char *const p</code> 限制 p 改指向；<code>const char *const p</code> 同时限制两者。不能强行去掉 const 来修改原本就定义为 const 的对象。</li>
 <li>实参表达式的值被复制给形参。指针形参能通过 <code>*p</code> 改对象，但 <code>p = ...</code> 只改形参；通过 <code>int **pp</code> 和 <code>*pp = ...</code> 才能修改调用者的指针对象。</li>
 <li>数组形参 <code>int a[]</code> 会调整为 <code>int *a</code>，因此应另传长度。二维数组的行指针 <code>int (*p)[3]</code> 与 <code>int **p</code> 不是同一种类型。</li>
 </ul>
@@ -56,9 +66,9 @@
   <div id="quiz5"></div>
 </div>
 </main>
-<script src="site-config.js?v=33"></script>
-<script src="demo-engine.js?v=33"></script>
-<script src="demo-traces.js?v=33"></script>
+<script src="site-config.js?v=34"></script>
+<script src="demo-engine.js?v=34"></script>
+<script src="demo-traces.js?v=34"></script>
 <script>
 createDemo("demo0", {
   title: "二维数组与指针",
@@ -114,12 +124,12 @@ int main() {
 });
 createDemo("demo2", {
   title: "指针与字符串",
-  subtitle: "const char * 指向字符串字面量，逐个读取字符",
+  subtitle: "char * 指向字符串字面量，逐个读取字符",
   code: `#include <stdio.h>
 
 int main() {
-    const char *str = "Hello";
-    const char *p = str;
+    char *str = "Hello";
+    char *p = str;
     while (*p != '\\0') {
         printf("%c ", *p);
         p++;
@@ -137,8 +147,8 @@ createDemo("demo3", {
 #include <string.h>
 
 int main() {
-    const char *names[4] = {"Pear", "Apple", "Kiwi", "Banana"};
-    const char *tmp;
+    char *names[4] = {"Pear", "Apple", "Kiwi", "Banana"};
+    char *tmp;
     int i, j;
     for (i = 0; i < 3; i++) {
         for (j = 0; j < 3 - i; j++) {
@@ -200,41 +210,39 @@ int main() {
   steps: CTeachingTraces["pointer2.html:demo5"]
 });
 createDemo("demo6", {
-  "title": "字符数组、字符串常量与 const",
-  "subtitle": "观察字符副本、地址共享，以及两种 const 限制",
+  title: "字符指针与字符数组：地址和内容",
+  subtitle: "指针可以改指向，数组可以改元素；字面量不能修改",
   code: `#include <stdio.h>
 #include <string.h>
 
 int main() {
-    char buffer[] = "cat";
+    char *str = "hello";
+    char buffer[6] = "hello";
     char *p = buffer;
-    const char *literal = "cat";
-    char *const fixed = buffer;
-    const char *view = buffer;
-    const int limit = 3;
-    p[0] = 'b';
-    fixed[1] = 'e';
-    printf("%s %s %s\\n", buffer, view, literal);
-    literal = "dog";
-    printf("%s %d %d %d\\n", literal, (int)sizeof(buffer), (int)strlen(view), limit);
+    buffer[0] = 'H';
+    printf("%s %s\\n", str, buffer);
+    p[1] = 'A';
+    printf("%s %s\\n", buffer, p);
+    str = "world";
+    printf("%s %s\\n", str, buffer);
+    str = NULL;
+    if (str == NULL) {
+        printf("str is NULL\\n");
+    }
+    printf("size=%d length=%d\\n", (int)sizeof(buffer), (int)strlen(buffer));
     return 0;
 }`,
-  "vizTypes": [
-    "vars",
-    "array",
-    "pointer",
-    "memory",
-    "console"
-  ],
-  "diagram": "<p><code>buffer</code> 持有可修改的字符副本；literal 指向不可修改的字符串字面量。<code>const char *view</code> 不能通过 view 修改字符，但 p 可以修改同一个 buffer，所以 view 看到的内容也会变化。<code>char *const fixed</code> 不能改指向，却可以修改 buffer。literal 的重新赋值只改地址，不修改字面量。</p>",
-  "stepNotes": {
-  "char buffer[] = \"cat\";": "创建独立的 4 个字符，包括结尾的空字符，数组内容可修改。",
-  "const char *literal = \"cat\";": "只创建指针对象；目标字面量有静态存储期，不能写入。",
-  "p[0] = 'b';": "通过 p 改的是 buffer[0]，view 与 fixed 也指向这组字符。",
-  "fixed[1] = 'e';": "fixed 不能重新赋值，但它指向的字符数组允许修改。",
-  "literal = \"dog\";": "改变指针保存的地址；原来的字符串字面量没有改变。"
+  vizTypes: ["vars", "array", "pointer", "memory", "branch", "console"],
+  diagram: "<p>观察两组 hello：str 指向字符串字面量，buffer 保存可修改的副本。比较 buffer[0]、p[1] 的写入和 str 的两次重新赋值；右侧会同步显示字符内容与指针目标。不能执行的操作列在章首对比表中，不在演示中运行。</p>",
+  stepNotes: {
+  "char *str = \"hello\";": "str 保存字面量的地址。不能执行 str[0] = 'H' 来修改这个字面量。",
+  "char buffer[6] = \"hello\";": "数组拥有 6 个字符的副本，包括结尾空字符。不能执行 buffer = NULL 给整个数组赋值。",
+  "buffer[0] = 'H';": "修改的是数组元素，数组地址不变；str 指向的字面量仍是 hello。",
+  "p[1] = 'A';": "p 指向可修改的 buffer，通过 p 写入合法。能否修改字符取决于目标对象。",
+  "str = \"world\";": "指针改指向另一个字面量，原来的 hello 仍然存在，buffer 不受影响。",
+  "str = NULL;": "改变指针的值是合法的；从此不能执行 str[0] 或用 %s 读取 str。"
 },
-  "steps": CTeachingTraces["pointer2.html:demo6"]
+  steps: CTeachingTraces["pointer2.html:demo6"]
 });
 createDemo("demo7", {
   "title": "函数返回后，内存还在吗",
@@ -418,19 +426,19 @@ int main() {
 });
 createQuiz("quiz3", {
   "type": "predict",
-  "title": "字符串的副本与只读访问",
+  "title": "字符串副本与指针改指向",
   code: `#include <stdio.h>
 int main() {
     char a[] = "sun";
-    const char *view = a;
-    const char *word = "sun";
+    char *view = a;
+    char *word = "sun";
     a[0] = 'r';
     word = "moon";
     printf("%s %s %s\\n", a, view, word);
     return 0;
 }`,
   "answer": "run run moon",
-  "explain": "view 与 a 访问同一组字符；const 限制通过 view 写入，并不阻止通过 a 修改。word 可以改指向另一个字面量，字面量本身没有被修改。"
+  "explain": "view 指向数组 a，所以通过 a 修改字符后，view 读取到的内容也改变。word 可以改指向另一个字面量；数组 a 本身不能通过赋值改指向。两个字面量都没有被修改。"
 });
 createQuiz("quiz4", {
   "type": "predict",
