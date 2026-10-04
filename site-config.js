@@ -9,9 +9,9 @@
     Object.freeze({ page: 'datatype.html', title: '数据类型与赋值语句', shortTitle: '数据类型与赋值语句', demo: 12, quiz: 6 }),
     Object.freeze({ page: 'condition.html', title: '条件语句', shortTitle: '条件语句', demo: 6, quiz: 6 }),
     Object.freeze({ page: 'loop.html', title: '循环语句', shortTitle: '循环语句', demo: 10, quiz: 6 }),
-    Object.freeze({ page: 'array1.html', title: '数组1', shortTitle: '数组1', demo: 10, quiz: 4 }),
-    Object.freeze({ page: 'array2.html', title: '数组2', shortTitle: '数组2', demo: 7, quiz: 4 }),
-    Object.freeze({ page: 'function.html', title: '函数', shortTitle: '函数', demo: 11, quiz: 6 }),
+    Object.freeze({ page: 'array1.html', title: '数组1', shortTitle: '数组1', demo: 10, quiz: 3, quizIds: Object.freeze(['quiz0', 'quiz2', 'quiz3']) }),
+    Object.freeze({ page: 'array2.html', title: '数组2', shortTitle: '数组2', demo: 7, quiz: 3, quizIds: Object.freeze(['quiz0', 'quiz2', 'quiz3']) }),
+    Object.freeze({ page: 'function.html', title: '函数', shortTitle: '函数', demo: 11, quiz: 8 }),
     Object.freeze({ page: 'pointer1.html', title: '指针1', shortTitle: '指针1', demo: 7, quiz: 6 }),
     Object.freeze({ page: 'pointer2.html', title: '指针2', shortTitle: '指针2', demo: 9, quiz: 6 }),
     Object.freeze({ page: 'struct.html', title: '结构体', shortTitle: '结构体', demo: 10, quiz: 6 }),
@@ -80,8 +80,8 @@
     "quiz0"
   ],
   "quiz1": [
-    "array1.html",
-    "quiz1"
+    "function.html",
+    "quiz6"
   ],
   "quiz2": [
     "array2.html",
@@ -92,8 +92,8 @@
     "quiz2"
   ],
   "quiz4": [
-    "array2.html",
-    "quiz1"
+    "function.html",
+    "quiz7"
   ],
   "quiz5": [
     "array2.html",
@@ -195,4 +195,25 @@
     });
     root.localStorage.setItem(marker, '1');
   } catch (e) { /* 无法使用本地存储时仍可正常学习。 */ }
+})(typeof window !== 'undefined' ? window : null);
+
+// 保持练习的稳定 ID，并迁移数组章中的完成记录与旧链接。
+(function moveArrayFunctionQuizzes(root) {
+  if (!root) return;
+  var moves = {'array1.html': 'quiz6', 'array2.html': 'quiz7'};
+  try {
+    var marker = 'cteaching:migration:array-function-quizzes-v1';
+    if (root.localStorage.getItem(marker) !== '1') {
+      Object.keys(moves).forEach(function (page) {
+        if (root.localStorage.getItem('cteaching:done:' + page + ':quiz1') === '1') {
+          root.localStorage.setItem('cteaching:done:function.html:' + moves[page], '1');
+        }
+      });
+      root.localStorage.setItem(marker, '1');
+    }
+  } catch (e) { /* 本地存储不可用时仍支持旧链接。 */ }
+  var page = root.location.pathname.split('/').pop();
+  if (moves[page] && root.location.hash === '#quiz1') {
+    root.location.replace('function.html#' + moves[page]);
+  }
 })(typeof window !== 'undefined' ? window : null);

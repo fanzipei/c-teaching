@@ -158,16 +158,16 @@ const PAGES = CHAPTERS.map(chapter => chapter.page);
   });
   await migrationPage.reload();
   const migratedBadges = await migrationPage.locator('.topic-progress').allTextContents();
-  let migrationOk = migratedBadges.includes('继续学习 · 11 / 14') &&
-    migratedBadges.includes('继续学习 · 8 / 11');
-  for (const [name, expectedDone] of [['array1.html', 11], ['array2.html', 8]]) {
+  let migrationOk = migratedBadges.includes('继续学习 · 10 / 13') &&
+    migratedBadges.includes('继续学习 · 7 / 10');
+  for (const [name, expectedDone] of [['array1.html', 10], ['array2.html', 7], ['function.html', 2]]) {
     await migrationPage.goto(localUrl(name));
     migrationOk = migrationOk && await migrationPage.locator('.demo-card.completed, .quiz-card.completed').count() === expectedDone;
     migrationOk = migrationOk && await migrationPage.locator('#quiz3 .quiz-card.completed').count() === 0;
   }
   for (const [oldId, destination] of [
     ['demo7', 'array1.html#demo7'], ['demo8', 'array2.html#demo0'],
-    ['quiz1', 'array1.html#quiz1'], ['quiz4', 'array2.html#quiz1'], ['quiz5', 'array2.html#quiz2']
+    ['quiz1', 'function.html#quiz6'], ['quiz4', 'function.html#quiz7'], ['quiz5', 'array2.html#quiz2']
   ]) {
     await migrationPage.goto(localUrl('array.html') + '#' + oldId);
     await migrationPage.waitForURL('**/' + destination);
@@ -175,6 +175,23 @@ const PAGES = CHAPTERS.map(chapter => chapter.page);
   }
   if (!migrationOk) failures++;
   console.log(`${migrationOk ? 'PASS' : 'FAIL'} 数组章节拆分：原进度迁移、新内容未完成、旧锚点跳转`);
+  // 已拆分数组章的书签和完成记录也要跟随练习迁移。
+  await migrationPage.evaluate(() => {
+    localStorage.clear();
+    localStorage.setItem('cteaching:done:array1.html:quiz1', '1');
+    localStorage.setItem('cteaching:done:array2.html:quiz1', '1');
+    localStorage.setItem('cteaching:done:array1.html:quiz3', '1');
+  });
+  await migrationPage.goto(localUrl('index.html'));
+  const arrayBadge = await migrationPage.locator('a[href^="array1.html"] .topic-progress').textContent();
+  let movedOk = arrayBadge.includes('1 / 13');
+  for (const [pageName, id] of [['array1.html', 'quiz6'], ['array2.html', 'quiz7']]) {
+    await migrationPage.goto(localUrl(pageName) + '#quiz1');
+    await migrationPage.waitForURL('**/function.html#' + id);
+    movedOk = movedOk && await migrationPage.locator('#' + id + ' .quiz-card.completed').count() === 1;
+  }
+  if (!movedOk) failures++;
+  console.log(`${movedOk ? 'PASS' : 'FAIL'} 数组函数练习迁移：旧书签、完成记录、首页计数`);
   await migrationCtx.close();
 
   // Pointer split: preserve old progress and deep links without completing new content.

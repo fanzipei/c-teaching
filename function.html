@@ -76,6 +76,8 @@
   <div id="quiz3"></div>
   <div id="quiz4"></div>
   <div id="quiz5"></div>
+  <div id="quiz6"></div>
+  <div id="quiz7"></div>
 </div>
 </main>
 
@@ -434,7 +436,7 @@ int main() {
   vizTypes: ["vars","array","stack","console"],
   steps: CTeachingTraces["function.html:demo10"]
 });
-/* ========== 章节练习：3 道预测输出 + 3 道改错 ========== */
+/* ========== 章节练习 ========== */
 createQuiz("quiz0", {
   type: "predict",
   title: "值传递：交换失败",
@@ -596,6 +598,81 @@ int main() {
     return 0;
 }`],
   explain: "函数必须先<strong>声明或定义</strong>再调用。这里编译器见到 average(3, 5) 时还不认识它，只能凭空猜测它返回 int，与实际的 double 返回值对不上，结果出错。最小修改：在 main 前加一行函数声明 <code>double average(int a, int b);</code>（或把整个函数定义搬到 main 之前）。"
+});
+createQuiz("quiz6", {
+  type: "predict",
+  title: "数组名作函数参数：函数里的修改会带回来",
+  code: `#include <stdio.h>
+
+void double_it(int a[], int n) {
+    int i;
+    for (i = 0; i < n; i++) {
+        a[i] *= 2;
+    }
+}
+
+int main() {
+    int a[4] = {1, 2, 3, 4};
+    int i;
+    double_it(a, 4);
+    for (i = 0; i < 4; i++) {
+        printf("%d ", a[i]);
+    }
+    printf("\\n");
+    return 0;
+}`,
+  answer: "2 4 6 8",
+  explain: "数组名作为实参时传的是<strong>首元素地址</strong>，形参 a 和实参 a 指向同一段内存，函数里把每个元素乘 2，main 里打印的就是修改后的结果 <code>2 4 6 8</code>（数组传参不是值拷贝）。"
+});
+createQuiz("quiz7", {
+  type: "fix",
+  title: "用函数打印矩阵",
+  hint: "二维数组作函数参数：列数不能省略",
+  code: `#include <stdio.h>
+
+int row_sum(int m[][], int r) {
+    int j, s = 0;
+    for (j = 0; j < 3; j++) {
+        s += m[r][j];
+    }
+    return s;
+}
+
+int main() {
+    int a[2][3] = {{1, 2, 3}, {4, 5, 6}};
+    printf("%d\\n", row_sum(a, 1));
+    return 0;
+}`,
+  accept: [`#include <stdio.h>
+
+int row_sum(int m[][3], int r) {
+    int j, s = 0;
+    for (j = 0; j < 3; j++) {
+        s += m[r][j];
+    }
+    return s;
+}
+
+int main() {
+    int a[2][3] = {{1, 2, 3}, {4, 5, 6}};
+    printf("%d\\n", row_sum(a, 1));
+    return 0;
+}`, `#include <stdio.h>
+
+int row_sum(int m[2][3], int r) {
+    int j, s = 0;
+    for (j = 0; j < 3; j++) {
+        s += m[r][j];
+    }
+    return s;
+}
+
+int main() {
+    int a[2][3] = {{1, 2, 3}, {4, 5, 6}};
+    printf("%d\\n", row_sum(a, 1));
+    return 0;
+}`],
+  explain: "二维数组按行优先连续存储，编译器要靠<strong>列数</strong>才能把 m[r][j] 换算成地址 r*列数+j，所以形参里第二维（列数）必须写，第一维可以省略。最小修改：把 <code>int m[][]</code> 改成 <code>int m[][3]</code>（写全 <code>int m[2][3]</code> 也可以）。"
 });
 </script>
 </body>

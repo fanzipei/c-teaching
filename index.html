@@ -96,10 +96,11 @@
         }
       }
       for (var j = 0; j < t.quiz; j++) {
-        if (localStorage.getItem('cteaching:done:' + page + ':quiz' + j) === '1') {
+        var quizId = t.quizIds ? t.quizIds[j] : 'quiz' + j;
+        if (localStorage.getItem('cteaching:done:' + page + ':' + quizId) === '1') {
           done++;
         } else if (!nextId) {
-          nextId = 'quiz' + j;
+          nextId = quizId;
         }
       }
     } catch (e) { return; }

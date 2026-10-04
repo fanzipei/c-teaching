@@ -66,7 +66,6 @@
 <h2>章节练习</h2>
 <div class="demo-grid">
   <div id="quiz0"></div>
-  <div id="quiz1"></div>
   <div id="quiz2"></div>
   <div id="quiz3"></div>
 </div>
@@ -298,31 +297,6 @@ int main() {
 }`,
   answer: "sum = 6",
   explain: "初始化列表只给了 3 个值，但数组有 5 个元素：C 语言规定<strong>剩余元素自动初始化为 0</strong>，所以 a[3]、a[4] 都是 0。求和 1+2+3+0+0 = 6。"
-});
-createQuiz("quiz1", {
-  type: "predict",
-  title: "数组名作函数参数：函数里的修改会带回来",
-  code: `#include <stdio.h>
-
-void double_it(int a[], int n) {
-    int i;
-    for (i = 0; i < n; i++) {
-        a[i] *= 2;
-    }
-}
-
-int main() {
-    int a[4] = {1, 2, 3, 4};
-    int i;
-    double_it(a, 4);
-    for (i = 0; i < 4; i++) {
-        printf("%d ", a[i]);
-    }
-    printf("\\n");
-    return 0;
-}`,
-  answer: "2 4 6 8",
-  explain: "数组名作为实参时传的是<strong>首元素地址</strong>，形参 a 和实参 a 指向同一段内存，函数里把每个元素乘 2，main 里打印的就是修改后的结果 <code>2 4 6 8</code>（数组传参不是值拷贝）。"
 });
 createQuiz("quiz2", {
   type: "fix",
