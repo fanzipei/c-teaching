@@ -184,6 +184,15 @@ const path = require('path');
       assert.ok(output.includes(expected), id + ' input');
     }
     await page.goto('file://' + path.resolve(__dirname, '..', 'datatype.html'));
+    const incrementChecks = await page.evaluate(() => {
+      const cfg = demos.demo11.config;
+      return cfg.steps.filter(s => ['i++;', '++j;', 'post = i++;', 'pre = ++j;', 'i--;', '--j;', 'post = i--;', 'pre = --j;'].includes(cfg.code.split('\n')[s.line].trim()))
+        .map(s => [s.vars.i.value, s.vars.j.value, s.vars.post.value, s.vars.pre.value]);
+    });
+    assert.deepEqual(incrementChecks, [
+      [6,5,'未初始化','未初始化'], [6,6,'未初始化','未初始化'],
+      [7,6,6,'未初始化'], [7,7,6,7], [6,7,6,7], [6,6,6,7], [5,6,6,7], [5,5,6,5]
+    ]);
     for (const input of ['18 92.5 B', '18 nope', 'nope']) {
       const state = await page.evaluate(input => {
         createDemo('demo4', makeScanfDemo(input));

@@ -6,7 +6,7 @@
 <meta name="description" content="C语言数据类型与赋值语句交互演示：基本类型、printf/scanf、类型转换、转义字符、常量与宏、复合赋值、自增自减，逐行执行并可视化变量状态。">
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
 <title>数据类型与赋值语句 - C语言教学演示</title>
-<link rel="stylesheet" href="style.css?v=34">
+<link rel="stylesheet" href="style.css?v=36">
 </head>
 <body>
 <nav></nav>
@@ -139,6 +139,7 @@
   <div id="demo8"></div>
   <div id="demo9"></div>
   <div id="demo10"></div>
+  <div id="demo11"></div>
 </div>
 <h2>章节练习</h2>
 <div class="quiz-grid">
@@ -151,9 +152,9 @@
 </div>
 </main>
 
-<script src="site-config.js?v=34"></script>
-<script src="demo-engine.js?v=34"></script>
-<script src="demo-traces.js?v=34"></script>
+<script src="site-config.js?v=36"></script>
+<script src="demo-engine.js?v=36"></script>
+<script src="demo-traces.js?v=36"></script>
 <script>
 /* ===== 数据类型与输入输出 ===== */
 createDemo("demo0", {
@@ -456,6 +457,43 @@ int main() {
 }`,
   vizTypes: ["vars","console"],
   steps: CTeachingTraces["datatype.html:demo10"]
+});
+createDemo("demo11", {
+  title: "自增自减：单独使用与参与赋值",
+  subtitle: "相同初值对照：变量最终值相同，表达式的取值可能不同",
+  diagram: "<p>i 和 j 从相同初值开始。单独执行 <code>i++;</code> 与 <code>++j;</code> 都加 1，单独执行 <code>i--;</code> 与 <code>--j;</code> 都减 1。参与赋值时，后置写法提供变化前的值，前置写法提供变化后的值。每一步右侧显示整条语句执行后的状态：后置运算也已完成加减，不会等到下一条语句才改变变量。</p>",
+  code: `#include <stdio.h>
+
+int main() {
+    int i = 5;
+    int j = 5;
+    int post, pre;
+    i++;
+    ++j;
+    printf("i=%d, j=%d\\n", i, j);
+    post = i++;
+    pre = ++j;
+    printf("post=%d, pre=%d, i=%d, j=%d\\n", post, pre, i, j);
+    i--;
+    --j;
+    printf("i=%d, j=%d\\n", i, j);
+    post = i--;
+    pre = --j;
+    printf("post=%d, pre=%d, i=%d, j=%d\\n", post, pre, i, j);
+    return 0;
+}`,
+  vizTypes: ["vars", "memory", "console"],
+  stepNotes: {
+    "i++;": "后置自增单独成句，没有使用表达式的旧值；i 从 5 变为 6。",
+    "++j;": "前置自增单独成句，j 也从 5 变为 6。",
+    "post = i++;": "post 接收旧值 6；这条语句结束时 i 已变为 7。",
+    "pre = ++j;": "j 变为 7，pre 接收新值 7；对比 post 的 6。",
+    "i--;": "后置自减单独成句，i 从 7 变为 6。",
+    "--j;": "前置自减单独成句，j 也从 7 变为 6。",
+    "post = i--;": "post 接收旧值 6；这条语句结束时 i 已变为 5。",
+    "pre = --j;": "j 变为 5，pre 接收新值 5；两个变量 i、j 最终都为 5。"
+  },
+  steps: CTeachingTraces["datatype.html:demo11"]
 });
 /* ========== 章节练习：3 道预测输出 + 3 道改错 ========== */
 createQuiz("quiz0", {
